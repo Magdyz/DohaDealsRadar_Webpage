@@ -1,18 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --primary: #6750a4;
-  --primary-light: #7965af;
-  --primary-dark: #553c8b;
-  --accent-hot: #ff4b4b;
-  --accent-cold: #4bb3ff;
-  --background: #ffffff;
-  --background-secondary: #f5f5f5;
-  --text-primary: #1c1b1f;
-  --text-secondary: #49454f;
-  --text-tertiary: #79747e;
+@theme {
+  --color-primary: #6750a4;
+  --color-primary-light: #7965af;
+  --color-primary-dark: #553c8b;
+  --color-accent-hot: #ff4b4b;
+  --color-accent-cold: #4bb3ff;
+  --color-background: #ffffff;
+  --color-background-secondary: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-variant: #e7e0ec;
+  --color-text-primary: #1c1b1f;
+  --color-text-secondary: #49454f;
+  --color-text-tertiary: #79747e;
 }
 
 * {
