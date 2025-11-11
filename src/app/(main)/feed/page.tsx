@@ -80,12 +80,12 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-md sticky top-0 z-20 border-b-2 border-primary/10">
+      <div className="bg-surface shadow-lg sticky top-0 z-20 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
               Doha Deals Radar
             </h1>
             <div className="flex gap-2">
@@ -127,57 +127,51 @@ export default function FeedPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <DealCardSkeleton key={i} />
             ))}
           </div>
         ) : error ? (
-          <Card variant="outlined">
-            <CardBody>
-              <p className="text-center text-red-600">{error}</p>
+          <div className="bg-card rounded-2xl p-8 border border-border text-center max-w-md mx-auto">
+            <p className="text-red-500 mb-4">{error}</p>
+            <Button
+              variant="primary"
+              size="md"
+              className="mx-auto"
+              onClick={() => loadDeals(true)}
+            >
+              Try Again
+            </Button>
+          </div>
+        ) : deals.length === 0 ? (
+          <div className="bg-card rounded-2xl p-12 border border-border text-center max-w-md mx-auto">
+            <Package className="w-20 h-20 text-text-tertiary mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-text-primary mb-2">
+              No deals found
+            </h3>
+            <p className="text-text-secondary mb-6">
+              {search || category
+                ? 'Try adjusting your search or filters'
+                : 'Be the first to post a deal!'}
+            </p>
+            {!search && !category && (
               <Button
                 variant="primary"
                 size="md"
-                className="mx-auto mt-4"
-                onClick={() => loadDeals(true)}
+                onClick={() => router.push('/submit')}
               >
-                Try Again
+                <Plus className="w-5 h-5 mr-2" />
+                Post Deal
               </Button>
-            </CardBody>
-          </Card>
-        ) : deals.length === 0 ? (
-          <Card variant="outlined">
-            <CardBody>
-              <div className="text-center py-8">
-                <Package className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-text-primary mb-2">
-                  No deals found
-                </h3>
-                <p className="text-text-secondary mb-4">
-                  {search || category
-                    ? 'Try adjusting your search or filters'
-                    : 'Be the first to post a deal!'}
-                </p>
-                {!search && !category && (
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => router.push('/submit')}
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Post Deal
-                  </Button>
-                )}
-              </div>
-            </CardBody>
-          </Card>
+            )}
+          </div>
         ) : (
           <>
-            {/* Deals List */}
-            <div className="space-y-6">
+            {/* Deals Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {deals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}

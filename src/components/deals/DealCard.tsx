@@ -3,10 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ExternalLink, MapPin, Tag, Clock, User } from 'lucide-react'
-import { Card, CardBody, Badge } from '@/components/ui'
-import VoteButtons from './VoteButtons'
-import { formatRelativeTime, getDaysUntilExpiry, truncateText } from '@/lib/utils'
+import { Flame, Snowflake, Clock, MapPin, Tag as TagIcon } from 'lucide-react'
+import { formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
 import { CATEGORIES } from '@/types'
 import type { Deal } from '@/types'
 
@@ -29,136 +27,124 @@ export default function DealCard({ deal }: DealCardProps) {
 
   const categoryInfo = getCategoryInfo()
 
-  const handleVoteSuccess = (newHotVotes: number, newColdVotes: number) => {
-    setHotVotes(newHotVotes)
-    setColdVotes(newColdVotes)
-  }
-
   // Check if image URL is valid
   const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
 
   return (
-    <Card variant="elevated" className="hover:shadow-xl transition-all duration-300 animate-fade-in group">
-      <CardBody className="p-0">
-        <div className="flex flex-col sm:flex-row">
-          {/* Image */}
-          <Link
-            href={`/deals/${deal.id}`}
-            className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-gray-100 overflow-hidden"
-          >
-            {hasValidImage ? (
-              <Image
-                src={deal.imageUrl}
-                alt={deal.title}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 100vw, 192px"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-100 via-purple-50 to-blue-100">
-                <Tag className="w-16 h-16 text-purple-400 mb-2" />
-                <span className="text-xs text-purple-600 font-medium">No Image</span>
+    <div className="bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in group border border-border">
+      {/* Image Section */}
+      <Link href={`/deals/${deal.id}`} className="relative block">
+        <div className="relative w-full h-56 bg-surface-variant overflow-hidden">
+          {hasValidImage ? (
+            <Image
+              src={deal.imageUrl}
+              alt={deal.title}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-900/20 via-purple-800/10 to-blue-900/20">
+              <TagIcon className="w-20 h-20 text-purple-500/30 mb-2" />
+              <span className="text-sm text-purple-400/50 font-medium">No Image</span>
+            </div>
+          )}
+
+          {/* Vote Badges Overlay */}
+          <div className="absolute top-3 left-3 flex gap-2">
+            {hotVotes > 0 && (
+              <div className="flex items-center gap-1 bg-red-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg">
+                <Flame className="w-4 h-4 text-white" fill="white" />
+                <span className="text-xs font-bold text-white">{hotVotes}</span>
               </div>
             )}
-            {isExpired && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <Badge variant="danger" size="lg">
-                  Expired
-                </Badge>
+            {coldVotes > 0 && (
+              <div className="flex items-center gap-1 bg-blue-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg">
+                <Snowflake className="w-4 h-4 text-white" fill="white" />
+                <span className="text-xs font-bold text-white">{coldVotes}</span>
               </div>
             )}
-          </Link>
-
-          {/* Content */}
-          <div className="flex-1 p-4">
-            {/* Category & Expiry */}
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {categoryInfo && (
-                  <Badge variant="purple" size="sm">
-                    <span className="flex items-center gap-1">
-                      <span>{categoryInfo.emoji}</span>
-                      <span>{categoryInfo.label}</span>
-                    </span>
-                  </Badge>
-                )}
-              </div>
-              {!isExpired && (
-                <div className="flex items-center gap-1 text-xs text-text-tertiary">
-                  <Clock className="w-3 h-3" />
-                  <span
-                    className={isExpiringSoon ? 'text-red-600 font-semibold' : ''}
-                  >
-                    {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Title */}
-            <Link href={`/deals/${deal.id}`}>
-              <h3 className="text-lg font-semibold text-text-primary hover:text-primary mb-2 line-clamp-2">
-                {deal.title}
-              </h3>
-            </Link>
-
-            {/* Description */}
-            {deal.description && (
-              <p className="text-sm text-text-secondary mb-3 line-clamp-2">
-                {truncateText(deal.description, 120)}
-              </p>
-            )}
-
-            {/* Metadata */}
-            <div className="flex flex-wrap gap-3 text-xs text-text-tertiary mb-3">
-              {deal.link && (
-                <div className="flex items-center gap-1">
-                  <ExternalLink className="w-3 h-3" />
-                  <span className="truncate max-w-[150px]">
-                    {new URL(deal.link).hostname}
-                  </span>
-                </div>
-              )}
-              {deal.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>{deal.location}</span>
-                </div>
-              )}
-              {deal.promoCode && (
-                <div className="flex items-center gap-1">
-                  <Tag className="w-3 h-3" />
-                  <span className="font-mono font-semibold">{deal.promoCode}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between">
-              {/* Posted by */}
-              <div className="flex items-center gap-2 text-xs text-text-tertiary">
-                <User className="w-3 h-3" />
-                <span>
-                  by <span className="font-medium">{deal.username || 'Anonymous'}</span>
-                </span>
-                <span>•</span>
-                <span>{formatRelativeTime(deal.createdAt)}</span>
-              </div>
-
-              {/* Vote buttons */}
-              {!isExpired && (
-                <VoteButtons
-                  dealId={deal.id}
-                  initialHotVotes={hotVotes}
-                  initialColdVotes={coldVotes}
-                  onVoteSuccess={handleVoteSuccess}
-                />
-              )}
-            </div>
           </div>
+
+          {/* Time Badge */}
+          {!isExpired && (
+            <div className="absolute top-3 right-3">
+              <div className="flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                <Clock className="w-3.5 h-3.5 text-white" />
+                <span className={`text-xs font-semibold ${isExpiringSoon ? 'text-red-400' : 'text-white'}`}>
+                  {daysLeft}d
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Expired Overlay */}
+          {isExpired && (
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+              <div className="bg-red-500 px-4 py-2 rounded-full">
+                <span className="text-white font-bold text-sm">EXPIRED</span>
+              </div>
+            </div>
+          )}
         </div>
-      </CardBody>
-    </Card>
+      </Link>
+
+      {/* Content Section */}
+      <div className="p-4">
+        {/* Category */}
+        {categoryInfo && (
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-lg">{categoryInfo.emoji}</span>
+            <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">
+              {categoryInfo.label}
+            </span>
+          </div>
+        )}
+
+        {/* Title */}
+        <Link href={`/deals/${deal.id}`}>
+          <h3 className="text-lg font-bold text-text-primary hover:text-primary mb-2 line-clamp-2 transition-colors">
+            {deal.title}
+          </h3>
+        </Link>
+
+        {/* Description */}
+        {deal.description && (
+          <p className="text-sm text-text-secondary mb-3 line-clamp-2">
+            {deal.description}
+          </p>
+        )}
+
+        {/* Metadata */}
+        <div className="flex flex-wrap gap-3 text-xs text-text-tertiary mb-4">
+          {deal.location && (
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{deal.location}</span>
+            </div>
+          )}
+          {deal.promoCode && (
+            <div className="flex items-center gap-1">
+              <TagIcon className="w-3.5 h-3.5" />
+              <span className="font-mono font-semibold">{deal.promoCode}</span>
+            </div>
+          )}
+        </div>
+
+        {/* View Deal Button */}
+        <Link href={`/deals/${deal.id}`}>
+          <button className="w-full bg-primary hover:bg-primary-light text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02]">
+            View Deal
+          </button>
+        </Link>
+
+        {/* Footer Info */}
+        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-text-tertiary">
+          <span>by {deal.username || 'Anonymous'}</span>
+          <span>{formatRelativeTime(deal.createdAt)}</span>
+        </div>
+      </div>
+    </div>
   )
 }

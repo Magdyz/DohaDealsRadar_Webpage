@@ -24,13 +24,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-95'
 
     const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-dark hover:shadow-lg focus:ring-primary',
+      primary: 'bg-primary text-white hover:bg-primary-light hover:shadow-lg shadow-primary/30 focus:ring-primary',
       secondary:
-        'bg-surface-variant text-text-primary hover:bg-gray-200 hover:shadow-md focus:ring-gray-300',
+        'bg-surface-variant text-text-primary hover:bg-surface border border-border hover:shadow-md focus:ring-primary',
       outline:
-        'border-2 border-primary text-primary hover:bg-primary/10 hover:shadow-md focus:ring-primary',
-      ghost: 'text-primary hover:bg-primary/10 hover:shadow-sm focus:ring-primary',
-      danger: 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg focus:ring-red-500',
+        'border border-border text-text-primary hover:bg-surface hover:border-primary/50 hover:text-primary focus:ring-primary',
+      ghost: 'text-text-primary hover:bg-surface-variant hover:text-primary focus:ring-primary',
+      danger: 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg shadow-red-600/30 focus:ring-red-500',
     }
 
     const sizes = {

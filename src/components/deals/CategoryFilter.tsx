@@ -19,13 +19,14 @@ export default function CategoryFilter({
       <button
         onClick={() => onChange('')}
         className={cn(
-          'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+          'px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200',
           selected === ''
-            ? 'bg-primary text-white'
-            : 'bg-white text-text-secondary border-2 border-gray-200 hover:border-primary'
+            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+            : 'bg-surface-variant text-text-secondary border border-border hover:border-primary/50 hover:bg-surface'
         )}
       >
-        All Categories
+        <span className="text-base mr-1.5">🔥</span>
+        All
       </button>
 
       {CATEGORIES.map((category) => (
@@ -33,13 +34,13 @@ export default function CategoryFilter({
           key={category.id}
           onClick={() => onChange(category.id)}
           className={cn(
-            'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-2',
+            'px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-2',
             selected === category.id
-              ? 'bg-primary text-white'
-              : 'bg-white text-text-secondary border-2 border-gray-200 hover:border-primary'
+              ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+              : 'bg-surface-variant text-text-secondary border border-border hover:border-primary/50 hover:bg-surface'
           )}
         >
-          <span>{category.emoji}</span>
+          <span className="text-base">{category.emoji}</span>
           <span>{category.label}</span>
         </button>
       ))}
