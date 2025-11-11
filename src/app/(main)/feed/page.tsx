@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, User, Package } from 'lucide-react'
-import { Button, Spinner, Card, CardBody } from '@/components/ui'
+import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
 import { getDeals } from '@/lib/api/deals'
 import { useAuthStore } from '@/lib/store/authStore'
@@ -82,10 +82,12 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-background-secondary">
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="bg-white shadow-md sticky top-0 z-20 border-b-2 border-primary/10">
+        <div className="max-w-4xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-primary">Doha Deals Radar</h1>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+              Doha Deals Radar
+            </h1>
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -122,8 +124,10 @@ export default function FeedPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Spinner size="lg" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <DealCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
           <Card variant="outlined">
@@ -172,20 +176,29 @@ export default function FeedPage() {
         ) : (
           <>
             {/* Deals List */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {deals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}
             </div>
 
+            {/* Load More Loading Skeletons */}
+            {isLoadingMore && (
+              <div className="space-y-4 mt-6">
+                {[1, 2, 3].map((i) => (
+                  <DealCardSkeleton key={i} />
+                ))}
+              </div>
+            )}
+
             {/* Load More */}
-            {hasMore && (
+            {hasMore && !isLoadingMore && (
               <div className="flex justify-center mt-6">
                 <Button
                   variant="outline"
                   size="lg"
                   onClick={handleLoadMore}
-                  isLoading={isLoadingMore}
+                  className="hover:bg-primary hover:text-white transition-all duration-300"
                 >
                   Load More Deals
                 </Button>
