@@ -15,11 +15,11 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal }: DealCardProps) {
-  const [hotVotes, setHotVotes] = useState(deal.hot_count)
-  const [coldVotes, setColdVotes] = useState(deal.cold_count)
+  const [hotVotes, setHotVotes] = useState(deal.hotVotes)
+  const [coldVotes, setColdVotes] = useState(deal.coldVotes)
   const [imageError, setImageError] = useState(false)
 
-  const daysLeft = getDaysUntilExpiry(deal.expires_at)
+  const daysLeft = getDaysUntilExpiry(deal.expiresAt)
   const isExpired = daysLeft < 0
   const isExpiringSoon = daysLeft <= 2 && daysLeft >= 0
 
@@ -35,7 +35,7 @@ export default function DealCard({ deal }: DealCardProps) {
   }
 
   // Check if image URL is valid
-  const hasValidImage = deal.image_url && deal.image_url.trim() !== '' && !imageError
+  const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
 
   return (
     <Card variant="elevated" className="hover:shadow-xl transition-all duration-300 animate-fade-in group">
@@ -48,7 +48,7 @@ export default function DealCard({ deal }: DealCardProps) {
           >
             {hasValidImage ? (
               <Image
-                src={deal.image_url}
+                src={deal.imageUrl}
                 alt={deal.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -126,10 +126,10 @@ export default function DealCard({ deal }: DealCardProps) {
                   <span>{deal.location}</span>
                 </div>
               )}
-              {deal.promo_code && (
+              {deal.promoCode && (
                 <div className="flex items-center gap-1">
                   <Tag className="w-3 h-3" />
-                  <span className="font-mono font-semibold">{deal.promo_code}</span>
+                  <span className="font-mono font-semibold">{deal.promoCode}</span>
                 </div>
               )}
             </div>
@@ -140,10 +140,10 @@ export default function DealCard({ deal }: DealCardProps) {
               <div className="flex items-center gap-2 text-xs text-text-tertiary">
                 <User className="w-3 h-3" />
                 <span>
-                  by <span className="font-medium">{deal.posted_by || 'Anonymous'}</span>
+                  by <span className="font-medium">{deal.username || 'Anonymous'}</span>
                 </span>
                 <span>•</span>
-                <span>{formatRelativeTime(deal.created_at)}</span>
+                <span>{formatRelativeTime(deal.createdAt)}</span>
               </div>
 
               {/* Vote buttons */}

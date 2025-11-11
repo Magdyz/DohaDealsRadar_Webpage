@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, User, Package } from 'lucide-react'
+import { Plus, User, Package, Shield } from 'lucide-react'
 import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
 import { getDeals } from '@/lib/api/deals'

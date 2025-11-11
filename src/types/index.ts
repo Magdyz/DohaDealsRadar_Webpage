@@ -9,24 +9,20 @@ export interface Deal {
   id: string
   title: string
   description: string | null
-  image_url: string
+  imageUrl: string
   link: string | null
   location: string | null
   category: DealCategory
-  promo_code: string | null
-  hot_count: number
-  cold_count: number
-  posted_by: string // username
-  submitted_by_user_id: string // actual user ID
-  status: 'pending' | 'approved' | 'rejected'
-  is_archived: boolean
-  created_at: string
-  expires_at: string
-  approved_at?: string | null
-  approved_by?: string | null
-  submitted_at?: string
-  auto_approved?: boolean
-  report_count?: number
+  promoCode: string | null
+  hotVotes: number
+  coldVotes: number
+  username: string | null // posted_by username
+  userId: string // submitted_by_user_id
+  isApproved: boolean
+  isArchived: boolean
+  createdAt: string
+  updatedAt: string
+  expiresAt: string
 }
 
 // Alias for backward compatibility

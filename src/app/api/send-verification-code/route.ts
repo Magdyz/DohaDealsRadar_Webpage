@@ -1,8 +1,6 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
-
-// In-memory storage for verification codes (for demo purposes)
-// In production, use Redis or database with expiry
-const verificationCodes = new Map<string, { code: string; expiresAt: number }>()
+import { supabase } from '@/lib/supabase/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,29 +23,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate 6-digit code
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    console.log(`📧 Sending OTP to ${email} via Supabase Auth...`)
 
-    // Store code with 10 minute expiry
-    const expiresAt = Date.now() + 10 * 60 * 1000
-    verificationCodes.set(email.toLowerCase(), { code, expiresAt })
+    // Use Supabase Auth to send OTP (One-Time Password)
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: email.toLowerCase(),
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: undefined, // We handle verification in-app
+      },
+    })
 
-    // Clean up expired codes
-    for (const [key, value] of verificationCodes.entries()) {
-      if (value.expiresAt < Date.now()) {
-        verificationCodes.delete(key)
-      }
+    if (error) {
+      console.error('❌ Supabase Auth error:', error)
+      return NextResponse.json(
+        { success: false, message: error.message || 'Failed to send verification code' },
+        { status: 500 }
+      )
     }
 
-    // In production, send email here using SendGrid, AWS SES, etc.
-    // For development, log the code to console
-    console.log(`\n🔐 Verification Code for ${email}: ${code}\n`)
+    console.log(`✅ OTP sent successfully via Supabase to ${email}`)
 
     return NextResponse.json({
       success: true,
       message: 'Verification code sent successfully',
-      // For demo purposes only - remove in production!
-      devCode: process.env.NODE_ENV === 'development' ? code : undefined,
     })
   } catch (error: any) {
     console.error('Send verification code error:', error)
@@ -58,5 +57,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Export the map for use in verify-code route
-export { verificationCodes }

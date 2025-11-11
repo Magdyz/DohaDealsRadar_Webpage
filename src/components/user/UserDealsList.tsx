@@ -41,10 +41,10 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
   }
 
   const getStatusBadge = (deal: Deal) => {
-    if (deal.status === 'pending') {
+    if (!deal.isApproved && !deal.isArchived) {
       return <Badge variant="warning">Pending</Badge>
     }
-    if (deal.status === 'rejected' || deal.is_archived) {
+    if (deal.isArchived) {
       return <Badge variant="danger">Rejected</Badge>
     }
     return <Badge variant="success">Approved</Badge>
@@ -94,7 +94,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
   return (
     <div className="space-y-4">
       {deals.map((deal) => {
-        const daysLeft = getDaysUntilExpiry(deal.expires_at)
+        const daysLeft = getDaysUntilExpiry(deal.expiresAt)
         const isExpired = daysLeft < 0
 
         return (
@@ -104,7 +104,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                 {/* Image */}
                 <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                   <Image
-                    src={deal.image_url}
+                    src={deal.imageUrl}
                     alt={deal.title}
                     width={96}
                     height={96}
@@ -149,10 +149,10 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                         <span>{deal.location}</span>
                       </div>
                     )}
-                    {deal.promo_code && (
+                    {deal.promoCode && (
                       <div className="flex items-center gap-1">
                         <Tag className="w-3 h-3" />
-                        <span className="font-mono">{deal.promo_code}</span>
+                        <span className="font-mono">{deal.promoCode}</span>
                       </div>
                     )}
                   </div>
@@ -160,7 +160,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                   <div className="flex items-center gap-3 mt-2 text-xs text-text-tertiary">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      <span>{formatRelativeTime(deal.created_at)}</span>
+                      <span>{formatRelativeTime(deal.createdAt)}</span>
                     </div>
                     {!isExpired && (
                       <div className="flex items-center gap-1">
