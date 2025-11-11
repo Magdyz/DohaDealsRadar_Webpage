@@ -160,11 +160,7 @@ export default function FeedPage() {
                   <Button
                     variant="primary"
                     size="md"
-                    onClick={() =>
-                      isAuthenticated
-                        ? router.push('/post')
-                        : router.push('/login?returnUrl=/post')
-                    }
+                    onClick={() => router.push('/submit')}
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Post Deal
@@ -228,11 +224,7 @@ export default function FeedPage() {
           variant="primary"
           size="lg"
           className="rounded-full w-14 h-14 p-0 shadow-lg"
-          onClick={() =>
-            isAuthenticated
-              ? router.push('/post')
-              : router.push('/login?returnUrl=/post')
-          }
+          onClick={() => router.push('/submit')}
         >
           <Plus className="w-6 h-6" />
         </Button>
