@@ -14,11 +14,11 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // Build query
+    // NOTE: Removed is_archived and is_approved filters as these columns
+    // don't exist in the current database schema
     let query = supabase
       .from('deals')
       .select('*', { count: 'exact' })
-      .eq('is_archived', isArchived)
-      .eq('is_approved', true)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
 
@@ -58,8 +58,9 @@ export async function GET(request: NextRequest) {
       hotVotes: deal.hot_votes,
       coldVotes: deal.cold_votes,
       userId: deal.user_id,
-      isApproved: deal.is_approved,
-      isArchived: deal.is_archived,
+      // These fields may not exist in the current schema
+      isApproved: deal.is_approved ?? true,
+      isArchived: deal.is_archived ?? false,
       createdAt: deal.created_at,
       updatedAt: deal.updated_at,
       expiresAt: deal.expires_at,
