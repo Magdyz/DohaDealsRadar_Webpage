@@ -9,20 +9,20 @@ export interface Deal {
   id: string
   title: string
   description: string | null
-  image_url: string
+  imageUrl: string
   link: string | null
   location: string | null
   category: DealCategory
-  promo_code: string | null
-  hot_votes: number
-  cold_votes: number
-  user_id: string
+  promoCode: string | null
+  hotVotes: number
+  coldVotes: number
+  userId: string
   username?: string
-  is_approved: boolean
-  is_archived: boolean
-  created_at: string
-  updated_at: string
-  expires_at: string
+  isApproved: boolean
+  isArchived: boolean
+  createdAt: string
+  updatedAt: string
+  expiresAt: string
 }
 
 export interface User {

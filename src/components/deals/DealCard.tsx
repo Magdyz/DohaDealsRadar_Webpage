@@ -15,10 +15,10 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal }: DealCardProps) {
-  const [hotVotes, setHotVotes] = useState(deal.hot_votes)
-  const [coldVotes, setColdVotes] = useState(deal.cold_votes)
+  const [hotVotes, setHotVotes] = useState(deal.hotVotes)
+  const [coldVotes, setColdVotes] = useState(deal.coldVotes)
 
-  const daysLeft = getDaysUntilExpiry(deal.expires_at)
+  const daysLeft = getDaysUntilExpiry(deal.expiresAt)
   const isExpired = daysLeft < 0
   const isExpiringSoon = daysLeft <= 2 && daysLeft >= 0
 
@@ -33,6 +33,9 @@ export default function DealCard({ deal }: DealCardProps) {
     setColdVotes(newColdVotes)
   }
 
+  // Check if image URL is valid
+  const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== ''
+
   return (
     <Card variant="elevated" className="hover:shadow-xl transition-shadow">
       <CardBody className="p-0">
@@ -42,13 +45,19 @@ export default function DealCard({ deal }: DealCardProps) {
             href={`/deals/${deal.id}`}
             className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-gray-100"
           >
-            <Image
-              src={deal.image_url}
-              alt={deal.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, 192px"
-            />
+            {hasValidImage ? (
+              <Image
+                src={deal.imageUrl}
+                alt={deal.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 192px"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">
+                <Tag className="w-12 h-12 text-purple-400" />
+              </div>
+            )}
             {isExpired && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                 <Badge variant="danger" size="lg">
@@ -114,10 +123,10 @@ export default function DealCard({ deal }: DealCardProps) {
                   <span>{deal.location}</span>
                 </div>
               )}
-              {deal.promo_code && (
+              {deal.promoCode && (
                 <div className="flex items-center gap-1">
                   <Tag className="w-3 h-3" />
-                  <span className="font-mono font-semibold">{deal.promo_code}</span>
+                  <span className="font-mono font-semibold">{deal.promoCode}</span>
                 </div>
               )}
             </div>
@@ -131,7 +140,7 @@ export default function DealCard({ deal }: DealCardProps) {
                   by <span className="font-medium">{deal.username || 'Anonymous'}</span>
                 </span>
                 <span>•</span>
-                <span>{formatRelativeTime(deal.created_at)}</span>
+                <span>{formatRelativeTime(deal.createdAt)}</span>
               </div>
 
               {/* Vote buttons */}
