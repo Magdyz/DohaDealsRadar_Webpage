@@ -15,10 +15,10 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal }: DealCardProps) {
-  const [hotVotes, setHotVotes] = useState(deal.hotVotes)
-  const [coldVotes, setColdVotes] = useState(deal.coldVotes)
+  const [hotVotes, setHotVotes] = useState(deal.hot_count)
+  const [coldVotes, setColdVotes] = useState(deal.cold_count)
 
-  const daysLeft = getDaysUntilExpiry(deal.expiresAt)
+  const daysLeft = getDaysUntilExpiry(deal.expires_at)
   const isExpired = daysLeft < 0
   const isExpiringSoon = daysLeft <= 2 && daysLeft >= 0
 
@@ -34,7 +34,7 @@ export default function DealCard({ deal }: DealCardProps) {
   }
 
   // Check if image URL is valid
-  const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== ''
+  const hasValidImage = deal.image_url && deal.image_url.trim() !== ''
 
   return (
     <Card variant="elevated" className="hover:shadow-xl transition-shadow">
@@ -47,7 +47,7 @@ export default function DealCard({ deal }: DealCardProps) {
           >
             {hasValidImage ? (
               <Image
-                src={deal.imageUrl}
+                src={deal.image_url}
                 alt={deal.title}
                 fill
                 className="object-cover"
@@ -123,10 +123,10 @@ export default function DealCard({ deal }: DealCardProps) {
                   <span>{deal.location}</span>
                 </div>
               )}
-              {deal.promoCode && (
+              {deal.promo_code && (
                 <div className="flex items-center gap-1">
                   <Tag className="w-3 h-3" />
-                  <span className="font-mono font-semibold">{deal.promoCode}</span>
+                  <span className="font-mono font-semibold">{deal.promo_code}</span>
                 </div>
               )}
             </div>
@@ -137,10 +137,10 @@ export default function DealCard({ deal }: DealCardProps) {
               <div className="flex items-center gap-2 text-xs text-text-tertiary">
                 <User className="w-3 h-3" />
                 <span>
-                  by <span className="font-medium">{deal.username || 'Anonymous'}</span>
+                  by <span className="font-medium">{deal.posted_by || 'Anonymous'}</span>
                 </span>
                 <span>•</span>
-                <span>{formatRelativeTime(deal.createdAt)}</span>
+                <span>{formatRelativeTime(deal.created_at)}</span>
               </div>
 
               {/* Vote buttons */}
