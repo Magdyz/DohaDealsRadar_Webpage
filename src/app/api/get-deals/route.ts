@@ -14,12 +14,13 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // Build query
-    // NOTE: Removed is_archived and is_approved filters as these columns
-    // don't exist in the current database schema
+    // Note: Database uses 'status' field for approval, not is_approved boolean
     let query = supabase
       .from('deals')
       .select('*', { count: 'exact' })
-      .gt('expires_at', new Date().toISOString())
+      .eq('status', 'approved') // Only show approved deals
+      .eq('is_archived', isArchived) // Filter by archived status
+      .gt('expires_at', new Date().toISOString()) // Only active deals
       .order('created_at', { ascending: false })
 
     // Apply search filter
@@ -46,7 +47,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform database format to API format
-    const transformedDeals = deals?.map((deal) => ({
+    // Note: Mapping actual database column names to expected API format
+    const transformedDeals = deals?.map((deal: any) => ({
       id: deal.id,
       title: deal.title,
       description: deal.description,
@@ -55,14 +57,18 @@ export async function GET(request: NextRequest) {
       location: deal.location,
       category: deal.category,
       promoCode: deal.promo_code,
-      hotVotes: deal.hot_votes,
-      coldVotes: deal.cold_votes,
-      userId: deal.user_id,
-      // These fields may not exist in the current schema
-      isApproved: deal.is_approved ?? true,
+      // Database uses hot_count/cold_count, not hot_votes/cold_votes
+      hotVotes: deal.hot_count ?? deal.hot_votes ?? 0,
+      coldVotes: deal.cold_count ?? deal.cold_votes ?? 0,
+      // Database uses submitted_by_user_id, not user_id
+      userId: deal.submitted_by_user_id ?? deal.user_id ?? '',
+      username: deal.posted_by ?? null,
+      // Database uses 'status' field instead of boolean is_approved
+      isApproved: deal.status === 'approved' || deal.is_approved === true,
       isArchived: deal.is_archived ?? false,
       createdAt: deal.created_at,
-      updatedAt: deal.updated_at,
+      // Database doesn't have updated_at, use created_at as fallback
+      updatedAt: deal.updated_at ?? deal.created_at,
       expiresAt: deal.expires_at,
     })) || []
 

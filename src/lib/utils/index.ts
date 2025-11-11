@@ -5,8 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return 'Unknown'
+
   const d = typeof date === 'string' ? new Date(date) : date
+
+  // Check if date is valid
+  if (isNaN(d.getTime())) return 'Unknown'
+
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -14,8 +20,15 @@ export function formatDate(date: string | Date): string {
   })
 }
 
-export function formatRelativeTime(date: string | Date): string {
+export function formatRelativeTime(date: string | Date | null | undefined): string {
+  // Handle undefined/null dates
+  if (!date) return 'Unknown'
+
   const d = typeof date === 'string' ? new Date(date) : date
+
+  // Check if date is valid
+  if (isNaN(d.getTime())) return 'Unknown'
+
   const now = new Date()
   const diffInMs = now.getTime() - d.getTime()
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
