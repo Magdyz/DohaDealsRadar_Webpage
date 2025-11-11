@@ -64,10 +64,10 @@ export default function DealDetailsPage() {
   }
 
   const handleCopyPromoCode = async () => {
-    if (!deal?.promoCode) return
+    if (!deal?.promo_code) return
 
     try {
-      await navigator.clipboard.writeText(deal.promoCode)
+      await navigator.clipboard.writeText(deal.promo_code)
       setCopySuccess(true)
       setTimeout(() => setCopySuccess(false), 2000)
     } catch (error) {
@@ -103,7 +103,7 @@ export default function DealDetailsPage() {
     )
   }
 
-  const daysLeft = getDaysUntilExpiry(deal.expiresAt)
+  const daysLeft = getDaysUntilExpiry(deal.expires_at)
   const isExpired = daysLeft < 0
   const isExpiringSoon = daysLeft <= 2 && daysLeft >= 0
 
@@ -145,9 +145,9 @@ export default function DealDetailsPage() {
           <CardBody className="p-0">
             {/* Image */}
             <div className="relative w-full h-96 bg-gray-100">
-              {deal.imageUrl && deal.imageUrl.trim() !== '' ? (
+              {deal.image_url && deal.image_url.trim() !== '' ? (
                 <Image
-                  src={deal.imageUrl}
+                  src={deal.image_url}
                   alt={deal.title}
                   fill
                   className="object-contain"
@@ -234,7 +234,7 @@ export default function DealDetailsPage() {
                   </div>
                 )}
 
-                {deal.promoCode && (
+                {deal.promo_code && (
                   <button
                     onClick={handleCopyPromoCode}
                     className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg hover:bg-gray-200 transition-colors"
@@ -243,7 +243,7 @@ export default function DealDetailsPage() {
                     <div className="flex-1 text-left">
                       <div className="text-xs text-text-tertiary mb-1">Promo Code</div>
                       <div className="text-sm font-mono font-semibold text-text-primary">
-                        {deal.promoCode}
+                        {deal.promo_code}
                       </div>
                     </div>
                     {copySuccess ? (
@@ -265,8 +265,8 @@ export default function DealDetailsPage() {
                   </div>
                   <VoteButtons
                     dealId={deal.id}
-                    initialHotVotes={deal.hotVotes}
-                    initialColdVotes={deal.coldVotes}
+                    initialHotVotes={deal.hot_count}
+                    initialColdVotes={deal.cold_count}
                   />
                 </div>
               )}
@@ -276,16 +276,16 @@ export default function DealDetailsPage() {
                 <div className="flex items-center gap-1">
                   <User className="w-4 h-4" />
                   <span>
-                    Posted by <strong>{deal.username || 'Anonymous'}</strong>
+                    Posted by <strong>{deal.posted_by || 'Anonymous'}</strong>
                   </span>
                 </div>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  <span>{formatRelativeTime(deal.createdAt)}</span>
+                  <span>{formatRelativeTime(deal.created_at)}</span>
                 </div>
                 <span>•</span>
-                <span>Expires {formatDate(deal.expiresAt)}</span>
+                <span>Expires {formatDate(deal.expires_at)}</span>
               </div>
             </div>
           </CardBody>

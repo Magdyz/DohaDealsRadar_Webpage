@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,82 +13,53 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || ''
     const isArchived = searchParams.get('isArchived') === 'true'
 
-    // Calculate offset
-    const offset = (page - 1) * limit
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Build query
-    // Note: Database uses 'status' field for approval, not is_approved boolean
     let query = supabase
       .from('deals')
       .select('*', { count: 'exact' })
-      .eq('status', 'approved') // Only show approved deals
-      .eq('is_archived', isArchived) // Filter by archived status
-      .gt('expires_at', new Date().toISOString()) // Only active deals
+      .eq('is_archived', isArchived)
       .order('created_at', { ascending: false })
 
-    // Apply search filter
+    // Apply filters
     if (search) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
     }
 
-    // Apply category filter
     if (category) {
       query = query.eq('category', category)
     }
 
+    // Only show approved deals for non-archived queries
+    if (!isArchived) {
+      query = query.eq('status', 'approved')
+    }
+
     // Apply pagination
-    query = query.range(offset, offset + limit - 1)
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+    query = query.range(from, to)
 
     const { data: deals, error, count } = await query
 
     if (error) {
-      console.error('Error fetching deals:', error)
-      return NextResponse.json(
-        { message: 'Failed to fetch deals', error: error.message },
-        { status: 500 }
-      )
+      throw error
     }
 
-    // Transform database format to API format
-    // Note: Mapping actual database column names to expected API format
-    const transformedDeals = deals?.map((deal: any) => ({
-      id: deal.id,
-      title: deal.title,
-      description: deal.description,
-      imageUrl: deal.image_url,
-      link: deal.link,
-      location: deal.location,
-      category: deal.category,
-      promoCode: deal.promo_code,
-      // Database uses hot_count/cold_count, not hot_votes/cold_votes
-      hotVotes: deal.hot_count ?? deal.hot_votes ?? 0,
-      coldVotes: deal.cold_count ?? deal.cold_votes ?? 0,
-      // Database uses submitted_by_user_id, not user_id
-      userId: deal.submitted_by_user_id ?? deal.user_id ?? '',
-      username: deal.posted_by ?? null,
-      // Database uses 'status' field instead of boolean is_approved
-      isApproved: deal.status === 'approved' || deal.is_approved === true,
-      isArchived: deal.is_archived ?? false,
-      createdAt: deal.created_at,
-      // Database doesn't have updated_at, use created_at as fallback
-      updatedAt: deal.updated_at ?? deal.created_at,
-      expiresAt: deal.expires_at,
-    })) || []
-
     const total = count || 0
-    const hasMore = offset + limit < total
+    const hasMore = total > page * limit
 
     return NextResponse.json({
-      deals: transformedDeals,
+      deals: deals || [],
       total,
       page,
       limit,
       hasMore,
     })
-  } catch (error) {
-    console.error('Unexpected error:', error)
+  } catch (error: any) {
+    console.error('Get deals API error:', error)
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: error.message || 'Failed to fetch deals' },
       { status: 500 }
     )
   }

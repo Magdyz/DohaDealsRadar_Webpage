@@ -41,10 +41,10 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
   }
 
   const getStatusBadge = (deal: Deal) => {
-    if (!deal.is_approved && !deal.is_archived) {
+    if (deal.status === 'pending') {
       return <Badge variant="warning">Pending</Badge>
     }
-    if (deal.is_archived) {
+    if (deal.status === 'rejected' || deal.is_archived) {
       return <Badge variant="danger">Rejected</Badge>
     }
     return <Badge variant="success">Approved</Badge>

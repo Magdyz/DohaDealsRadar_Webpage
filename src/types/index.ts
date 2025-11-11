@@ -9,21 +9,28 @@ export interface Deal {
   id: string
   title: string
   description: string | null
-  imageUrl: string
+  image_url: string
   link: string | null
   location: string | null
   category: DealCategory
-  promoCode: string | null
-  hotVotes: number
-  coldVotes: number
-  userId: string
-  username?: string
-  isApproved: boolean
-  isArchived: boolean
-  createdAt: string
-  updatedAt: string
-  expiresAt: string
+  promo_code: string | null
+  hot_count: number
+  cold_count: number
+  posted_by: string // username
+  submitted_by_user_id: string // actual user ID
+  status: 'pending' | 'approved' | 'rejected'
+  is_archived: boolean
+  created_at: string
+  expires_at: string
+  approved_at?: string | null
+  approved_by?: string | null
+  submitted_at?: string
+  auto_approved?: boolean
+  report_count?: number
 }
+
+// Alias for backward compatibility
+export type DealStatus = 'pending' | 'approved' | 'rejected'
 
 export interface User {
   id: string
@@ -32,7 +39,7 @@ export interface User {
   role: UserRole
   auto_approve: boolean
   created_at: string
-  updated_at: string
+  last_login_at?: string
 }
 
 export type UserRole = 'user' | 'moderator' | 'admin'
