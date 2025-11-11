@@ -11,7 +11,7 @@ import type { Deal, DealCategory } from '@/types'
 
 export default function FeedPage() {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
 
   const [deals, setDeals] = useState<Deal[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -89,6 +89,15 @@ export default function FeedPage() {
               Doha Deals Radar
             </h1>
             <div className="flex gap-2">
+              {user && (user.role === 'moderator' || user.role === 'admin') && (
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={() => router.push('/moderation')}
+                >
+                  <Shield className="w-5 h-5" />
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="md"
@@ -99,11 +108,7 @@ export default function FeedPage() {
               <Button
                 variant="primary"
                 size="md"
-                onClick={() =>
-                  isAuthenticated
-                    ? router.push('/post')
-                    : router.push('/login?returnUrl=/post')
-                }
+                onClick={() => router.push('/submit')}
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Post Deal
