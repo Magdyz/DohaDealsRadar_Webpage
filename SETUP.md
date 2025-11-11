@@ -12,18 +12,30 @@ npm install
 ```
 
 ### 2. Configure Environment Variables
-Copy `.env.example` to `.env.local` and add your Supabase credentials:
+
+#### Step 2.1: Get Supabase Credentials
+1. Go to [https://supabase.com](https://supabase.com) and sign up/login
+2. Create a new project (or use existing one)
+3. Wait for the project to finish setting up
+4. Go to Project Settings > API
+5. Copy your:
+   - **Project URL** (under "Project URL")
+   - **Anon/Public Key** (under "Project API keys" → anon/public)
+
+#### Step 2.2: Create .env.local file
+A `.env.local` file has been created for you. Edit it with your Supabase credentials:
 
 ```bash
-cp .env.example .env.local
+# Open .env.local and replace the placeholder values:
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-actual-anon-key-here
+NEXT_PUBLIC_API_BASE_URL=/api
 ```
 
-Edit `.env.local` with your actual values:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-NEXT_PUBLIC_API_BASE_URL=your_supabase_edge_functions_url
-```
+**Important:**
+- Replace `your-project-id` with your actual Supabase project ID
+- Replace `your-actual-anon-key-here` with your actual anon key
+- Keep `NEXT_PUBLIC_API_BASE_URL=/api` as is (uses Next.js API routes)
 
 ### 3. Run Development Server
 ```bash
@@ -81,6 +93,23 @@ Phase 2 will implement:
 - Account pages
 
 ## Troubleshooting
+
+### Deals not loading (404 errors)
+If you see 404 errors when trying to load deals:
+1. Make sure you've configured `.env.local` with your actual Supabase credentials
+2. Restart the development server after updating `.env.local`:
+   ```bash
+   # Stop the server (Ctrl+C) then restart:
+   npm run dev
+   ```
+3. Verify your Supabase project has the required database tables set up
+4. Check browser console for any error messages
+
+### Missing Supabase credentials error
+If you see "Missing Supabase environment variables":
+1. Ensure `.env.local` exists in the project root
+2. Verify the file contains valid `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Restart the dev server after making changes
 
 ### Port already in use
 If port 3000 is in use, you can specify a different port:
