@@ -16,14 +16,17 @@ export interface Deal {
   promoCode: string | null
   hotVotes: number
   coldVotes: number
-  userId: string
-  username?: string
+  username: string | null // posted_by username
+  userId: string // submitted_by_user_id
   isApproved: boolean
   isArchived: boolean
   createdAt: string
   updatedAt: string
   expiresAt: string
 }
+
+// Alias for backward compatibility
+export type DealStatus = 'pending' | 'approved' | 'rejected'
 
 export interface User {
   id: string
@@ -32,7 +35,7 @@ export interface User {
   role: UserRole
   auto_approve: boolean
   created_at: string
-  updated_at: string
+  last_login_at?: string
 }
 
 export type UserRole = 'user' | 'moderator' | 'admin'

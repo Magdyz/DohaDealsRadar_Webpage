@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
-import { ArrowLeft, ExternalLink, MapPin, Tag, Calendar, Clock, Share2, Copy, Flag } from 'lucide-react'
+import { ArrowLeft, ExternalLink, MapPin, Tag, Calendar, Clock, Share2, Copy, Flag, User } from 'lucide-react'
 import { Button, Badge, Card, CardBody, Spinner } from '@/components/ui'
 import VoteButtons from '@/components/deals/VoteButtons'
 import { getDealById } from '@/lib/api/deals'
@@ -294,6 +294,3 @@ export default function DealDetailsPage() {
     </div>
   )
 }
-
-// Missing import
-import { User } from 'lucide-react'

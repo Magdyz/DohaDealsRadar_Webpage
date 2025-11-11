@@ -17,6 +17,7 @@ interface DealCardProps {
 export default function DealCard({ deal }: DealCardProps) {
   const [hotVotes, setHotVotes] = useState(deal.hotVotes)
   const [coldVotes, setColdVotes] = useState(deal.coldVotes)
+  const [imageError, setImageError] = useState(false)
 
   const daysLeft = getDaysUntilExpiry(deal.expiresAt)
   const isExpired = daysLeft < 0
@@ -34,28 +35,30 @@ export default function DealCard({ deal }: DealCardProps) {
   }
 
   // Check if image URL is valid
-  const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== ''
+  const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
 
   return (
-    <Card variant="elevated" className="hover:shadow-xl transition-shadow">
+    <Card variant="elevated" className="hover:shadow-xl transition-all duration-300 animate-fade-in group">
       <CardBody className="p-0">
         <div className="flex flex-col sm:flex-row">
           {/* Image */}
           <Link
             href={`/deals/${deal.id}`}
-            className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-gray-100"
+            className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-gray-100 overflow-hidden"
           >
             {hasValidImage ? (
               <Image
                 src={deal.imageUrl}
                 alt={deal.title}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, 192px"
+                onError={() => setImageError(true)}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">
-                <Tag className="w-12 h-12 text-purple-400" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-100 via-purple-50 to-blue-100">
+                <Tag className="w-16 h-16 text-purple-400 mb-2" />
+                <span className="text-xs text-purple-600 font-medium">No Image</span>
               </div>
             )}
             {isExpired && (
