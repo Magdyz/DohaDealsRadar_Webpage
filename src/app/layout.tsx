@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import QueryProvider from '@/lib/providers/QueryProvider'
 import '../styles/globals.css'
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-background text-text-primary">{children}</body>
+      <body className="bg-background text-text-primary">
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   )
 }
