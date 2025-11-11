@@ -115,7 +115,7 @@ export async function getDealById(dealId: string): Promise<Deal> {
 // Submit new deal
 export async function submitDeal(dealData: SubmitDealData): Promise<SubmitDealResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/submit_deal`, {
+    const response = await fetch(`${API_BASE_URL}/submit-deal`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
