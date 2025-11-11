@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, User, Package } from 'lucide-react'
+import { ArrowLeft, Package } from 'lucide-react'
 import { Button, Spinner, Card, CardBody } from '@/components/ui'
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
+import { ProtectedRoute } from '@/components/auth'
 import { getDeals } from '@/lib/api/deals'
-import { useAuthStore } from '@/lib/store/authStore'
+import { useIsAdmin } from '@/lib/store/authStore'
 import type { Deal, DealCategory } from '@/types'
 
-export default function FeedPage() {
+function ArchivePageContent() {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const isAdmin = useIsAdmin()
 
   const [deals, setDeals] = useState<Deal[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -44,7 +45,7 @@ export default function FeedPage() {
         limit: 20,
         search,
         category,
-        isArchived: false,
+        isArchived: true,
       })
 
       if (reset) {
@@ -56,7 +57,7 @@ export default function FeedPage() {
       setHasMore(response.hasMore)
       setPage(currentPage + 1)
     } catch (err: any) {
-      setError(err.message || 'Failed to load deals')
+      setError(err.message || 'Failed to load archived deals')
     } finally {
       setIsLoading(false)
       setIsLoadingMore(false)
@@ -79,38 +80,44 @@ export default function FeedPage() {
     setPage(1)
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card variant="outlined">
+          <CardBody>
+            <p className="text-center text-red-600">
+              You need admin privileges to access this page
+            </p>
+            <Button
+              variant="primary"
+              size="md"
+              className="mx-auto mt-4"
+              onClick={() => router.push('/feed')}
+            >
+              Back to Feed
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background-secondary">
       {/* Header */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-primary">Doha Deals Radar</h1>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="md"
-                onClick={() => router.push('/account')}
-              >
-                <User className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="md" onClick={() => router.push('/feed')}>
+                <ArrowLeft className="w-5 h-5" />
               </Button>
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() =>
-                  isAuthenticated
-                    ? router.push('/post')
-                    : router.push('/login?returnUrl=/post')
-                }
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Post Deal
-              </Button>
+              <h1 className="text-2xl font-bold text-text-primary">Archive</h1>
             </div>
           </div>
 
           {/* Search */}
-          <SearchBar value={search} onChange={handleSearchChange} />
+          <SearchBar value={search} onChange={handleSearchChange} placeholder="Search archived deals..." />
 
           {/* Category Filter */}
           <div className="mt-4">
@@ -145,27 +152,13 @@ export default function FeedPage() {
               <div className="text-center py-8">
                 <Package className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-text-primary mb-2">
-                  No deals found
+                  No archived deals found
                 </h3>
-                <p className="text-text-secondary mb-4">
+                <p className="text-text-secondary">
                   {search || category
                     ? 'Try adjusting your search or filters'
-                    : 'Be the first to post a deal!'}
+                    : 'All archived and rejected deals will appear here'}
                 </p>
-                {!search && !category && (
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() =>
-                      isAuthenticated
-                        ? router.push('/post')
-                        : router.push('/login?returnUrl=/post')
-                    }
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Post Deal
-                  </Button>
-                )}
               </div>
             </CardBody>
           </Card>
@@ -200,30 +193,14 @@ export default function FeedPage() {
           </>
         )}
       </div>
-
-      {/* Floating Action Buttons (Mobile) */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 md:hidden">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="rounded-full w-14 h-14 p-0 shadow-lg"
-          onClick={() => router.push('/account')}
-        >
-          <User className="w-6 h-6" />
-        </Button>
-        <Button
-          variant="primary"
-          size="lg"
-          className="rounded-full w-14 h-14 p-0 shadow-lg"
-          onClick={() =>
-            isAuthenticated
-              ? router.push('/post')
-              : router.push('/login?returnUrl=/post')
-          }
-        >
-          <Plus className="w-6 h-6" />
-        </Button>
-      </div>
     </div>
+  )
+}
+
+export default function ArchivePage() {
+  return (
+    <ProtectedRoute requireAdmin={true}>
+      <ArchivePageContent />
+    </ProtectedRoute>
   )
 }
