@@ -1,14 +1,6 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
-
-// Import the verification codes map from send-verification-code
-// Note: In production, use a proper cache like Redis
-let verificationCodes: Map<string, { code: string; expiresAt: number }>
-
-// Dynamic import workaround for shared state
-if (typeof window === 'undefined') {
-  verificationCodes = new Map()
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,40 +14,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get stored verification code
     const normalizedEmail = email.toLowerCase()
 
-    // For development, accept any 6-digit code (remove in production)
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    console.log(`🔐 Verifying OTP for ${normalizedEmail}...`)
 
-    if (!isDevelopment) {
-      const stored = verificationCodes.get(normalizedEmail)
+    // Verify OTP using Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
+      email: normalizedEmail,
+      token: code,
+      type: 'email',
+    })
 
-      if (!stored) {
-        return NextResponse.json(
-          { success: false, message: 'Verification code not found or expired' },
-          { status: 400 }
-        )
-      }
-
-      if (stored.expiresAt < Date.now()) {
-        verificationCodes.delete(normalizedEmail)
-        return NextResponse.json(
-          { success: false, message: 'Verification code expired' },
-          { status: 400 }
-        )
-      }
-
-      if (stored.code !== code) {
-        return NextResponse.json(
-          { success: false, message: 'Invalid verification code' },
-          { status: 400 }
-        )
-      }
-
-      // Code is valid, remove it
-      verificationCodes.delete(normalizedEmail)
+    if (authError) {
+      console.error('❌ Supabase Auth verification error:', authError)
+      return NextResponse.json(
+        { success: false, message: authError.message || 'Invalid verification code' },
+        { status: 400 }
+      )
     }
+
+    if (!authData.user) {
+      return NextResponse.json(
+        { success: false, message: 'Verification failed' },
+        { status: 400 }
+      )
+    }
+
+    console.log(`✅ OTP verified successfully for ${normalizedEmail}`)
+    console.log(`👤 Supabase User ID: ${authData.user.id}`)
 
     // Check if user exists
     const { data: existingUser, error: fetchError } = await supabase

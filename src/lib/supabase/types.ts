@@ -19,11 +19,18 @@ export interface Database {
           location: string | null
           category: string
           promo_code: string | null
-          hot_votes: number
-          cold_votes: number
-          user_id: string
-          is_approved: boolean
+          hot_count: number
+          cold_count: number
+          submitted_by_user_id: string
+          posted_by: string | null
+          status: string
           is_archived: boolean
+          requires_review: boolean
+          approved_by: string | null
+          approved_at: string | null
+          deleted_by: string | null
+          deleted_at: string | null
+          deletion_reason: string | null
           created_at: string
           updated_at: string
           expires_at: string
@@ -37,11 +44,18 @@ export interface Database {
           location?: string | null
           category: string
           promo_code?: string | null
-          hot_votes?: number
-          cold_votes?: number
-          user_id: string
-          is_approved?: boolean
+          hot_count?: number
+          cold_count?: number
+          submitted_by_user_id: string
+          posted_by?: string | null
+          status?: string
           is_archived?: boolean
+          requires_review?: boolean
+          approved_by?: string | null
+          approved_at?: string | null
+          deleted_by?: string | null
+          deleted_at?: string | null
+          deletion_reason?: string | null
           created_at?: string
           updated_at?: string
           expires_at: string
@@ -55,11 +69,18 @@ export interface Database {
           location?: string | null
           category?: string
           promo_code?: string | null
-          hot_votes?: number
-          cold_votes?: number
-          user_id?: string
-          is_approved?: boolean
+          hot_count?: number
+          cold_count?: number
+          submitted_by_user_id?: string
+          posted_by?: string | null
+          status?: string
           is_archived?: boolean
+          requires_review?: boolean
+          approved_by?: string | null
+          approved_at?: string | null
+          deleted_by?: string | null
+          deleted_at?: string | null
+          deletion_reason?: string | null
           created_at?: string
           updated_at?: string
           expires_at?: string
@@ -72,6 +93,9 @@ export interface Database {
           username: string | null
           role: string
           auto_approve: boolean
+          device_id: string | null
+          email_verified: boolean
+          last_login_at: string | null
           created_at: string
           updated_at: string
         }
@@ -81,6 +105,9 @@ export interface Database {
           username?: string | null
           role?: string
           auto_approve?: boolean
+          device_id?: string | null
+          email_verified?: boolean
+          last_login_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -90,6 +117,9 @@ export interface Database {
           username?: string | null
           role?: string
           auto_approve?: boolean
+          device_id?: string | null
+          email_verified?: boolean
+          last_login_at?: string | null
           created_at?: string
           updated_at?: string
         }
