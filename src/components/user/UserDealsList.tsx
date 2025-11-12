@@ -43,9 +43,10 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
 
       if (reset) {
         setDeals(response.deals)
-        setPage(2)
+        setPage(2) // Next page will be 2
       } else {
-        setDeals([...deals, ...response.deals])
+        // Use functional update to avoid stale closure
+        setDeals(prevDeals => [...prevDeals, ...response.deals])
         setPage(currentPage + 1)
       }
 
