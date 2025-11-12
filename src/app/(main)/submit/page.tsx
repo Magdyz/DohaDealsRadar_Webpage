@@ -7,6 +7,8 @@ import { Button, Card, CardBody, Input, Badge, Spinner } from '@/components/ui'
 import { submitDeal, uploadImage } from '@/lib/api/deals'
 import { useAuthStore } from '@/lib/store/authStore'
 import { useDeviceId } from '@/lib/hooks/useDeviceId'
+import { useToast } from '@/lib/hooks/useToast'
+import { dealSubmissionSchema, formatZodError } from '@/lib/validation/dealSchema'
 import { CATEGORIES } from '@/types'
 import type { DealCategory } from '@/types'
 
@@ -14,6 +16,7 @@ function SubmitDealContent() {
   const router = useRouter()
   const { user } = useAuthStore()
   const deviceId = useDeviceId()
+  const { toast } = useToast()
 
   // Form state
   const [title, setTitle] = useState('')
@@ -65,31 +68,34 @@ function SubmitDealContent() {
     setImagePreview('')
   }
 
-  // Validate form
+  // Validate form using Zod
   const validateForm = (): boolean => {
-    if (!title.trim()) {
-      setError('Please enter a deal title')
-      return false
-    }
-
-    if (title.length < 10) {
-      setError('Title must be at least 10 characters')
-      return false
-    }
-
+    // Validate image first
     if (!imageFile && !imagePreview) {
       setError('Please upload an image')
       return false
     }
 
-    if (!category) {
-      setError('Please select a category')
+    const days = parseInt(expiryDays)
+    if (isNaN(days)) {
+      setError('Please enter a valid number for expiry days')
       return false
     }
 
-    const days = parseInt(expiryDays)
-    if (isNaN(days) || days < 1 || days > 30) {
-      setError('Expiry days must be between 1 and 30')
+    // Validate using Zod schema
+    const result = dealSubmissionSchema.safeParse({
+      title,
+      description,
+      link,
+      location,
+      category,
+      promoCode,
+      expiryDays: days,
+    })
+
+    if (!result.success) {
+      const errorMessage = formatZodError(result.error)
+      setError(errorMessage)
       return false
     }
 
@@ -131,14 +137,26 @@ function SubmitDealContent() {
       const result = await submitDeal(dealData)
 
       if (result.success && result.deal) {
-        // Redirect to the new deal
-        router.push(`/deals/${result.deal.id}`)
+        // Show success toast
+        toast.success('Deal submitted successfully! Redirecting...')
+
+        // Store deal ID for setTimeout closure
+        const dealId = result.deal.id
+
+        // Redirect to the new deal after a short delay
+        setTimeout(() => {
+          router.push(`/deals/${dealId}`)
+        }, 1000)
       } else {
-        setError(result.message || 'Failed to submit deal')
+        const errorMsg = result.message || 'Failed to submit deal'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     } catch (err: any) {
       console.error('Submit error:', err)
-      setError(err.message || 'Failed to submit deal. Please try again.')
+      const errorMsg = err.message || 'Failed to submit deal. Please try again.'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setIsSubmitting(false)
     }

@@ -8,7 +8,7 @@ import { DealTypeSelector, ImageUpload } from '@/components/post'
 import { ProtectedRoute } from '@/components/auth'
 import { useAuthStore } from '@/lib/store/authStore'
 import { submitDeal } from '@/lib/api/deals'
-import { dealSchema, validateDealForm, type DealFormData } from '@/lib/validation/dealSchema'
+import { dealSubmissionSchema, formatZodError, type DealSubmissionData } from '@/lib/validation/dealSchema'
 import { CATEGORIES } from '@/types'
 import type { DealCategory } from '@/types'
 
@@ -16,8 +16,7 @@ function PostDealContent() {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [formData, setFormData] = useState<Partial<DealFormData>>({
-    dealType: 'online',
+  const [formData, setFormData] = useState<Partial<DealSubmissionData>>({
     category: 'food_dining',
     expiryDays: 10,
   })
@@ -27,7 +26,7 @@ function PostDealContent() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [isAutoApproved, setIsAutoApproved] = useState(false)
 
-  const handleChange = (field: keyof DealFormData, value: any) => {
+  const handleChange = (field: keyof DealSubmissionData, value: any) => {
     setFormData({ ...formData, [field]: value })
     // Clear error for this field
     if (errors[field]) {
@@ -36,21 +35,22 @@ function PostDealContent() {
   }
 
   const validateForm = (): boolean => {
-    try {
-      dealSchema.parse(formData)
-      const { isValid, errors: validationErrors } = validateDealForm(formData as DealFormData)
-      setErrors(validationErrors)
-      return isValid
-    } catch (error: any) {
+    const result = dealSubmissionSchema.safeParse(formData)
+
+    if (!result.success) {
       const validationErrors: Record<string, string> = {}
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          validationErrors[err.path[0]] = err.message
-        })
-      }
+      result.error.issues.forEach((err) => {
+        const field = err.path.join('.')
+        if (field) {
+          validationErrors[field] = err.message
+        }
+      })
       setErrors(validationErrors)
       return false
     }
+
+    setErrors({})
+    return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

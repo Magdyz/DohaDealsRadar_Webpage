@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { ArrowLeft, ExternalLink, MapPin, Tag, Calendar, Clock, Share2, Copy, Flag, User } from 'lucide-react'
 import { Button, Badge, Card, CardBody, Spinner } from '@/components/ui'
 import VoteButtons from '@/components/deals/VoteButtons'
+import { ReportModal } from '@/components/modals'
 import { getDealById } from '@/lib/api/deals'
 import { formatDate, formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
 import { CATEGORIES } from '@/types'
@@ -20,6 +21,7 @@ export default function DealDetailsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   useEffect(() => {
     if (dealId) {
@@ -130,12 +132,14 @@ export default function DealDetailsPage() {
               <button
                 onClick={handleShare}
                 className="p-2 hover:bg-background-secondary rounded-full transition-colors"
+                title="Share deal"
               >
                 <Share2 className="w-5 h-5 text-text-secondary" />
               </button>
               <button
-                onClick={() => router.push(`/report/${dealId}`)}
+                onClick={() => setIsReportModalOpen(true)}
                 className="p-2 hover:bg-background-secondary rounded-full transition-colors"
+                title="Report deal"
               >
                 <Flag className="w-5 h-5 text-text-secondary" />
               </button>
@@ -291,6 +295,16 @@ export default function DealDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {deal && (
+        <ReportModal
+          dealId={deal.id}
+          dealTitle={deal.title}
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </div>
   )
 }

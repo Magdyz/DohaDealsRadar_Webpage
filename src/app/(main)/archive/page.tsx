@@ -4,15 +4,18 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Package } from 'lucide-react'
 import { Button, Spinner, Card, CardBody } from '@/components/ui'
-import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
+import { ArchivedDealCard, SearchBar, CategoryFilter } from '@/components/deals'
 import { ProtectedRoute } from '@/components/auth'
 import { getDeals } from '@/lib/api/deals'
-import { useIsAdmin } from '@/lib/store/authStore'
+import { useIsAdmin, useUser } from '@/lib/store/authStore'
+import { useToast } from '@/lib/hooks/useToast'
 import type { Deal, DealCategory } from '@/types'
 
 function ArchivePageContent() {
   const router = useRouter()
   const isAdmin = useIsAdmin()
+  const user = useUser()
+  const { toast } = useToast()
 
   const [deals, setDeals] = useState<Deal[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -61,6 +64,58 @@ function ArchivePageContent() {
     } finally {
       setIsLoading(false)
       setIsLoadingMore(false)
+    }
+  }
+
+  const handleRestore = async (dealId: string) => {
+    try {
+      const response = await fetch('/api/restore-deal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealId,
+          moderatorUserId: user?.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to restore deal')
+      }
+
+      toast.success('Deal restored to feed successfully!')
+
+      // Remove the deal from the list
+      setDeals(deals.filter((deal) => deal.id !== dealId))
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to restore deal')
+    }
+  }
+
+  const handleDelete = async (dealId: string) => {
+    try {
+      const response = await fetch('/api/delete-deal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealId,
+          moderatorUserId: user?.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete deal')
+      }
+
+      toast.success('Deal permanently deleted')
+
+      // Remove the deal from the list
+      setDeals(deals.filter((deal) => deal.id !== dealId))
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete deal')
     }
   }
 
@@ -164,10 +219,15 @@ function ArchivePageContent() {
           </Card>
         ) : (
           <>
-            {/* Deals List */}
-            <div className="space-y-4">
+            {/* Deals Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {deals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} />
+                <ArchivedDealCard
+                  key={deal.id}
+                  deal={deal}
+                  onRestore={handleRestore}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
 
