@@ -150,6 +150,7 @@ export default function DealDetailsPage() {
                   src={deal.imageUrl}
                   alt={deal.title}
                   fill
+                  unoptimized
                   className="object-contain"
                   priority
                 />

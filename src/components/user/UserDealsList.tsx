@@ -108,6 +108,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                     alt={deal.title}
                     width={96}
                     height={96}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>
