@@ -1,7 +1,13 @@
 # DohaDealsRadar Web Development Checklist
 
 **Last Updated:** November 12, 2025
-**Current Status:** ~70% Complete
+**Current Status:** ~80% Complete ⬆️ (+10%)
+
+## 🎉 Recent Completions
+- ✅ Toast Notification System (success/error/info/warning)
+- ✅ Archive Page with Admin Actions (restore/delete)
+- ✅ Report System (rate limiting, duplicate prevention)
+- ✅ Form Validation with Zod (comprehensive validation)
 
 ---
 
@@ -151,7 +157,7 @@
 - ✅ Category badge
 - ✅ Vote interface (VoteButtons)
 - ✅ Share button
-- ⚠️ Report button (route exists, needs verification)
+- ✅ Report button (opens ReportModal)
 - ✅ Link/Location display
 - ✅ Promo code with copy button
 - ✅ Posted by username
@@ -170,20 +176,22 @@
 - ⚠️ Disable button after voting (needs verification)
 - ⚠️ Visual feedback (needs verification)
 
-### 3.4 Archive Page ❌ NOT STARTED
-**Page: /archive** ❌
+### 3.4 Archive Page ✅ COMPLETE
+**Page: /archive** ✅
 
-- ❌ Archive view layout
-- ❌ Show archived deals (isArchived = true)
-- ❌ Search & filter for archive
-- ❌ Admin actions: "Return to Feed"
-- ❌ Admin actions: "Permanent Delete"
-- ❌ Confirmation dialogs
+- ✅ Archive view layout (grid display)
+- ✅ Show archived deals (isArchived = true)
+- ✅ Search & filter for archive
+- ✅ Admin actions: "Return to Feed" (restore)
+- ✅ Admin actions: "Permanent Delete"
+- ✅ Confirmation dialogs (via confirm())
+- ✅ ArchivedDealCard component with admin controls
+- ✅ Toast notifications for actions
 
-**Missing APIs:**
-- ❌ getArchivedDeals
-- ❌ returnToFeed
-- ❌ permanentDeleteDeal
+**APIs:**
+- ✅ getArchivedDeals (uses existing get-deals with isArchived flag)
+- ✅ /api/restore-deal
+- ✅ /api/delete-deal
 
 ---
 
@@ -221,23 +229,25 @@
 - ✅ submit-deal API route
 
 **Validation:**
-- ❌ Zod schemas (Zod not installed)
-- ⚠️ Form validation (needs verification)
+- ✅ Zod schemas (dealSubmissionSchema implemented)
+- ✅ Form validation (integrated in submit page)
+- ✅ Error formatting and display
+- ✅ Toast notifications for validation errors
 
-### 4.2 Report Feature ❌ NOT IMPLEMENTED
-**Page: /report/[dealId]** ❌
+### 4.2 Report Feature ✅ COMPLETE
+**Modal-based (not separate page)** ✅
 
-- ❌ Report form component
-- ❌ Radio buttons for 4 reasons
-- ❌ Additional details textarea
-- ❌ Submit button
-- ❌ Success screen
-- ❌ Rate limiting (localStorage)
-- ❌ Reports per day limit (max 5)
-- ❌ Already reported check
+- ✅ ReportModal component
+- ✅ Radio buttons for 4 reasons (spam, inappropriate, expired, misleading)
+- ✅ Reason descriptions for clarity
+- ✅ Submit button with loading state
+- ✅ Success toast notification
+- ✅ Rate limiting (max 5 reports per day per user)
+- ✅ Already reported check (prevent duplicates)
+- ✅ Integrated in deal details page (/deals/[id])
 
-**Missing APIs:**
-- ❌ createReport
+**APIs:**
+- ✅ /api/report-deal (with all validations)
 
 ---
 
@@ -366,11 +376,16 @@
 - ❌ Progress bars (uploads)
 - ⚠️ Optimistic updates (votes)
 
-**Toast Notifications:** ❌
-- ❌ Success messages
-- ❌ Error messages
-- ❌ Info messages
-- ❌ Auto-dismiss
+**Toast Notifications:** ✅ COMPLETE
+- ✅ Success messages (green)
+- ✅ Error messages (red)
+- ✅ Info messages (blue)
+- ✅ Warning messages (yellow)
+- ✅ Auto-dismiss (5 seconds default)
+- ✅ Slide-in-right animation
+- ✅ Global state with Zustand
+- ✅ useToast hook for easy access
+- ✅ Integrated throughout app
 
 ### 6.5 SEO & Meta Tags ⚠️ PARTIAL
 **Dynamic Meta Tags:** ⚠️
@@ -443,18 +458,18 @@
 - ✅ Deal feed with search
 - ✅ Category filtering (5 categories)
 - ✅ Hot/Cold voting (device-tracked)
-- ⚠️ Deal submission with image upload (partial)
+- ✅ Deal submission with image upload & validation
 - ✅ Deal details with share
-- ❌ Report system with rate limiting
+- ✅ Report system with rate limiting (5/day, duplicate prevention)
 - ⚠️ User account page with stats (partial)
 - ❌ Public user profiles
-- ❌ Archive view
+- ✅ Archive view with admin actions
 - ⚠️ Moderator dashboard (partial)
 - ⚠️ Pending deals queue (partial)
 - ✅ Approve/Reject actions
 - ❌ Delete with reason
-- ❌ Admin permanent delete
-- ❌ Admin return to feed
+- ✅ Admin permanent delete
+- ✅ Admin return to feed (restore)
 - ⚠️ Auto-approval for trusted users (needs verification)
 - ✅ Role-based access control
 - ❌ Onboarding flow
@@ -476,27 +491,27 @@
 ### By Phase
 - **Phase 1 (Setup):** ✅ 95% Complete
 - **Phase 2 (Auth):** ✅ 90% Complete
-- **Phase 3 (Core Features):** ⚠️ 70% Complete
-- **Phase 4 (Submission):** ⚠️ 50% Complete
+- **Phase 3 (Core Features):** ✅ 90% Complete (Archive added!)
+- **Phase 4 (Submission):** ✅ 85% Complete (Validation + Reports added!)
 - **Phase 5 (Moderation):** ⚠️ 60% Complete
-- **Phase 6 (Polish/Deploy):** ❌ 10% Complete
+- **Phase 6 (Polish/Deploy):** ⚠️ 25% Complete (Toast notifications added!)
 
-### Overall: ~70% Complete
+### Overall: ~80% Complete ⬆️ (+10%)
 
 ---
 
 ## 🚨 Critical Missing Items
 
 ### High Priority (Blocking Launch)
-1. ❌ **Archive Page** - Core feature, users need access to archived deals
-2. ❌ **Report System** - Important for moderation workflow
-3. ❌ **Toast Notifications** - User feedback for actions
-4. ❌ **Error Boundaries** - Production stability
-5. ❌ **PWA Setup** - Mobile app-like experience
-6. ❌ **Deployment to Vercel** - Make it live!
+1. ✅ **Archive Page** - ✅ COMPLETE
+2. ✅ **Report System** - ✅ COMPLETE
+3. ✅ **Toast Notifications** - ✅ COMPLETE
+4. ✅ **Form Validation** - ✅ COMPLETE
+5. ❌ **Error Boundaries** - Production stability **← NEXT**
+6. ❌ **PWA Setup** - Mobile app-like experience
+7. ❌ **Deployment to Vercel** - Make it live!
 
-### Medium Priority (Launch Blockers)
-7. ⚠️ **Form Validation** - Need Zod schemas for deal submission
+### Medium Priority (Post-Launch)
 8. ❌ **Public User Profiles** - Social feature
 9. ❌ **SEO & Meta Tags** - Discoverability
 10. ⚠️ **Infinite Scroll** - Feed UX improvement
@@ -512,15 +527,15 @@
 
 ## 🎯 Recommended Next Steps
 
-### Week 1: Complete Core Features
-1. ✅ Fix image loading (DONE)
-2. Implement Archive page
-3. Add Report system
-4. Complete Deal submission form validation
-5. Add Toast notifications
+### ~~Week 1: Complete Core Features~~ ✅ COMPLETE
+1. ✅ Fix image loading
+2. ✅ Implement Archive page
+3. ✅ Add Report system
+4. ✅ Complete Deal submission form validation
+5. ✅ Add Toast notifications
 
-### Week 2: Polish & Testing
-1. Add Error boundaries
+### Week 2: Polish & Testing **← CURRENT PHASE**
+1. **Add Error boundaries** ← Start here
 2. Implement infinite scroll
 3. Complete moderator UI
 4. Manual testing on devices
