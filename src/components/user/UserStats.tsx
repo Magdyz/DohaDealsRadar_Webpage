@@ -1,3 +1,5 @@
+'use client'
+
 import { Package, CheckCircle, Clock, XCircle } from 'lucide-react'
 import { Card, CardBody } from '@/components/ui'
 import type { UserStats } from '@/types'
