@@ -88,7 +88,7 @@ export default function CodeInput({
 
   return (
     <div className="w-full">
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-3 md:gap-4 justify-center px-2">
         {code.map((digit, index) => (
           <input
             key={index}
@@ -104,20 +104,26 @@ export default function CodeInput({
             onPaste={handlePaste}
             disabled={disabled}
             className={cn(
-              'w-12 h-14 text-center text-2xl font-semibold border-2 rounded-lg',
-              'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
-              'transition-colors',
+              'w-12 h-16 md:w-14 md:h-20 text-center text-2xl md:text-3xl font-bold border-2 rounded-xl',
+              'focus:outline-none focus:ring-4 focus:ring-primary/30 focus:border-primary',
+              'transition-all duration-200 shadow-sm',
+              'bg-surface',
               error
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300',
-              disabled && 'bg-gray-100 cursor-not-allowed opacity-50'
+                ? 'border-error focus:ring-error/30 focus:border-error animate-shake'
+                : 'border-border hover:border-primary/50',
+              disabled && 'bg-background-secondary cursor-not-allowed opacity-60'
             )}
             autoFocus={index === 0}
           />
         ))}
       </div>
       {error && (
-        <p className="mt-2 text-sm text-red-600 text-center">{error}</p>
+        <div className="mt-4 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <p className="text-sm font-medium text-error text-center flex items-center justify-center gap-2">
+            <span className="text-base">⚠</span>
+            {error}
+          </p>
+        </div>
       )}
     </div>
   )
