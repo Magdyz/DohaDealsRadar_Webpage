@@ -80,6 +80,13 @@ export function useInfiniteScroll({
     async (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries
 
+      console.log('👁️ IntersectionObserver triggered:', {
+        isIntersecting: entry.isIntersecting,
+        isLoadingRef: isLoadingRef.current,
+        hasMoreRef: hasMoreRef.current,
+        enabled
+      })
+
       // Only load more if:
       // 1. Target is intersecting (visible)
       // 2. Not currently loading (check ref for immediate value)
@@ -91,6 +98,7 @@ export function useInfiniteScroll({
         hasMoreRef.current &&
         enabled
       ) {
+        console.log('✅ All conditions met, calling onLoadMore()')
         // Set loading flag immediately to prevent duplicate calls
         isLoadingRef.current = true
         try {
@@ -98,6 +106,8 @@ export function useInfiniteScroll({
         } finally {
           // Reset will happen when isLoading state updates via useEffect above
         }
+      } else {
+        console.log('❌ Conditions not met, skipping onLoadMore()')
       }
     },
     [onLoadMore, enabled]
