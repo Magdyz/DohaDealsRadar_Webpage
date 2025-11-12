@@ -80,11 +80,14 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
           <div className="text-center py-8">
             <Package className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
             <p className="text-text-secondary">No deals submitted yet</p>
-            <Link href="/post">
-              <Button variant="primary" size="md" className="mt-4">
-                Post Your First Deal
-              </Button>
-            </Link>
+            <Button
+              variant="primary"
+              size="md"
+              className="mt-4"
+              onClick={() => window.location.href = '/post'}
+            >
+              Post Your First Deal
+            </Button>
           </div>
         </CardBody>
       </Card>

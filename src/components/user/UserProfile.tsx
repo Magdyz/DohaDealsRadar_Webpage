@@ -1,3 +1,5 @@
+'use client'
+
 import { User as UserIcon, Mail, Shield, Award } from 'lucide-react'
 import { Card, CardBody, Badge } from '@/components/ui'
 import type { User } from '@/types'
