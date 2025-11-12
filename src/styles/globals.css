@@ -15,10 +15,10 @@
   --color-card: #FFFFFF;
   --color-purple-container: #E9E4FF;
 
-  /* Text Colors (matching Android) */
+  /* Text Colors (improved contrast for accessibility) */
   --color-text-primary: #0F1419;
-  --color-text-secondary: #5B7083;
-  --color-text-tertiary: #8B96A3;
+  --color-text-secondary: #536471;
+  --color-text-tertiary: #6B7280;
 
   /* Vote Colors (matching Android) */
   --color-hot-bg: #FFF4ED;

@@ -130,11 +130,12 @@ function PostDealContent() {
 
       {/* Form */}
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
-          {/* Deal Type */}
-          <DealTypeSelector
-            value={formData.dealType || 'online'}
-            onChange={(value) => handleChange('dealType', value)}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-modern-lg p-6 md:p-8 space-y-8">
+          {/* Image Upload - Moved to top */}
+          <ImageUpload
+            value={formData.imageUrl || ''}
+            onChange={(url) => handleChange('imageUrl', url)}
+            error={errors.imageUrl}
           />
 
           {/* Title */}
@@ -158,33 +159,44 @@ function PostDealContent() {
             rows={4}
           />
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              Category *
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleChange('category', category.id)}
-                  className={`p-3 border-2 rounded-lg transition-all text-left ${
-                    formData.category === category.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{category.emoji}</span>
-                    <span className="text-sm font-medium">{category.label}</span>
-                  </div>
-                </button>
-              ))}
+          {/* Deal Type & Category - Side by side on larger screens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Deal Type */}
+            <div>
+              <DealTypeSelector
+                value={formData.dealType || 'online'}
+                onChange={(value) => handleChange('dealType', value)}
+              />
             </div>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-            )}
+
+            {/* Category */}
+            <div>
+              <label className="block text-base font-semibold text-text-primary mb-3">
+                Category *
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {CATEGORIES.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => handleChange('category', category.id)}
+                    className={`p-3 border-2 rounded-xl transition-all text-left ${
+                      formData.category === category.id
+                        ? 'border-primary bg-primary/10 shadow-sm'
+                        : 'border-border hover:border-primary/50 hover:bg-primary/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xl">{category.emoji}</span>
+                      <span className="text-sm font-medium text-text-primary">{category.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {errors.category && (
+                <p className="mt-2 text-sm font-medium text-error">{errors.category}</p>
+              )}
+            </div>
           </div>
 
           {/* Link or Location */}
@@ -221,7 +233,7 @@ function PostDealContent() {
 
           {/* Expiry */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label className="block text-base font-semibold text-text-primary mb-3">
               Deal Expires In (Days) *
             </label>
             <input
@@ -230,29 +242,24 @@ function PostDealContent() {
               max="30"
               value={formData.expiryDays || 10}
               onChange={(e) => handleChange('expiryDays', parseInt(e.target.value))}
-              className="w-full"
+              className="w-full h-2 bg-background-secondary rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
             />
-            <div className="flex justify-between text-sm text-text-tertiary mt-1">
-              <span>1 day</span>
-              <Badge variant="purple">{formData.expiryDays || 10} days</Badge>
-              <span>30 days</span>
+            <div className="flex justify-between items-center text-sm text-text-secondary mt-3">
+              <span className="font-medium">1 day</span>
+              <Badge variant="purple" className="px-4 py-1.5 text-base font-bold">
+                {formData.expiryDays || 10} days
+              </Badge>
+              <span className="font-medium">30 days</span>
             </div>
             {errors.expiryDays && (
-              <p className="mt-1 text-sm text-red-600">{errors.expiryDays}</p>
+              <p className="mt-2 text-sm font-medium text-error">{errors.expiryDays}</p>
             )}
           </div>
 
-          {/* Image Upload */}
-          <ImageUpload
-            value={formData.imageUrl || ''}
-            onChange={(url) => handleChange('imageUrl', url)}
-            error={errors.imageUrl}
-          />
-
           {/* Submit Error */}
           {errors.submit && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{errors.submit}</p>
+            <div className="p-4 bg-error/10 border-2 border-error/30 rounded-xl">
+              <p className="text-sm font-medium text-error">{errors.submit}</p>
             </div>
           )}
 
@@ -261,7 +268,7 @@ function PostDealContent() {
             type="submit"
             variant="primary"
             size="lg"
-            className="w-full"
+            className="w-full min-h-[52px] text-base font-bold"
             isLoading={isSubmitting}
           >
             Submit Deal

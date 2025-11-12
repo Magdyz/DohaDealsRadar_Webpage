@@ -79,58 +79,56 @@ export default function ImageUpload({ value, onChange, error }: ImageUploadProps
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-text-primary mb-2">
+      <label className="block text-base font-semibold text-text-primary mb-3">
         Deal Image *
       </label>
 
       {preview ? (
-        <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-gray-200">
+        <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-border shadow-sm">
           <Image
             src={preview}
             alt="Deal preview"
             fill
             unoptimized
-            className="object-contain"
+            className="object-cover"
           />
           <button
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+            className="absolute top-3 right-3 p-2 bg-error text-white rounded-full hover:bg-error/90 transition-all shadow-md hover:shadow-lg active:scale-95"
             disabled={isUploading}
+            aria-label="Remove image"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       ) : (
         <div
           onClick={handleClick}
           className={cn(
-            'w-full h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors',
+            'w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all',
             error
-              ? 'border-red-500 bg-red-50'
-              : 'border-gray-300 hover:border-primary hover:bg-gray-50',
+              ? 'border-error bg-error/5 hover:bg-error/10'
+              : 'border-border hover:border-primary hover:bg-primary/5',
             isUploading && 'pointer-events-none opacity-50'
           )}
         >
           {isUploading ? (
             <>
               <Spinner size="lg" />
-              <p className="mt-4 text-sm text-text-secondary">
-                Compressing and uploading...
+              <p className="mt-3 text-sm font-medium text-text-secondary">
+                Uploading...
               </p>
             </>
           ) : (
             <>
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <ImageIcon className="w-8 h-8 text-primary" />
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <ImageIcon className="w-7 h-7 text-primary" />
               </div>
-              <p className="text-base font-medium text-text-primary mb-1">
-                Click to upload image
+              <p className="text-base font-semibold text-text-primary mb-1">
+                Upload Image
               </p>
-              <p className="text-sm text-text-tertiary">
-                PNG, JPG, WEBP up to 10MB
-              </p>
-              <p className="text-xs text-text-tertiary mt-2">
-                Image will be automatically compressed
+              <p className="text-sm text-text-secondary">
+                PNG, JPG, WEBP • Max 10MB
               </p>
             </>
           )}
@@ -147,10 +145,12 @@ export default function ImageUpload({ value, onChange, error }: ImageUploadProps
       />
 
       {(error || uploadError) && (
-        <p className="mt-2 text-sm text-red-600">{error || uploadError}</p>
+        <div className="mt-3 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <p className="text-sm font-medium text-error">{error || uploadError}</p>
+        </div>
       )}
 
-      <p className="mt-2 text-xs text-text-tertiary">
+      <p className="mt-2 text-sm text-text-secondary">
         High-quality images get more attention and votes!
       </p>
     </div>

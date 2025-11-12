@@ -225,8 +225,8 @@ export default function FeedPage() {
       {/* Content - 2025 Modern Mobile-first grid with better spacing */}
       <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <DealCardSkeleton key={i} />
             ))}
           </div>
@@ -269,7 +269,7 @@ export default function FeedPage() {
         ) : (
           <>
             {/* Deals Grid - 2025 Mobile-first with better spacing */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
               {deals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}
