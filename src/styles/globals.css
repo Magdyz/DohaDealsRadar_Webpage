@@ -1,62 +1,65 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Vinted-inspired Purple Palette - matching Android app exactly */
-  --color-primary: #C57AF7;
-  --color-primary-light: #E9E4FF;
-  --color-primary-dark: #9046CF;
-  --color-action-primary: #9046CF;
+  --color-primary: #c57af7;
+  --color-primary-light: #e9e4ff;
+  --color-primary-dark: #9046cf;
+  --color-action-primary: #9046cf;
 
   /* Light Theme Colors (matching Android) */
-  --color-background: #FAFBFC;
-  --color-background-secondary: #F3F4F6;
-  --color-surface: #FFFFFF;
-  --color-surface-variant: #F3F4F6;
-  --color-card: #FFFFFF;
-  --color-purple-container: #E9E4FF;
+  --color-background: #fafbfc;
+  --color-background-secondary: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f3f4f6;
+  --color-card: #ffffff;
+  --color-purple-container: #e9e4ff;
 
   /* Text Colors (improved contrast for accessibility) */
-  --color-text-primary: #0F1419;
+  --color-text-primary: #0f1419;
   --color-text-secondary: #536471;
-  --color-text-tertiary: #6B7280;
+  --color-text-tertiary: #6b7280;
 
   /* Vote Colors (matching Android) */
-  --color-hot-bg: #FFF4ED;
-  --color-hot-content: #FF6B35;
-  --color-cold-bg: #EFF6FF;
-  --color-cold-content: #4A90E2;
+  --color-hot-bg: #fff4ed;
+  --color-hot-content: #ff6b35;
+  --color-cold-bg: #eff6ff;
+  --color-cold-content: #4a90e2;
 
   /* Status Colors */
-  --color-success: #10B981;
-  --color-error: #EF4444;
-  --color-warning: #F59E0B;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
 
   /* Border Colors (matching Android) */
-  --color-border: #E8EAED;
-  --color-border-light: #F3F4F6;
+  --color-border: #e8eaed;
+  --color-border-light: #f3f4f6;
 
   /* 2025 Modern Spacing System (8px grid) */
-  --spacing-xs: 0.5rem;    /* 8px */
-  --spacing-sm: 0.75rem;   /* 12px */
-  --spacing-md: 1rem;      /* 16px */
-  --spacing-lg: 1.5rem;    /* 24px */
-  --spacing-xl: 2rem;      /* 32px */
-  --spacing-2xl: 3rem;     /* 48px */
-  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-xs: 0.5rem; /* 8px */
+  --spacing-sm: 0.75rem; /* 12px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-2xl: 3rem; /* 48px */
+  --spacing-3xl: 4rem; /* 64px */
 
   /* 2025 Modern Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-purple: 0 8px 16px -4px rgba(197, 122, 247, 0.2);
 
   /* 2025 Modern Border Radius */
-  --radius-sm: 0.5rem;     /* 8px */
-  --radius-md: 0.75rem;    /* 12px */
-  --radius-lg: 1rem;       /* 16px */
-  --radius-xl: 1.5rem;     /* 24px */
-  --radius-2xl: 2rem;      /* 32px */
+  --radius-sm: 0.5rem; /* 8px */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem; /* 16px */
+  --radius-xl: 1.5rem; /* 24px */
+  --radius-2xl: 2rem; /* 32px */
   --radius-full: 9999px;
 }
 
@@ -72,9 +75,9 @@ body {
   overflow-x: hidden;
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* 2025 Modern Typography */
@@ -84,7 +87,12 @@ body {
 }
 
 /* 2025 Modern Typography - Base Styles Only */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   line-height: 1.3;
   letter-spacing: -0.02em;
 }
@@ -166,11 +174,21 @@ a {
   }
 
   /* 2025 Modern Shadows */
-  .shadow-modern-sm { box-shadow: var(--shadow-sm); }
-  .shadow-modern-md { box-shadow: var(--shadow-md); }
-  .shadow-modern-lg { box-shadow: var(--shadow-lg); }
-  .shadow-modern-xl { box-shadow: var(--shadow-xl); }
-  .shadow-purple { box-shadow: var(--shadow-purple); }
+  .shadow-modern-sm {
+    box-shadow: var(--shadow-sm);
+  }
+  .shadow-modern-md {
+    box-shadow: var(--shadow-md);
+  }
+  .shadow-modern-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  .shadow-modern-xl {
+    box-shadow: var(--shadow-xl);
+  }
+  .shadow-purple {
+    box-shadow: var(--shadow-purple);
+  }
 
   /* Smooth Transitions */
   .transition-smooth {
@@ -244,13 +262,21 @@ a {
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-4px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(4px);
   }
 }
