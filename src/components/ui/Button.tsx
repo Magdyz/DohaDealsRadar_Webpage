@@ -22,23 +22,25 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
+    // 2025 Modern Button Styles
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-95'
+      'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-3 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] touch-target'
 
     const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-light hover:shadow-lg shadow-primary/30 focus:ring-primary',
+      primary: 'bg-action-primary text-white hover:bg-primary-dark shadow-purple hover:shadow-xl focus:ring-primary transform hover:-translate-y-0.5',
       secondary:
-        'bg-surface-variant text-text-primary hover:bg-surface border border-border hover:shadow-md focus:ring-primary',
+        'bg-surface-variant text-text-primary hover:bg-surface border-2 border-border hover:shadow-modern-md focus:ring-primary hover:border-primary/30',
       outline:
-        'border border-border text-text-primary hover:bg-surface hover:border-primary/50 hover:text-primary focus:ring-primary',
-      ghost: 'text-text-primary hover:bg-surface-variant hover:text-primary focus:ring-primary',
-      danger: 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg shadow-red-600/30 focus:ring-red-500',
+        'border-2 border-border text-text-primary hover:bg-surface hover:border-primary hover:text-primary focus:ring-primary hover:shadow-modern-sm',
+      ghost: 'text-text-primary hover:bg-surface-variant hover:text-primary focus:ring-primary/50',
+      danger: 'bg-error text-white hover:bg-red-700 shadow-md hover:shadow-xl focus:ring-error transform hover:-translate-y-0.5',
     }
 
+    // 2025 Modern Sizing - Better touch targets (44px minimum)
     const sizes = {
-      sm: 'text-sm px-3 py-1.5',
-      md: 'text-base px-4 py-2',
-      lg: 'text-lg px-6 py-3',
+      sm: 'text-sm px-4 py-2.5 min-h-[40px]',
+      md: 'text-base px-6 py-3 min-h-[44px]',
+      lg: 'text-lg px-8 py-4 min-h-[52px]',
     }
 
     return (

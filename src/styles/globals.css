@@ -34,6 +34,30 @@
   /* Border Colors (matching Android) */
   --color-border: #E8EAED;
   --color-border-light: #F3F4F6;
+
+  /* 2025 Modern Spacing System (8px grid) */
+  --spacing-xs: 0.5rem;    /* 8px */
+  --spacing-sm: 0.75rem;   /* 12px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+
+  /* 2025 Modern Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-purple: 0 8px 16px -4px rgba(197, 122, 247, 0.2);
+
+  /* 2025 Modern Border Radius */
+  --radius-sm: 0.5rem;     /* 8px */
+  --radius-md: 0.75rem;    /* 12px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.5rem;     /* 24px */
+  --radius-2xl: 2rem;      /* 32px */
+  --radius-full: 9999px;
 }
 
 * {
@@ -53,6 +77,29 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 2025 Modern Typography */
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+}
+
+/* 2025 Modern Typography Scale */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.875rem); }
+h4 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(0.875rem, 1.5vw, 1.125rem); }
+
+p {
+  line-height: 1.7;
+  margin-bottom: 1rem;
 }
 
 a {
@@ -73,6 +120,37 @@ a {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* 2025 Modern Touch Targets (44px minimum) */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 2025 Modern Spacing Utilities */
+  .container-padding {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+
+  @media (min-width: 768px) {
+    .container-padding {
+      padding-left: var(--spacing-lg);
+      padding-right: var(--spacing-lg);
+    }
+  }
+
+  /* 2025 Modern Shadows */
+  .shadow-modern-sm { box-shadow: var(--shadow-sm); }
+  .shadow-modern-md { box-shadow: var(--shadow-md); }
+  .shadow-modern-lg { box-shadow: var(--shadow-lg); }
+  .shadow-modern-xl { box-shadow: var(--shadow-xl); }
+  .shadow-purple { box-shadow: var(--shadow-purple); }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @keyframes shimmer {
@@ -84,10 +162,11 @@ a {
   }
 }
 
+/* 2025 Modern Smooth Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -97,9 +176,11 @@ a {
 
 @keyframes slideIn {
   from {
-    transform: translateX(-100%);
+    opacity: 0;
+    transform: translateX(-20px);
   }
   to {
+    opacity: 1;
     transform: translateX(0);
   }
 }
@@ -107,7 +188,7 @@ a {
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -115,11 +196,10 @@ a {
   }
 }
 
-/* PWA: Slide-up animation for install prompt */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(100%);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -127,19 +207,34 @@ a {
   }
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 2025 Modern Animation Classes */
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-slide-in {
-  animation: slideIn 0.3s ease-in-out;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* PWA: Slide-up animation class */
 .animate-slide-up {
   animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

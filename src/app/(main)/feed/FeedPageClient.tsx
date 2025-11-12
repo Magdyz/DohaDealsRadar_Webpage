@@ -166,15 +166,15 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - Compact, mobile-first */}
-      <div className="bg-surface shadow-sm sticky top-0 z-20 border-b border-border">
-        <div className="max-w-7xl mx-auto px-3 py-3 md:px-4 md:py-4">
+      {/* Header - 2025 Modern Design */}
+      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-7xl mx-auto px-4 py-4 md:px-6 md:py-5">
           {/* Top Bar - Title & Icons */}
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl md:text-2xl font-bold text-text-primary">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">
               Doha Deals Radar
             </h1>
-            <div className="hidden md:flex gap-2">
+            <div className="hidden md:flex gap-3">
               {user && (user.role === 'moderator' || user.role === 'admin') && (
                 <Button
                   variant="outline"
@@ -213,33 +213,35 @@ export default function FeedPage() {
         </div>
       </div>
 
-      {/* Content - Mobile-first 2-column grid */}
-      <div className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-6">
+      {/* Content - 2025 Modern Mobile-first grid with better spacing */}
+      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <DealCardSkeleton key={i} />
             ))}
           </div>
         ) : error ? (
-          <div className="bg-card rounded-2xl p-8 border border-border text-center max-w-md mx-auto">
-            <p className="text-red-500 mb-4">{error}</p>
+          <div className="bg-card rounded-2xl p-10 md:p-12 border-2 border-error/20 shadow-modern-lg text-center max-w-md mx-auto animate-scale-in">
+            <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <p className="text-error text-base font-semibold mb-6">{error}</p>
             <Button
               variant="primary"
-              size="md"
-              className="mx-auto bg-action-primary hover:bg-primary-dark"
+              size="lg"
               onClick={() => loadDeals(true)}
             >
               Try Again
             </Button>
           </div>
         ) : deals.length === 0 ? (
-          <div className="bg-card rounded-2xl p-8 md:p-12 border border-border text-center max-w-md mx-auto">
-            <Package className="w-16 md:w-20 h-16 md:h-20 text-text-tertiary mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg md:text-xl font-bold text-text-primary mb-2">
+          <div className="bg-card rounded-2xl p-10 md:p-16 border-2 border-border/30 shadow-modern-lg text-center max-w-lg mx-auto animate-scale-in">
+            <Package className="w-20 md:w-24 h-20 md:h-24 text-text-tertiary mx-auto mb-6 opacity-40" />
+            <h3 className="text-xl md:text-2xl font-bold text-text-primary mb-3">
               No deals found
             </h3>
-            <p className="text-sm md:text-base text-text-secondary mb-6">
+            <p className="text-base md:text-lg text-text-secondary mb-8 leading-relaxed">
               {search || category
                 ? 'Try adjusting your search or filters'
                 : 'Be the first to post a deal!'}
@@ -247,9 +249,8 @@ export default function FeedPage() {
             {!search && !category && (
               <Button
                 variant="primary"
-                size="md"
+                size="lg"
                 onClick={() => router.push('/submit')}
-                className="bg-action-primary hover:bg-primary-dark"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Post Deal
@@ -258,8 +259,8 @@ export default function FeedPage() {
           </div>
         ) : (
           <>
-            {/* Deals Grid - Mobile-first 2 columns */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
+            {/* Deals Grid - 2025 Mobile-first with better spacing */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {deals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}
@@ -301,19 +302,21 @@ export default function FeedPage() {
         )}
       </div>
 
-      {/* Floating Action Buttons (Mobile) */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-3 md:hidden">
+      {/* Floating Action Buttons (Mobile) - 2025 Modern Design */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-4 md:hidden z-30">
         <button
-          className="w-14 h-14 rounded-full bg-surface border-2 border-border shadow-lg flex items-center justify-center text-text-primary hover:bg-background-secondary transition-colors"
+          className="w-14 h-14 rounded-full bg-surface border-2 border-border shadow-modern-lg flex items-center justify-center text-text-primary hover:bg-background-secondary hover:scale-110 transition-all duration-300 active:scale-95"
           onClick={() => router.push('/account')}
+          aria-label="Account"
         >
           <User className="w-6 h-6" />
         </button>
         <button
-          className="w-14 h-14 rounded-full bg-action-primary shadow-lg flex items-center justify-center text-white hover:bg-primary-dark transition-colors"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-action-primary to-primary-dark shadow-purple flex items-center justify-center text-white hover:shadow-xl hover:scale-110 transition-all duration-300 active:scale-95 animate-pulse-slow"
           onClick={() => router.push('/submit')}
+          aria-label="Post Deal"
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-7 h-7" />
         </button>
       </div>
     </div>

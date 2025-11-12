@@ -38,7 +38,7 @@ export default function SearchBar({
 
   return (
     <div className="relative">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
         <Search className="w-5 h-5" />
       </div>
       <input
@@ -46,12 +46,13 @@ export default function SearchBar({
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-12 pr-12 py-3.5 border border-border rounded-xl bg-surface-variant text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-surface transition-all"
+        className="w-full pl-12 pr-12 py-4 border-2 border-border rounded-xl bg-surface text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-3 focus:ring-primary/30 focus:border-primary hover:border-primary/40 transition-all duration-200 min-h-[48px] text-base"
       />
       {localValue && (
         <button
           onClick={handleClear}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-text-tertiary hover:text-text-primary hover:bg-surface-variant rounded-lg transition-all"
+          aria-label="Clear search"
         >
           <X className="w-5 h-5" />
         </button>
