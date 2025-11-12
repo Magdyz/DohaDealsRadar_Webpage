@@ -7,6 +7,7 @@ import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
 import { getDeals } from '@/lib/api/deals'
 import { useAuthStore } from '@/lib/store/authStore'
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
 import type { Deal, DealCategory } from '@/types'
 
 export default function FeedPage() {
@@ -78,6 +79,13 @@ export default function FeedPage() {
     setCategory(value)
     setPage(1)
   }
+
+  // Infinite scroll - automatically load more when scrolling near bottom
+  const { observerTarget } = useInfiniteScroll({
+    onLoadMore: () => loadDeals(),
+    hasMore,
+    isLoading: isLoadingMore,
+  })
 
   return (
     <div className="min-h-screen bg-background">
@@ -180,33 +188,37 @@ export default function FeedPage() {
               ))}
             </div>
 
-            {/* Load More Loading Skeletons */}
-            {isLoadingMore && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mt-2 md:mt-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <DealCardSkeleton key={i} />
-                ))}
-              </div>
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+              <>
+                {/* Observer target - triggers load when visible */}
+                <div ref={observerTarget} className="h-4" />
+
+                {/* Loading indicator */}
+                {isLoadingMore && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Spinner size="md" />
+                    <p className="text-text-secondary text-sm mt-3">
+                      Loading more deals...
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Load More */}
-            {hasMore && !isLoadingMore && (
-              <div className="flex justify-center mt-4 md:mt-6">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleLoadMore}
-                  className="hover:bg-action-primary hover:text-white transition-all duration-300"
-                >
-                  Load More Deals
-                </Button>
-              </div>
-            )}
-
+            {/* End of content message */}
             {!hasMore && deals.length > 0 && (
-              <p className="text-center text-text-tertiary text-sm mt-4 md:mt-6">
-                You've reached the end!
-              </p>
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-12 h-12 rounded-full bg-background-secondary border-2 border-border flex items-center justify-center mb-3">
+                  <Package className="w-6 h-6 text-text-tertiary" />
+                </div>
+                <p className="text-text-tertiary text-sm font-medium">
+                  You've reached the end!
+                </p>
+                <p className="text-text-tertiary text-xs mt-1">
+                  {deals.length} deal{deals.length !== 1 ? 's' : ''} loaded
+                </p>
+              </div>
             )}
           </>
         )}

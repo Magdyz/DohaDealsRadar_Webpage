@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ExternalLink, MapPin, Tag, Calendar, Clock } from 'lucide-react'
+import { ExternalLink, MapPin, Tag, Calendar, Clock, Package } from 'lucide-react'
 import { Card, CardBody, Badge, Button, Spinner } from '@/components/ui'
 import { getUserDeals } from '@/lib/api/deals'
 import { formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
 import { CATEGORIES } from '@/types'
 import type { Deal } from '@/types'
 import Image from 'next/image'
@@ -17,28 +18,52 @@ interface UserDealsListProps {
 export default function UserDealsList({ userId }: UserDealsListProps) {
   const [deals, setDeals] = useState<Deal[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
 
   useEffect(() => {
-    loadDeals()
-  }, [userId, page])
+    loadDeals(true)
+  }, [userId])
 
-  const loadDeals = async () => {
-    setIsLoading(true)
+  const loadDeals = async (reset: boolean = false) => {
+    const currentPage = reset ? 1 : page
+
+    if (reset) {
+      setIsLoading(true)
+    } else {
+      setIsLoadingMore(true)
+    }
+
     setError('')
 
     try {
-      const response = await getUserDeals(userId, page, 10)
-      setDeals(response.deals)
+      const response = await getUserDeals(userId, currentPage, 10)
+
+      if (reset) {
+        setDeals(response.deals)
+        setPage(2)
+      } else {
+        setDeals([...deals, ...response.deals])
+        setPage(currentPage + 1)
+      }
+
       setHasMore(response.hasMore)
     } catch (err: any) {
       setError(err.message || 'Failed to load deals')
     } finally {
       setIsLoading(false)
+      setIsLoadingMore(false)
     }
   }
+
+  // Infinite scroll - automatically load more when scrolling near bottom
+  const { observerTarget } = useInfiniteScroll({
+    onLoadMore: () => loadDeals(),
+    hasMore,
+    isLoading: isLoadingMore,
+  })
 
   const getStatusBadge = (deal: Deal) => {
     if (!deal.isApproved && !deal.isArchived) {
@@ -180,32 +205,38 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
         )
       })}
 
-      {/* Pagination */}
-      {(hasMore || page > 1) && (
-        <div className="flex justify-center gap-2">
-          {page > 1 && (
-            <Button
-              variant="outline"
-              onClick={() => setPage(page - 1)}
-              disabled={isLoading}
-            >
-              Previous
-            </Button>
+      {/* Infinite Scroll Trigger */}
+      {hasMore && (
+        <>
+          {/* Observer target - triggers load when visible */}
+          <div ref={observerTarget} className="h-4" />
+
+          {/* Loading indicator */}
+          {isLoadingMore && (
+            <div className="flex flex-col items-center justify-center py-6">
+              <Spinner size="md" />
+              <p className="text-text-secondary text-sm mt-3">
+                Loading more deals...
+              </p>
+            </div>
           )}
-          {hasMore && (
-            <Button
-              variant="outline"
-              onClick={() => setPage(page + 1)}
-              disabled={isLoading}
-            >
-              Next
-            </Button>
-          )}
+        </>
+      )}
+
+      {/* End of content message */}
+      {!hasMore && deals.length > 0 && (
+        <div className="flex flex-col items-center justify-center py-6">
+          <div className="w-12 h-12 rounded-full bg-background-secondary border-2 border-border flex items-center justify-center mb-3">
+            <Package className="w-6 h-6 text-text-tertiary" />
+          </div>
+          <p className="text-text-tertiary text-sm font-medium">
+            All your deals loaded!
+          </p>
+          <p className="text-text-tertiary text-xs mt-1">
+            {deals.length} deal{deals.length !== 1 ? 's' : ''} total
+          </p>
         </div>
       )}
     </div>
   )
 }
-
-// Missing import
-import { Package } from 'lucide-react'

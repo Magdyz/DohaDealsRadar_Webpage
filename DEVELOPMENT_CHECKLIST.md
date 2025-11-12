@@ -134,7 +134,7 @@
   - ✅ "View Deal" button
   - ✅ Expiry indicator
 - ✅ VoteButtons component
-- ⚠️ Infinite scroll (needs verification)
+- ✅ Infinite scroll (Intersection Observer API)
 - ❌ Pull-to-refresh
 - ✅ Search with debounce
 - ✅ Category filtering
