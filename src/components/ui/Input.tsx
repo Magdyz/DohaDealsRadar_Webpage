@@ -18,7 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-text-primary mb-1"
+            className="block text-sm font-semibold text-text-primary mb-2.5"
           >
             {label}
           </label>
@@ -27,21 +27,27 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           ref={ref}
           className={cn(
-            'w-full px-3 py-2 border rounded-lg bg-white text-text-primary placeholder:text-text-tertiary',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
-            'disabled:bg-gray-100 disabled:cursor-not-allowed',
+            // 2025 Modern Input Styles with better touch target and spacing
+            'w-full px-4 py-3.5 border-2 rounded-xl bg-surface text-text-primary placeholder:text-text-tertiary',
+            'focus:outline-none focus:ring-3 focus:ring-primary/30 focus:border-primary',
+            'disabled:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-60',
+            'transition-all duration-200 min-h-[44px]',
+            'hover:border-primary/40',
             error
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300',
+              ? 'border-error focus:ring-error/30 focus:border-error'
+              : 'border-border',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-2 text-sm text-error font-medium flex items-center gap-1.5">
+            <span className="text-base">⚠</span>
+            {error}
+          </p>
         )}
         {helperText && !error && (
-          <p className="mt-1 text-sm text-text-tertiary">{helperText}</p>
+          <p className="mt-2 text-sm text-text-tertiary leading-relaxed">{helperText}</p>
         )}
       </div>
     )

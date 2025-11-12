@@ -15,14 +15,14 @@ export default function CategoryFilter({
   onChange,
 }: CategoryFilterProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 px-3 md:px-4 scrollbar-hide">
+    <div className="flex gap-2.5 overflow-x-auto pb-3 px-4 md:px-6 scrollbar-hide">
       <button
         onClick={() => onChange('')}
         className={cn(
-          'px-4 py-2 rounded-full text-[15px] font-semibold whitespace-nowrap transition-all duration-200 h-10',
+          'px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 min-h-[40px]',
           selected === ''
-            ? 'bg-action-primary text-white border-2 border-action-primary'
-            : 'bg-transparent text-text-primary border border-border/40 hover:border-action-primary/50'
+            ? 'bg-gradient-to-r from-action-primary to-primary-dark text-white shadow-purple scale-105'
+            : 'bg-surface text-text-primary border-2 border-border hover:border-primary/50 hover:scale-105'
         )}
       >
         All
@@ -33,10 +33,10 @@ export default function CategoryFilter({
           key={category.id}
           onClick={() => onChange(category.id)}
           className={cn(
-            'px-4 py-2 rounded-full text-[15px] font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 h-10',
+            'px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 flex items-center gap-2 min-h-[40px]',
             selected === category.id
-              ? 'bg-action-primary text-white border-2 border-action-primary'
-              : 'bg-transparent text-text-primary border border-border/40 hover:border-action-primary/50'
+              ? 'bg-gradient-to-r from-action-primary to-primary-dark text-white shadow-purple scale-105'
+              : 'bg-surface text-text-primary border-2 border-border hover:border-primary/50 hover:scale-105'
           )}
         >
           <span className="text-base">{category.emoji}</span>

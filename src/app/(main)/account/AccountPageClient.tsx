@@ -70,32 +70,32 @@ export default function AccountPageClient() {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
-      {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-background">
+      {/* Header - 2025 Modern Design */}
+      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-4xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <button
               onClick={() => router.push('/feed')}
-              className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-surface-variant rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to Feed</span>
+              <span className="font-medium">Back to Feed</span>
             </button>
-            <h1 className="text-2xl font-bold text-text-primary">My Account</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">My Account</h1>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-border hover:bg-surface-variant text-text-primary rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] border-2 border-border hover:bg-error/5 hover:border-error/50 text-text-primary hover:text-error rounded-xl transition-all"
             >
               <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <span className="font-medium">Logout</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      {/* Content - 2025 Modern Layout */}
+      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-10 space-y-8">
         {/* User Profile */}
         <UserProfile user={user} />
 

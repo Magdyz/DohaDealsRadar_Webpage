@@ -163,12 +163,12 @@ function SubmitDealContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary pb-20">
-      {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header - 2025 Modern Design */}
+      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-4xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-text-primary">Post a Deal</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">Post a Deal</h1>
             <Button
               variant="ghost"
               size="sm"
@@ -181,15 +181,16 @@ function SubmitDealContent() {
         </div>
       </div>
 
-      {/* Form */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <form onSubmit={handleSubmit}>
+      {/* Form - 2025 Modern Layout with better spacing */}
+      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-10">
+        <form onSubmit={handleSubmit} className="animate-fade-in">
           <Card variant="elevated">
-            <CardBody className="p-6 space-y-6">
-              {/* Error message */}
+            <CardBody className="p-6 md:p-8 space-y-8">
+              {/* Error message - 2025 Modern Style */}
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                  {error}
+                <div className="bg-error/10 border-2 border-error/30 text-error px-6 py-4 rounded-xl flex items-start gap-3 animate-scale-in">
+                  <span className="text-2xl">⚠️</span>
+                  <p className="font-medium flex-1">{error}</p>
                 </div>
               )}
 
@@ -230,19 +231,21 @@ function SubmitDealContent() {
                 </p>
               </div>
 
-              {/* Image Upload */}
+              {/* Image Upload - 2025 Modern Design */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-semibold text-text-primary mb-3">
                   Deal Image *
                 </label>
                 {!imagePreview ? (
-                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-72 border-3 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary hover:bg-primary-light/30 transition-all duration-300 group">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                      <p className="mb-2 text-sm text-gray-600">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Upload className="w-8 h-8 text-primary-dark" />
+                      </div>
+                      <p className="mb-2 text-base text-text-primary">
+                        <span className="font-bold">Click to upload</span> or drag and drop
                       </p>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                      <p className="text-sm text-text-secondary">PNG, JPG, GIF up to 5MB</p>
                     </div>
                     <input
                       type="file"
@@ -253,46 +256,47 @@ function SubmitDealContent() {
                     />
                   </label>
                 ) : (
-                  <div className="relative">
+                  <div className="relative rounded-2xl overflow-hidden shadow-modern-md">
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-64 object-cover rounded-lg"
+                      className="w-full h-72 object-cover"
                     />
                     {!isSubmitting && (
                       <button
                         type="button"
                         onClick={handleRemoveImage}
-                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        className="absolute top-3 right-3 p-2.5 bg-error text-white rounded-full hover:bg-red-700 shadow-lg hover:scale-110 transition-all"
+                        aria-label="Remove image"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-5 h-5" />
                       </button>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Category */}
+              {/* Category - 2025 Modern Selection */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-semibold text-text-primary mb-3">
                   Category *
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}
                       type="button"
                       onClick={() => setCategory(cat.id)}
                       disabled={isSubmitting}
-                      className={`p-3 rounded-lg border-2 transition-all ${
+                      className={`p-4 rounded-xl border-2 transition-all duration-300 min-h-[56px] ${
                         category === cat.id
-                          ? 'border-primary bg-purple-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary bg-primary-light shadow-purple scale-105'
+                          : 'border-border hover:border-primary/50 hover:bg-surface-variant hover:scale-102'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{cat.emoji}</span>
-                        <span className="text-sm font-medium">{cat.label}</span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-2xl">{cat.emoji}</span>
+                        <span className="text-sm font-semibold">{cat.label}</span>
                       </div>
                     </button>
                   ))}
@@ -363,14 +367,25 @@ function SubmitDealContent() {
                 </p>
               </div>
 
-              {/* Submit Buttons */}
-              <div className="flex gap-3 pt-4">
+              {/* Auto-approval notice - 2025 Modern Design */}
+              {user?.auto_approve && (
+                <div className="bg-success/10 border-2 border-success/30 text-success px-6 py-4 rounded-xl flex items-start gap-3 animate-scale-in">
+                  <span className="text-2xl">✨</span>
+                  <div>
+                    <p className="font-semibold mb-1">Auto-Approval Enabled</p>
+                    <p className="text-sm opacity-90">Your deals are auto-approved! This deal will be visible immediately.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button - 2025 Modern Design */}
+              <div className="pt-4">
                 <Button
                   type="submit"
                   variant="primary"
                   size="lg"
                   disabled={isSubmitting}
-                  className="flex-1"
+                  className="w-full bg-gradient-to-r from-action-primary to-primary-dark hover:from-primary-dark hover:to-action-primary shadow-purple hover:shadow-xl"
                 >
                   {isSubmitting ? (
                     <>
@@ -382,13 +397,6 @@ function SubmitDealContent() {
                   )}
                 </Button>
               </div>
-
-              {/* Auto-approval notice */}
-              {user?.auto_approve && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-                  ✨ Your deals are auto-approved! This deal will be visible immediately.
-                </div>
-              )}
             </CardBody>
           </Card>
         </form>
