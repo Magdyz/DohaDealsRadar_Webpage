@@ -63,26 +63,50 @@ export function useInfiniteScroll({
 }: UseInfiniteScrollOptions) {
   const observerTarget = useRef<HTMLDivElement>(null)
 
+  // Track loading state synchronously to prevent race conditions
+  const isLoadingRef = useRef(false)
+  const hasMoreRef = useRef(hasMore)
+
+  // Update refs when props change
+  useEffect(() => {
+    isLoadingRef.current = isLoading
+  }, [isLoading])
+
+  useEffect(() => {
+    hasMoreRef.current = hasMore
+  }, [hasMore])
+
   const handleIntersection = useCallback(
     async (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries
 
       // Only load more if:
       // 1. Target is intersecting (visible)
-      // 2. Not currently loading
-      // 3. There are more items to load
+      // 2. Not currently loading (check ref for immediate value)
+      // 3. There are more items to load (check ref for immediate value)
       // 4. Hook is enabled
-      if (entry.isIntersecting && !isLoading && hasMore && enabled) {
-        await onLoadMore()
+      if (
+        entry.isIntersecting &&
+        !isLoadingRef.current &&
+        hasMoreRef.current &&
+        enabled
+      ) {
+        // Set loading flag immediately to prevent duplicate calls
+        isLoadingRef.current = true
+        try {
+          await onLoadMore()
+        } finally {
+          // Reset will happen when isLoading state updates via useEffect above
+        }
       }
     },
-    [onLoadMore, isLoading, hasMore, enabled]
+    [onLoadMore, enabled]
   )
 
   useEffect(() => {
     const currentTarget = observerTarget.current
 
-    if (!currentTarget || !enabled) {
+    if (!currentTarget || !enabled || !hasMore) {
       return
     }
 
@@ -103,7 +127,7 @@ export function useInfiniteScroll({
       }
       observer.disconnect()
     }
-  }, [handleIntersection, threshold, enabled])
+  }, [handleIntersection, threshold, enabled, hasMore])
 
   return { observerTarget }
 }
