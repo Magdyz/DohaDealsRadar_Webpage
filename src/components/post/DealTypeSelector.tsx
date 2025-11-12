@@ -11,64 +11,64 @@ interface DealTypeSelectorProps {
 export default function DealTypeSelector({ value, onChange }: DealTypeSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-text-primary mb-3">
+      <label className="block text-base font-semibold text-text-primary mb-3">
         Deal Type *
       </label>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         <button
           type="button"
           onClick={() => onChange('online')}
           className={cn(
-            'p-6 border-2 rounded-lg transition-all text-left',
+            'p-4 border-2 rounded-xl transition-all text-left',
             value === 'online'
-              ? 'border-primary bg-primary/5'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-primary bg-primary/10 shadow-sm'
+              : 'border-border hover:border-primary/50 hover:bg-primary/5'
           )}
         >
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3">
             <div
               className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center',
-                value === 'online' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+                'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+                value === 'online' ? 'bg-primary text-white' : 'bg-background-secondary text-text-secondary'
               )}
             >
-              <Globe className="w-6 h-6" />
+              <Globe className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-text-primary">Online Deal</h3>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-text-primary mb-0.5">Online Deal</h3>
+              <p className="text-xs text-text-secondary leading-snug">
+                Website or online store
+              </p>
             </div>
           </div>
-          <p className="text-sm text-text-secondary">
-            Deal available through a website or online store
-          </p>
         </button>
 
         <button
           type="button"
           onClick={() => onChange('physical')}
           className={cn(
-            'p-6 border-2 rounded-lg transition-all text-left',
+            'p-4 border-2 rounded-xl transition-all text-left',
             value === 'physical'
-              ? 'border-primary bg-primary/5'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-primary bg-primary/10 shadow-sm'
+              : 'border-border hover:border-primary/50 hover:bg-primary/5'
           )}
         >
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3">
             <div
               className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center',
-                value === 'physical' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+                'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+                value === 'physical' ? 'bg-primary text-white' : 'bg-background-secondary text-text-secondary'
               )}
             >
-              <MapPin className="w-6 h-6" />
+              <MapPin className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-text-primary">Physical Deal</h3>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-text-primary mb-0.5">Physical Deal</h3>
+              <p className="text-xs text-text-secondary leading-snug">
+                Physical location in Doha
+              </p>
             </div>
           </div>
-          <p className="text-sm text-text-secondary">
-            Deal available at a physical location in Doha
-          </p>
         </button>
       </div>
     </div>
