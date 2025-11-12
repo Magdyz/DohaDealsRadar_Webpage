@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Doha Deals Radar</title>
+    <style>
+        /* Inline styles matching the app's theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #C57AF7 0%, #9046CF 100%);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #FFFFFF;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .button {
+            display: inline-block;
+            background: #FFFFFF;
+            color: #9046CF;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:hover {
+            background: #F3F4F6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .offline-features {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature {
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .feature::before {
+            content: "✓ ";
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .connection-status {
+            margin-top: 24px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF6B35;
+            margin-right: 8px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you've lost your internet connection. Don't worry, we've saved your recent activity!
+        </p>
+
+        <a href="/" class="button" onclick="window.location.reload(); return false;">
+            Try Again
+        </a>
+
+        <div class="offline-features">
+            <div class="feature">Previously viewed deals are cached</div>
+            <div class="feature">Your votes and preferences are saved</div>
+            <div class="feature">Auto-sync when connection returns</div>
+        </div>
+
+        <div class="connection-status">
+            <span class="dot"></span>
+            Waiting for connection...
+        </div>
+    </div>
+
+    <script>
+        // Auto-reload when connection is restored
+        function checkConnection() {
+            if (navigator.onLine) {
+                window.location.reload();
+            }
+        }
+
+        // Check connection every 3 seconds
+        setInterval(checkConnection, 3000);
+
+        // Listen for online event
+        window.addEventListener('online', function() {
+            window.location.reload();
+        });
+
+        // Show connection restored message briefly before reload
+        window.addEventListener('online', function() {
+            const statusDiv = document.querySelector('.connection-status');
+            statusDiv.innerHTML = '<span style="background: #4CAF50;" class="dot"></span>Connection restored! Reloading...';
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
