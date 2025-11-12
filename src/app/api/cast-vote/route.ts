@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Update deal vote counts
     const { data: deal, error: dealError } = await supabase
       .from('deals')
-      .select('hot_count, cold_count')
+      .select('hot_votes, cold_votes')
       .eq('id', dealId)
       .single()
 
@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
     }
 
     const updates = voteType === 'hot'
-      ? { hot_count: (deal.hot_count || 0) + 1 }
-      : { cold_count: (deal.cold_count || 0) + 1 }
+      ? { hot_votes: (deal.hot_votes || 0) + 1 }
+      : { cold_votes: (deal.cold_votes || 0) + 1 }
 
     const { error: updateError } = await supabase
       .from('deals')
@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Vote recorded successfully',
-      hotVotes: voteType === 'hot' ? updates.hot_count : deal.hot_count,
-      coldVotes: voteType === 'cold' ? updates.cold_count : deal.cold_count,
+      hotVotes: voteType === 'hot' ? updates.hot_votes : deal.hot_votes,
+      coldVotes: voteType === 'cold' ? updates.cold_votes : deal.cold_votes,
     })
   } catch (error: any) {
     console.error('Cast vote API error:', error)

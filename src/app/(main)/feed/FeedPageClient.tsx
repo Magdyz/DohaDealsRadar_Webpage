@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, User, Package, Shield } from 'lucide-react'
+import { Plus, User, Package, Shield, Archive } from 'lucide-react'
 import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
 import { getDeals } from '@/lib/api/deals'
@@ -182,6 +182,15 @@ export default function FeedPage() {
                   onClick={() => router.push('/moderation')}
                 >
                   <Shield className="w-5 h-5" />
+                </Button>
+              )}
+              {user && user.role === 'admin' && (
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={() => router.push('/archive')}
+                >
+                  <Archive className="w-5 h-5" />
                 </Button>
               )}
               <Button
