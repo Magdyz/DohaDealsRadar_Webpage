@@ -1,30 +1,39 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary Purple Accent */
-  --color-primary: #8b5cf6;
-  --color-primary-light: #a78bfa;
-  --color-primary-dark: #7c3aed;
+  /* Vinted-inspired Purple Palette - matching Android app exactly */
+  --color-primary: #C57AF7;
+  --color-primary-light: #E9E4FF;
+  --color-primary-dark: #9046CF;
+  --color-action-primary: #9046CF;
 
-  /* Dark Theme Colors */
-  --color-background: #0a0a0a;
-  --color-background-secondary: #121212;
-  --color-surface: #1a1a1a;
-  --color-surface-variant: #2a2a2a;
-  --color-card: #1e1e1e;
+  /* Light Theme Colors (matching Android) */
+  --color-background: #FAFBFC;
+  --color-background-secondary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-variant: #F3F4F6;
+  --color-card: #FFFFFF;
+  --color-purple-container: #E9E4FF;
 
-  /* Text Colors */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #e0e0e0;
-  --color-text-tertiary: #9ca3af;
+  /* Text Colors (matching Android) */
+  --color-text-primary: #0F1419;
+  --color-text-secondary: #5B7083;
+  --color-text-tertiary: #8B96A3;
 
-  /* Accent Colors */
-  --color-accent-hot: #ef4444;
-  --color-accent-cold: #3b82f6;
+  /* Vote Colors (matching Android) */
+  --color-hot-bg: #FFF4ED;
+  --color-hot-content: #FF6B35;
+  --color-cold-bg: #EFF6FF;
+  --color-cold-content: #4A90E2;
 
-  /* Border Colors */
-  --color-border: #2a2a2a;
-  --color-border-light: #3a3a3a;
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  /* Border Colors (matching Android) */
+  --color-border: #E8EAED;
+  --color-border-light: #F3F4F6;
 }
 
 * {
@@ -54,6 +63,15 @@ a {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 

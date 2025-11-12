@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const fileExt = filename.split('.').pop()
     const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    const filePath = `deals/images/${uniqueFilename}`
+    const filePath = `images/${uniqueFilename}`
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage

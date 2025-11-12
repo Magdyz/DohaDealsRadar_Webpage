@@ -81,14 +81,15 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-surface shadow-lg sticky top-0 z-20 border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-5">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
+      {/* Header - Compact, mobile-first */}
+      <div className="bg-surface shadow-sm sticky top-0 z-20 border-b border-border">
+        <div className="max-w-7xl mx-auto px-3 py-3 md:px-4 md:py-4">
+          {/* Top Bar - Title & Icons */}
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl md:text-2xl font-bold text-text-primary">
               Doha Deals Radar
             </h1>
-            <div className="flex gap-2">
+            <div className="hidden md:flex gap-2">
               {user && (user.role === 'moderator' || user.role === 'admin') && (
                 <Button
                   variant="outline"
@@ -109,6 +110,7 @@ export default function FeedPage() {
                 variant="primary"
                 size="md"
                 onClick={() => router.push('/submit')}
+                className="bg-action-primary hover:bg-primary-dark"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Post Deal
@@ -118,18 +120,18 @@ export default function FeedPage() {
 
           {/* Search */}
           <SearchBar value={search} onChange={handleSearchChange} />
+        </div>
 
-          {/* Category Filter */}
-          <div className="mt-4">
-            <CategoryFilter selected={category} onChange={handleCategoryChange} />
-          </div>
+        {/* Category Filter - Horizontal Scroll */}
+        <div className="overflow-x-auto scrollbar-hide">
+          <CategoryFilter selected={category} onChange={handleCategoryChange} />
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Content - Mobile-first 2-column grid */}
+      <div className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-6">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <DealCardSkeleton key={i} />
             ))}
@@ -140,19 +142,19 @@ export default function FeedPage() {
             <Button
               variant="primary"
               size="md"
-              className="mx-auto"
+              className="mx-auto bg-action-primary hover:bg-primary-dark"
               onClick={() => loadDeals(true)}
             >
               Try Again
             </Button>
           </div>
         ) : deals.length === 0 ? (
-          <div className="bg-card rounded-2xl p-12 border border-border text-center max-w-md mx-auto">
-            <Package className="w-20 h-20 text-text-tertiary mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-text-primary mb-2">
+          <div className="bg-card rounded-2xl p-8 md:p-12 border border-border text-center max-w-md mx-auto">
+            <Package className="w-16 md:w-20 h-16 md:h-20 text-text-tertiary mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg md:text-xl font-bold text-text-primary mb-2">
               No deals found
             </h3>
-            <p className="text-text-secondary mb-6">
+            <p className="text-sm md:text-base text-text-secondary mb-6">
               {search || category
                 ? 'Try adjusting your search or filters'
                 : 'Be the first to post a deal!'}
@@ -162,6 +164,7 @@ export default function FeedPage() {
                 variant="primary"
                 size="md"
                 onClick={() => router.push('/submit')}
+                className="bg-action-primary hover:bg-primary-dark"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Post Deal
@@ -170,8 +173,8 @@ export default function FeedPage() {
           </div>
         ) : (
           <>
-            {/* Deals Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Deals Grid - Mobile-first 2 columns */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
               {deals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}
@@ -179,8 +182,8 @@ export default function FeedPage() {
 
             {/* Load More Loading Skeletons */}
             {isLoadingMore && (
-              <div className="space-y-4 mt-6">
-                {[1, 2, 3].map((i) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mt-2 md:mt-4">
+                {[1, 2, 3, 4].map((i) => (
                   <DealCardSkeleton key={i} />
                 ))}
               </div>
@@ -188,12 +191,12 @@ export default function FeedPage() {
 
             {/* Load More */}
             {hasMore && !isLoadingMore && (
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-4 md:mt-6">
                 <Button
                   variant="outline"
                   size="lg"
                   onClick={handleLoadMore}
-                  className="hover:bg-primary hover:text-white transition-all duration-300"
+                  className="hover:bg-action-primary hover:text-white transition-all duration-300"
                 >
                   Load More Deals
                 </Button>
@@ -201,7 +204,7 @@ export default function FeedPage() {
             )}
 
             {!hasMore && deals.length > 0 && (
-              <p className="text-center text-text-tertiary mt-6">
+              <p className="text-center text-text-tertiary text-sm mt-4 md:mt-6">
                 You've reached the end!
               </p>
             )}
@@ -210,23 +213,19 @@ export default function FeedPage() {
       </div>
 
       {/* Floating Action Buttons (Mobile) */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 md:hidden">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="rounded-full w-14 h-14 p-0 shadow-lg"
+      <div className="fixed bottom-4 right-4 flex flex-col gap-3 md:hidden">
+        <button
+          className="w-14 h-14 rounded-full bg-surface border-2 border-border shadow-lg flex items-center justify-center text-text-primary hover:bg-background-secondary transition-colors"
           onClick={() => router.push('/account')}
         >
           <User className="w-6 h-6" />
-        </Button>
-        <Button
-          variant="primary"
-          size="lg"
-          className="rounded-full w-14 h-14 p-0 shadow-lg"
+        </button>
+        <button
+          className="w-14 h-14 rounded-full bg-action-primary shadow-lg flex items-center justify-center text-white hover:bg-primary-dark transition-colors"
           onClick={() => router.push('/submit')}
         >
           <Plus className="w-6 h-6" />
-        </Button>
+        </button>
       </div>
     </div>
   )

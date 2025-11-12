@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Flame, Snowflake, Clock, MapPin, Tag as TagIcon } from 'lucide-react'
-import { formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
-import { CATEGORIES } from '@/types'
+import { Eye } from 'lucide-react'
+import { formatRelativeTime } from '@/lib/utils'
 import type { Deal } from '@/types'
 
 interface DealCardProps {
@@ -13,138 +12,94 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal }: DealCardProps) {
-  const [hotVotes, setHotVotes] = useState(deal.hotVotes)
-  const [coldVotes, setColdVotes] = useState(deal.coldVotes)
   const [imageError, setImageError] = useState(false)
 
-  const daysLeft = getDaysUntilExpiry(deal.expiresAt)
-  const isExpired = daysLeft < 0
-  const isExpiringSoon = daysLeft <= 2 && daysLeft >= 0
-
-  const getCategoryInfo = () => {
-    return CATEGORIES.find((c) => c.id === deal.category)
-  }
-
-  const categoryInfo = getCategoryInfo()
+  // Check if deal is new (within 48 hours)
+  const isNewDeal = useMemo(() => {
+    const createdAt = new Date(deal.createdAt)
+    const now = new Date()
+    const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60)
+    return hoursDiff <= 48
+  }, [deal.createdAt])
 
   // Check if image URL is valid
   const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in group border border-border">
-      {/* Image Section */}
-      <Link href={`/deals/${deal.id}`} className="relative block">
-        <div className="relative w-full h-56 bg-surface-variant overflow-hidden">
-          {hasValidImage ? (
-            <Image
-              src={deal.imageUrl}
-              alt={deal.title}
-              fill
-              unoptimized
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-900/20 via-purple-800/10 to-blue-900/20">
-              <TagIcon className="w-20 h-20 text-purple-500/30 mb-2" />
-              <span className="text-sm text-purple-400/50 font-medium">No Image</span>
-            </div>
-          )}
+    <div className="bg-surface rounded-2xl overflow-hidden border border-border/20 transition-all duration-200 hover:shadow-lg">
+      {/* Image Section with Vote Buttons Overlay */}
+      <Link href={`/deals/${deal.id}`} className="block">
+        <div className="relative w-full aspect-square p-2">
+          <div className="relative w-full h-full rounded-xl overflow-hidden bg-white">
+            {hasValidImage ? (
+              <Image
+                src={deal.imageUrl}
+                alt={deal.title}
+                fill
+                unoptimized
+                className="object-contain"
+                sizes="(max-width: 768px) 50vw, 33vw"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                <span className="text-6xl text-gray-300">📷</span>
+              </div>
+            )}
 
-          {/* Vote Badges Overlay */}
-          <div className="absolute top-3 left-3 flex gap-2">
-            {hotVotes > 0 && (
-              <div className="flex items-center gap-1 bg-red-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg">
-                <Flame className="w-4 h-4 text-white" fill="white" />
-                <span className="text-xs font-bold text-white">{hotVotes}</span>
+            {/* New Badge - Top Right */}
+            {isNewDeal && (
+              <div className="absolute top-1.5 right-1.5 bg-action-primary/90 rounded-full px-2 py-1">
+                <span className="text-white text-[11px] font-bold tracking-wide">New</span>
               </div>
             )}
-            {coldVotes > 0 && (
-              <div className="flex items-center gap-1 bg-blue-500/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg">
-                <Snowflake className="w-4 h-4 text-white" fill="white" />
-                <span className="text-xs font-bold text-white">{coldVotes}</span>
-              </div>
-            )}
+
+            {/* Vote Buttons - Bottom Center with Glass-morphism */}
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-black/25 backdrop-blur-sm rounded-full px-1.5 py-1">
+              {/* Hot Vote Button */}
+              <button
+                className="flex items-center gap-1 bg-hot-bg rounded-full px-1.5 py-1 border border-hot-content/30 min-w-[40px] h-6"
+                onClick={(e) => {
+                  e.preventDefault()
+                  // Vote handling would go here
+                }}
+              >
+                <span className="text-[11px]">🔥</span>
+                <span className="text-hot-content text-[10px] font-medium">{deal.hotVotes}</span>
+              </button>
+
+              {/* Cold Vote Button */}
+              <button
+                className="flex items-center gap-1 bg-cold-bg rounded-full px-1.5 py-1 border border-cold-content/30 min-w-[40px] h-6"
+                onClick={(e) => {
+                  e.preventDefault()
+                  // Vote handling would go here
+                }}
+              >
+                <span className="text-[11px]">❄️</span>
+                <span className="text-cold-content text-[10px] font-medium">{deal.coldVotes}</span>
+              </button>
+            </div>
           </div>
-
-          {/* Time Badge */}
-          {!isExpired && (
-            <div className="absolute top-3 right-3">
-              <div className="flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                <Clock className="w-3.5 h-3.5 text-white" />
-                <span className={`text-xs font-semibold ${isExpiringSoon ? 'text-red-400' : 'text-white'}`}>
-                  {daysLeft}d
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Expired Overlay */}
-          {isExpired && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
-              <div className="bg-red-500 px-4 py-2 rounded-full">
-                <span className="text-white font-bold text-sm">EXPIRED</span>
-              </div>
-            </div>
-          )}
         </div>
       </Link>
 
       {/* Content Section */}
-      <div className="p-4">
-        {/* Category */}
-        {categoryInfo && (
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-lg">{categoryInfo.emoji}</span>
-            <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">
-              {categoryInfo.label}
-            </span>
-          </div>
-        )}
-
-        {/* Title */}
+      <div className="px-3 pb-3 space-y-2.5">
+        {/* Title - 2 lines max, fixed height */}
         <Link href={`/deals/${deal.id}`}>
-          <h3 className="text-lg font-bold text-text-primary hover:text-primary mb-2 line-clamp-2 transition-colors">
+          <h3 className="text-[13px] font-bold text-text-primary leading-5 line-clamp-2 h-10 hover:text-primary-dark transition-colors">
             {deal.title}
           </h3>
         </Link>
 
-        {/* Description */}
-        {deal.description && (
-          <p className="text-sm text-text-secondary mb-3 line-clamp-2">
-            {deal.description}
-          </p>
-        )}
-
-        {/* Metadata */}
-        <div className="flex flex-wrap gap-3 text-xs text-text-tertiary mb-4">
-          {deal.location && (
-            <div className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{deal.location}</span>
-            </div>
-          )}
-          {deal.promoCode && (
-            <div className="flex items-center gap-1">
-              <TagIcon className="w-3.5 h-3.5" />
-              <span className="font-mono font-semibold">{deal.promoCode}</span>
-            </div>
-          )}
-        </div>
-
-        {/* View Deal Button */}
-        <Link href={`/deals/${deal.id}`}>
-          <button className="w-full bg-primary hover:bg-primary-light text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02]">
-            View Deal
+        {/* View Deal Button - Full width, prominent */}
+        <Link href={`/deals/${deal.id}`} className="block">
+          <button className="w-full h-11 bg-action-primary hover:bg-primary-dark text-white rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md">
+            <Eye className="w-4.5 h-4.5" />
+            <span>View Deal</span>
           </button>
         </Link>
-
-        {/* Footer Info */}
-        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-text-tertiary">
-          <span>by {deal.username || 'Anonymous'}</span>
-          <span>{formatRelativeTime(deal.createdAt)}</span>
-        </div>
       </div>
     </div>
   )

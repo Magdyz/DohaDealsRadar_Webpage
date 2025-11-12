@@ -83,16 +83,16 @@ export default function VoteButtons({
         onClick={() => handleVote('hot')}
         disabled={hasVoted(dealId) || isVoting}
         className={cn(
-          'flex items-center gap-1 px-3 py-1.5 rounded-full transition-all',
-          'border-2 text-sm font-medium',
+          'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all',
+          'border text-sm font-medium min-w-[60px]',
           userVote === 'hot'
-            ? 'border-accent-hot bg-accent-hot text-white'
-            : 'border-accent-hot text-accent-hot hover:bg-accent-hot/10',
+            ? 'bg-white border-hot-content/30'
+            : 'bg-hot-bg border-hot-content/30 hover:bg-hot-content/10',
           (hasVoted(dealId) || isVoting) && 'opacity-50 cursor-not-allowed'
         )}
       >
-        <Flame className="w-4 h-4" />
-        <span>{hotVotes}</span>
+        <span className="text-base">🔥</span>
+        <span className="text-hot-content font-medium">{hotVotes}</span>
       </button>
 
       {/* Cold Vote Button */}
@@ -100,16 +100,16 @@ export default function VoteButtons({
         onClick={() => handleVote('cold')}
         disabled={hasVoted(dealId) || isVoting}
         className={cn(
-          'flex items-center gap-1 px-3 py-1.5 rounded-full transition-all',
-          'border-2 text-sm font-medium',
+          'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all',
+          'border text-sm font-medium min-w-[60px]',
           userVote === 'cold'
-            ? 'border-accent-cold bg-accent-cold text-white'
-            : 'border-accent-cold text-accent-cold hover:bg-accent-cold/10',
+            ? 'bg-white border-cold-content/30'
+            : 'bg-cold-bg border-cold-content/30 hover:bg-cold-content/10',
           (hasVoted(dealId) || isVoting) && 'opacity-50 cursor-not-allowed'
         )}
       >
-        <Snowflake className="w-4 h-4" />
-        <span>{coldVotes}</span>
+        <span className="text-base">❄️</span>
+        <span className="text-cold-content font-medium">{coldVotes}</span>
       </button>
     </div>
   )

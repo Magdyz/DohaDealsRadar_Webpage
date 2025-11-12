@@ -47,11 +47,45 @@ export async function GET(request: NextRequest) {
       throw error
     }
 
+    // Transform database fields to match frontend types (snake_case to camelCase)
+    const transformedDeals = await Promise.all((deals || []).map(async (deal: any) => {
+      // Get username from users table
+      let username = null
+      if (deal.user_id) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('username')
+          .eq('id', deal.user_id)
+          .single()
+        username = userData?.username || null
+      }
+
+      return {
+        id: deal.id,
+        title: deal.title,
+        description: deal.description,
+        imageUrl: deal.image_url,
+        link: deal.link,
+        location: deal.location,
+        category: deal.category,
+        promoCode: deal.promo_code,
+        hotVotes: deal.hot_votes || 0,
+        coldVotes: deal.cold_votes || 0,
+        username: username,
+        userId: deal.user_id,
+        isApproved: deal.is_approved,
+        isArchived: deal.is_archived,
+        createdAt: deal.created_at,
+        updatedAt: deal.updated_at,
+        expiresAt: deal.expires_at,
+      }
+    }))
+
     const total = count || 0
     const hasMore = total > page * limit
 
     return NextResponse.json({
-      deals: deals || [],
+      deals: transformedDeals,
       total,
       page,
       limit,

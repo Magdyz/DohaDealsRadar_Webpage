@@ -29,7 +29,39 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Deal not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ deal })
+    // Get username from users table
+    let username = null
+    if (deal.user_id) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('username')
+        .eq('id', deal.user_id)
+        .single()
+      username = userData?.username || null
+    }
+
+    // Transform database fields to match frontend types (snake_case to camelCase)
+    const transformedDeal = {
+      id: deal.id,
+      title: deal.title,
+      description: deal.description,
+      imageUrl: deal.image_url,
+      link: deal.link,
+      location: deal.location,
+      category: deal.category,
+      promoCode: deal.promo_code,
+      hotVotes: deal.hot_votes || 0,
+      coldVotes: deal.cold_votes || 0,
+      username: username,
+      userId: deal.user_id,
+      isApproved: deal.is_approved,
+      isArchived: deal.is_archived,
+      createdAt: deal.created_at,
+      updatedAt: deal.updated_at,
+      expiresAt: deal.expires_at,
+    }
+
+    return NextResponse.json({ deal: transformedDeal })
   } catch (error: any) {
     console.error('Get deal API error:', error)
     return NextResponse.json(

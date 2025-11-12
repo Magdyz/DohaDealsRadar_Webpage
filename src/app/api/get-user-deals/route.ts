@@ -22,8 +22,11 @@ export async function GET(request: NextRequest) {
 
     const { data: deals, error, count } = await supabase
       .from('deals')
-      .select('*', { count: 'exact' })
-      .eq('submitted_by_user_id', userId)
+      .select(`
+        *,
+        users!user_id (username)
+      `, { count: 'exact' })
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(from, to)
 
@@ -31,11 +34,32 @@ export async function GET(request: NextRequest) {
       throw error
     }
 
+    // Transform database fields to match frontend types (snake_case to camelCase)
+    const transformedDeals = (deals || []).map((deal: any) => ({
+      id: deal.id,
+      title: deal.title,
+      description: deal.description,
+      imageUrl: deal.image_url,
+      link: deal.link,
+      location: deal.location,
+      category: deal.category,
+      promoCode: deal.promo_code,
+      hotVotes: deal.hot_votes || 0,
+      coldVotes: deal.cold_votes || 0,
+      username: deal.users?.username || null,
+      userId: deal.user_id,
+      isApproved: deal.is_approved,
+      isArchived: deal.is_archived,
+      createdAt: deal.created_at,
+      updatedAt: deal.updated_at,
+      expiresAt: deal.expires_at,
+    }))
+
     const total = count || 0
     const hasMore = total > page * limit
 
     return NextResponse.json({
-      deals: deals || [],
+      deals: transformedDeals,
       total,
       page,
       limit,

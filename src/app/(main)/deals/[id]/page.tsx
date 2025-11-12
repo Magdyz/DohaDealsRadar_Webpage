@@ -114,183 +114,182 @@ export default function DealDetailsPage() {
   const categoryInfo = getCategoryInfo()
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="bg-surface shadow-sm sticky top-0 z-10 border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="md" onClick={() => router.back()}>
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
-            </Button>
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-text-primary hover:text-action-primary transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Back</span>
+            </button>
             <div className="flex gap-2">
-              <Button variant="outline" size="md" onClick={handleShare}>
-                <Share2 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="md"
-                onClick={() => router.push(`/report/${dealId}`)}
+              <button
+                onClick={handleShare}
+                className="p-2 hover:bg-background-secondary rounded-full transition-colors"
               >
-                <Flag className="w-5 h-5" />
-              </Button>
+                <Share2 className="w-5 h-5 text-text-secondary" />
+              </button>
+              <button
+                onClick={() => router.push(`/report/${dealId}`)}
+                className="p-2 hover:bg-background-secondary rounded-full transition-colors"
+              >
+                <Flag className="w-5 h-5 text-text-secondary" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <Card variant="elevated">
-          <CardBody className="p-0">
-            {/* Image */}
-            <div className="relative w-full h-96 bg-gray-100">
-              {deal.imageUrl && deal.imageUrl.trim() !== '' ? (
-                <Image
-                  src={deal.imageUrl}
-                  alt={deal.title}
-                  fill
-                  unoptimized
-                  className="object-contain"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">
-                  <Tag className="w-24 h-24 text-purple-400" />
+      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6">
+        <div className="bg-surface rounded-2xl overflow-hidden shadow-sm border border-border">
+          {/* Image */}
+          <div className="relative w-full aspect-square md:aspect-video bg-white">
+            {deal.imageUrl && deal.imageUrl.trim() !== '' ? (
+              <Image
+                src={deal.imageUrl}
+                alt={deal.title}
+                fill
+                unoptimized
+                className="object-contain"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                <Tag className="w-24 h-24 text-gray-300" />
+              </div>
+            )}
+            {isExpired && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <div className="bg-red-500 px-6 py-3 rounded-full">
+                  <span className="text-white font-bold">EXPIRED</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="p-4 md:p-6">
+            {/* Category & Expiry */}
+            <div className="flex items-center justify-between mb-4">
+              {categoryInfo && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-light rounded-full">
+                  <span className="text-lg">{categoryInfo.emoji}</span>
+                  <span className="text-sm font-semibold text-action-primary">{categoryInfo.label}</span>
                 </div>
               )}
-              {isExpired && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <Badge variant="danger" size="lg">
-                    This deal has expired
-                  </Badge>
-                </div>
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              {/* Category & Expiry */}
-              <div className="flex items-center justify-between mb-4">
-                {categoryInfo && (
-                  <Badge variant="purple" size="md">
-                    <span className="flex items-center gap-2">
-                      <span className="text-lg">{categoryInfo.emoji}</span>
-                      <span>{categoryInfo.label}</span>
-                    </span>
-                  </Badge>
-                )}
-                {!isExpired && (
-                  <div className="flex items-center gap-1 text-sm text-text-tertiary">
-                    <Clock className="w-4 h-4" />
-                    <span
-                      className={isExpiringSoon ? 'text-red-600 font-semibold' : ''}
-                    >
-                      {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Title */}
-              <h1 className="text-3xl font-bold text-text-primary mb-4">
-                {deal.title}
-              </h1>
-
-              {/* Description */}
-              {deal.description && (
-                <p className="text-base text-text-secondary mb-6 whitespace-pre-wrap">
-                  {deal.description}
-                </p>
-              )}
-
-              {/* Metadata Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {deal.link && (
-                  <a
-                    href={deal.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <ExternalLink className="w-5 h-5 text-primary flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-text-tertiary mb-1">Visit Deal</div>
-                      <div className="text-sm font-medium text-text-primary truncate">
-                        {new URL(deal.link).hostname}
-                      </div>
-                    </div>
-                  </a>
-                )}
-
-                {deal.location && (
-                  <div className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg">
-                    <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
-                    <div>
-                      <div className="text-xs text-text-tertiary mb-1">Location</div>
-                      <div className="text-sm font-medium text-text-primary">
-                        {deal.location}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {deal.promoCode && (
-                  <button
-                    onClick={handleCopyPromoCode}
-                    className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Tag className="w-5 h-5 text-primary flex-shrink-0" />
-                    <div className="flex-1 text-left">
-                      <div className="text-xs text-text-tertiary mb-1">Promo Code</div>
-                      <div className="text-sm font-mono font-semibold text-text-primary">
-                        {deal.promoCode}
-                      </div>
-                    </div>
-                    {copySuccess ? (
-                      <Badge variant="success" size="sm">
-                        Copied!
-                      </Badge>
-                    ) : (
-                      <Copy className="w-4 h-4 text-text-tertiary" />
-                    )}
-                  </button>
-                )}
-              </div>
-
-              {/* Vote Section */}
               {!isExpired && (
-                <div className="flex items-center justify-between py-4 border-t border-b border-gray-200 mb-6">
-                  <div className="text-sm text-text-secondary">
-                    Vote if this deal is hot or cold
-                  </div>
-                  <VoteButtons
-                    dealId={deal.id}
-                    initialHotVotes={deal.hotVotes}
-                    initialColdVotes={deal.coldVotes}
-                  />
-                </div>
-              )}
-
-              {/* Posted By & Date */}
-              <div className="flex items-center gap-4 text-sm text-text-tertiary">
-                <div className="flex items-center gap-1">
-                  <User className="w-4 h-4" />
-                  <span>
-                    Posted by <strong>{deal.username || 'Anonymous'}</strong>
+                <div className="flex items-center gap-1 text-sm text-text-tertiary">
+                  <Clock className="w-4 h-4" />
+                  <span className={isExpiringSoon ? 'text-red-600 font-semibold' : ''}>
+                    {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
                   </span>
                 </div>
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>{formatRelativeTime(deal.createdAt)}</span>
-                </div>
-                <span>•</span>
-                <span>Expires {formatDate(deal.expiresAt)}</span>
-              </div>
+              )}
             </div>
-          </CardBody>
-        </Card>
+
+            {/* Title */}
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+              {deal.title}
+            </h1>
+
+            {/* Description */}
+            {deal.description && (
+              <p className="text-base text-text-secondary mb-6 whitespace-pre-wrap leading-relaxed">
+                {deal.description}
+              </p>
+            )}
+
+            {/* Metadata Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+              {deal.link && (
+                <a
+                  href={deal.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 bg-background-secondary rounded-xl hover:bg-border-light transition-colors"
+                >
+                  <ExternalLink className="w-5 h-5 text-action-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-text-tertiary mb-1">Visit Deal</div>
+                    <div className="text-sm font-medium text-text-primary truncate">
+                      {new URL(deal.link).hostname}
+                    </div>
+                  </div>
+                </a>
+              )}
+
+              {deal.location && (
+                <div className="flex items-center gap-3 p-4 bg-background-secondary rounded-xl">
+                  <MapPin className="w-5 h-5 text-action-primary flex-shrink-0" />
+                  <div>
+                    <div className="text-xs text-text-tertiary mb-1">Location</div>
+                    <div className="text-sm font-medium text-text-primary">
+                      {deal.location}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {deal.promoCode && (
+                <button
+                  onClick={handleCopyPromoCode}
+                  className="flex items-center gap-3 p-4 bg-background-secondary rounded-xl hover:bg-border-light transition-colors"
+                >
+                  <Tag className="w-5 h-5 text-action-primary flex-shrink-0" />
+                  <div className="flex-1 text-left">
+                    <div className="text-xs text-text-tertiary mb-1">Promo Code</div>
+                    <div className="text-sm font-mono font-semibold text-text-primary">
+                      {deal.promoCode}
+                    </div>
+                  </div>
+                  {copySuccess ? (
+                    <div className="bg-green-500 px-2 py-1 rounded-full">
+                      <span className="text-xs font-bold text-white">Copied!</span>
+                    </div>
+                  ) : (
+                    <Copy className="w-4 h-4 text-text-tertiary" />
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Vote Section */}
+            {!isExpired && (
+              <div className="flex items-center justify-between py-4 border-t border-b border-border mb-6">
+                <div className="text-sm text-text-secondary">
+                  Vote if this deal is hot or cold
+                </div>
+                <VoteButtons
+                  dealId={deal.id}
+                  initialHotVotes={deal.hotVotes}
+                  initialColdVotes={deal.coldVotes}
+                />
+              </div>
+            )}
+
+            {/* Posted By & Date */}
+            <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-text-tertiary">
+              <div className="flex items-center gap-1">
+                <User className="w-4 h-4" />
+                <span>
+                  Posted by <strong className="text-text-secondary">{deal.username || 'Anonymous'}</strong>
+                </span>
+              </div>
+              <span className="hidden md:inline">•</span>
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                <span>{formatRelativeTime(deal.createdAt)}</span>
+              </div>
+              <span className="hidden md:inline">•</span>
+              <span>Expires {formatDate(deal.expiresAt)}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

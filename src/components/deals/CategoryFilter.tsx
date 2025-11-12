@@ -15,17 +15,16 @@ export default function CategoryFilter({
   onChange,
 }: CategoryFilterProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-2 overflow-x-auto pb-2 px-3 md:px-4 scrollbar-hide">
       <button
         onClick={() => onChange('')}
         className={cn(
-          'px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200',
+          'px-4 py-2 rounded-full text-[15px] font-semibold whitespace-nowrap transition-all duration-200 h-10',
           selected === ''
-            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
-            : 'bg-surface-variant text-text-secondary border border-border hover:border-primary/50 hover:bg-surface'
+            ? 'bg-action-primary text-white border-2 border-action-primary'
+            : 'bg-transparent text-text-primary border border-border/40 hover:border-action-primary/50'
         )}
       >
-        <span className="text-base mr-1.5">🔥</span>
         All
       </button>
 
@@ -34,10 +33,10 @@ export default function CategoryFilter({
           key={category.id}
           onClick={() => onChange(category.id)}
           className={cn(
-            'px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-2',
+            'px-4 py-2 rounded-full text-[15px] font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 h-10',
             selected === category.id
-              ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
-              : 'bg-surface-variant text-text-secondary border border-border hover:border-primary/50 hover:bg-surface'
+              ? 'bg-action-primary text-white border-2 border-action-primary'
+              : 'bg-transparent text-text-primary border border-border/40 hover:border-action-primary/50'
           )}
         >
           <span className="text-base">{category.emoji}</span>
