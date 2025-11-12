@@ -1,6 +1,8 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
+:root {
   /* Vinted-inspired Purple Palette - matching Android app exactly */
   --color-primary: #c57af7;
   --color-primary-light: #e9e4ff;
