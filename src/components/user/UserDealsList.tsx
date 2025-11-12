@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ExternalLink, MapPin, Tag, Calendar, Clock, Package } from 'lucide-react'
 import { Card, CardBody, Badge, Button, Spinner } from '@/components/ui'
 import { getUserDeals } from '@/lib/api/deals'
@@ -20,18 +20,22 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState('')
-  const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+
+  // Use ref to track next page - updates immediately, no async issues
+  const nextPageRef = useRef(1)
 
   useEffect(() => {
     loadDeals(true)
   }, [userId])
 
   const loadDeals = async (reset: boolean = false) => {
-    const currentPage = reset ? 1 : page
+    // Use ref for immediate, synchronous page tracking
+    const currentPage = reset ? 1 : nextPageRef.current
 
     if (reset) {
       setIsLoading(true)
+      nextPageRef.current = 1 // Reset to page 1
     } else {
       setIsLoadingMore(true)
     }
@@ -43,11 +47,11 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
 
       if (reset) {
         setDeals(response.deals)
-        setPage(2) // Next page will be 2
+        nextPageRef.current = 2 // Next page will be 2
       } else {
         // Use functional update to avoid stale closure
         setDeals(prevDeals => [...prevDeals, ...response.deals])
-        setPage(currentPage + 1)
+        nextPageRef.current = currentPage + 1 // Increment immediately
       }
 
       setHasMore(response.hasMore)

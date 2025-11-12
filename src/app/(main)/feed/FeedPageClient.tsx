@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, User, Package, Shield } from 'lucide-react'
 import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
@@ -18,21 +18,25 @@ export default function FeedPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState('')
-  const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<DealCategory | ''>('')
+
+  // Use ref to track next page - updates immediately, no async issues
+  const nextPageRef = useRef(1)
 
   useEffect(() => {
     loadDeals(true)
   }, [search, category])
 
   const loadDeals = async (reset: boolean = false) => {
-    const currentPage = reset ? 1 : page
+    // Use ref for immediate, synchronous page tracking
+    const currentPage = reset ? 1 : nextPageRef.current
 
     if (reset) {
       setIsLoading(true)
+      nextPageRef.current = 1 // Reset to page 1
     } else {
       setIsLoadingMore(true)
     }
@@ -50,11 +54,11 @@ export default function FeedPage() {
 
       if (reset) {
         setDeals(response.deals)
-        setPage(2) // Next page will be 2
+        nextPageRef.current = 2 // Next page will be 2
       } else {
         // Use functional update to avoid stale closure
         setDeals(prevDeals => [...prevDeals, ...response.deals])
-        setPage(currentPage + 1)
+        nextPageRef.current = currentPage + 1 // Increment immediately
       }
 
       setHasMore(response.hasMore)
@@ -74,12 +78,12 @@ export default function FeedPage() {
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setPage(1)
+    nextPageRef.current = 1 // Reset page on search change
   }
 
   const handleCategoryChange = (value: DealCategory | '') => {
     setCategory(value)
-    setPage(1)
+    nextPageRef.current = 1 // Reset page on category change
   }
 
   // Infinite scroll - automatically load more when scrolling near bottom
