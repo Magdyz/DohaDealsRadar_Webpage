@@ -72,17 +72,17 @@ function UsernameForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">
+        <div className="text-center mb-10">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3">
             Doha Deals Radar
           </h1>
-          <p className="text-text-secondary">Choose your username</p>
+          <p className="text-base text-text-secondary">Choose your username</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-text-primary mb-2">
+        <div className="bg-surface rounded-2xl shadow-lg border border-border/30 p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-2">
             Welcome!
           </h2>
           <p className="text-text-secondary mb-6">

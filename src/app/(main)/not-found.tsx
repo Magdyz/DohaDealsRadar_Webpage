@@ -5,19 +5,19 @@ import { Home, Search, ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-6">
       <div className="max-w-md w-full text-center">
-        <div className="bg-surface rounded-2xl shadow-lg border border-border p-8">
+        <div className="bg-surface rounded-2xl shadow-lg border-2 border-border/30 p-6 md:p-8">
           {/* 404 Illustration */}
-          <div className="mb-6">
-            <h1 className="text-8xl font-bold text-primary mb-2">404</h1>
-            <div className="text-6xl mb-4">🔍</div>
+          <div className="mb-8">
+            <div className="text-7xl font-bold text-primary mb-4">404</div>
+            <div className="text-6xl mb-2">🔍</div>
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-text-primary mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
             Page Not Found
-          </h2>
+          </h1>
 
           {/* Message */}
           <p className="text-text-secondary mb-6 leading-relaxed">

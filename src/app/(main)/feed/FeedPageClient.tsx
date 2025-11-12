@@ -167,7 +167,7 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header - 2025 Modern Design */}
-      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+      <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
         <div className="max-w-7xl mx-auto px-4 py-4 md:px-6 md:py-5">
           {/* Top Bar - Title & Icons */}
           <div className="flex items-center justify-between mb-4">
@@ -231,7 +231,7 @@ export default function FeedPage() {
             ))}
           </div>
         ) : error ? (
-          <div className="bg-card rounded-2xl p-10 md:p-12 border-2 border-error/20 shadow-modern-lg text-center max-w-md mx-auto animate-scale-in">
+          <div className="bg-card rounded-2xl p-10 md:p-12 border-2 border-error/20 shadow-lg text-center max-w-md mx-auto animate-scale-in">
             <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚠️</span>
             </div>
@@ -245,11 +245,11 @@ export default function FeedPage() {
             </Button>
           </div>
         ) : deals.length === 0 ? (
-          <div className="bg-card rounded-2xl p-10 md:p-16 border-2 border-border/30 shadow-modern-lg text-center max-w-lg mx-auto animate-scale-in">
+          <div className="bg-card rounded-2xl p-10 md:p-16 border-2 border-border/30 shadow-lg text-center max-w-lg mx-auto animate-scale-in">
             <Package className="w-20 md:w-24 h-20 md:h-24 text-text-tertiary mx-auto mb-6 opacity-40" />
-            <h3 className="text-xl md:text-2xl font-bold text-text-primary mb-3">
+            <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-3">
               No deals found
-            </h3>
+            </h2>
             <p className="text-base md:text-lg text-text-secondary mb-8 leading-relaxed">
               {search || category
                 ? 'Try adjusting your search or filters'
@@ -314,7 +314,7 @@ export default function FeedPage() {
       {/* Floating Action Buttons (Mobile) - 2025 Modern Design */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-4 md:hidden z-30">
         <button
-          className="w-14 h-14 rounded-full bg-surface border-2 border-border shadow-modern-lg flex items-center justify-center text-text-primary hover:bg-background-secondary hover:scale-110 transition-all duration-300 active:scale-95"
+          className="w-14 h-14 rounded-full bg-surface border-2 border-border shadow-lg flex items-center justify-center text-text-primary hover:bg-background-secondary hover:scale-110 transition-all duration-300 active:scale-95"
           onClick={() => router.push('/account')}
           aria-label="Account"
         >

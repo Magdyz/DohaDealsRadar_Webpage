@@ -72,8 +72,8 @@ export default function AccountPageClient() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header - 2025 Modern Design */}
-      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
-        <div className="max-w-4xl mx-auto px-6 py-5">
+      <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-4xl mx-auto px-4 py-4 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <button
               onClick={() => router.push('/feed')}
@@ -95,7 +95,7 @@ export default function AccountPageClient() {
       </div>
 
       {/* Content - 2025 Modern Layout */}
-      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-10 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8 space-y-8">
         {/* User Profile */}
         <UserProfile user={user} />
 

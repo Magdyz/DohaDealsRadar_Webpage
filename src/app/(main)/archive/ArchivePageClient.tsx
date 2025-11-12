@@ -190,16 +190,16 @@ function ArchivePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-4xl mx-auto px-4 py-4 md:px-6 md:py-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="md" onClick={() => router.push('/feed')}>
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <h1 className="text-2xl font-bold text-text-primary">Archive</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">Archive</h1>
             </div>
           </div>
 
@@ -214,7 +214,7 @@ function ArchivePageContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Spinner size="lg" />

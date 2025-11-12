@@ -148,13 +148,13 @@ function ModerationContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-6xl mx-auto px-4 py-4 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-text-primary">Moderation Panel</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">Moderation Panel</h1>
               <p className="text-sm text-text-tertiary mt-1">
                 {pendingDeals.length} pending deal{pendingDeals.length !== 1 ? 's' : ''} awaiting review
               </p>
@@ -167,18 +167,18 @@ function ModerationContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 md:px-6 md:py-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
+          <div className="bg-error/10 border-2 border-error/30 text-error px-6 py-4 rounded-xl mb-6 animate-scale-in">
+            <span className="font-medium">{error}</span>
           </div>
         )}
 
         {pendingDeals.length === 0 ? (
           <Card variant="outlined">
-            <CardBody className="p-12 text-center">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-text-primary mb-2">
+            <CardBody className="p-6 md:p-8 text-center">
+              <CheckCircle className="w-20 h-20 text-success mx-auto mb-6" />
+              <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-3">
                 All Caught Up!
               </h2>
               <p className="text-text-secondary">
@@ -213,7 +213,7 @@ function ModerationContent() {
                       </div>
 
                       {/* Content */}
-                      <div className="flex-1 p-6">
+                      <div className="flex-1 p-6 md:p-8">
                         {/* Header */}
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2 flex-wrap">

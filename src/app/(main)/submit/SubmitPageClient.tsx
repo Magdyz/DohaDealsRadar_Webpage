@@ -165,8 +165,8 @@ function SubmitDealContent() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header - 2025 Modern Design */}
-      <div className="bg-surface shadow-modern-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
-        <div className="max-w-4xl mx-auto px-6 py-5">
+      <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
+        <div className="max-w-4xl mx-auto px-4 py-4 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">Post a Deal</h1>
             <Button
@@ -182,10 +182,10 @@ function SubmitDealContent() {
       </div>
 
       {/* Form - 2025 Modern Layout with better spacing */}
-      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-10">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
         <form onSubmit={handleSubmit} className="animate-fade-in">
           <Card variant="elevated">
-            <CardBody className="p-6 md:p-8 space-y-8">
+            <CardBody className="p-6 md:p-8 space-y-6">
               {/* Error message - 2025 Modern Style */}
               {error && (
                 <div className="bg-error/10 border-2 border-error/30 text-error px-6 py-4 rounded-xl flex items-start gap-3 animate-scale-in">
@@ -256,7 +256,7 @@ function SubmitDealContent() {
                     />
                   </label>
                 ) : (
-                  <div className="relative rounded-2xl overflow-hidden shadow-modern-md">
+                  <div className="relative rounded-2xl overflow-hidden shadow-md">
                     <img
                       src={imagePreview}
                       alt="Preview"
