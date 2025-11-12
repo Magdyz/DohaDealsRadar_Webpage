@@ -9,6 +9,7 @@ import { ProtectedRoute } from '@/components/auth'
 import { getDeals } from '@/lib/api/deals'
 import { useIsAdmin, useUser } from '@/lib/store/authStore'
 import { useToast } from '@/lib/hooks/useToast'
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
 import type { Deal, DealCategory } from '@/types'
 
 // Force dynamic rendering to prevent prerendering issues
@@ -144,6 +145,13 @@ function ArchivePageContent() {
     setPage(1)
   }
 
+  // Infinite scroll - automatically load more when scrolling near bottom
+  const { observerTarget } = useInfiniteScroll({
+    onLoadMore: () => loadDeals(),
+    hasMore,
+    isLoading: isLoadingMore,
+  })
+
   // Prevent rendering until client-side mounted
   if (!isMounted) {
     return (
@@ -249,24 +257,37 @@ function ArchivePageContent() {
               ))}
             </div>
 
-            {/* Load More */}
+            {/* Infinite Scroll Trigger */}
             {hasMore && (
-              <div className="flex justify-center mt-6">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleLoadMore}
-                  isLoading={isLoadingMore}
-                >
-                  Load More Deals
-                </Button>
-              </div>
+              <>
+                {/* Observer target - triggers load when visible */}
+                <div ref={observerTarget} className="h-4" />
+
+                {/* Loading indicator */}
+                {isLoadingMore && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Spinner size="md" />
+                    <p className="text-text-secondary text-sm mt-3">
+                      Loading more deals...
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
+            {/* End of content message */}
             {!hasMore && deals.length > 0 && (
-              <p className="text-center text-text-tertiary mt-6">
-                You've reached the end!
-              </p>
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-12 h-12 rounded-full bg-background-secondary border-2 border-border flex items-center justify-center mb-3">
+                  <Package className="w-6 h-6 text-text-tertiary" />
+                </div>
+                <p className="text-text-tertiary text-sm font-medium">
+                  You've reached the end!
+                </p>
+                <p className="text-text-tertiary text-xs mt-1">
+                  {deals.length} archived deal{deals.length !== 1 ? 's' : ''} loaded
+                </p>
+              </div>
             )}
           </>
         )}
