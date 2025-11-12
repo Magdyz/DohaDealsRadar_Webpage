@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { ExternalLink, MapPin, Tag, Calendar, Clock, Package } from 'lucide-react'
 import { Card, CardBody, Badge, Button, Spinner } from '@/components/ui'
 import { getUserDeals } from '@/lib/api/deals'
@@ -25,11 +25,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
   // Use ref to track next page - updates immediately, no async issues
   const nextPageRef = useRef(1)
 
-  useEffect(() => {
-    loadDeals(true)
-  }, [userId])
-
-  const loadDeals = async (reset: boolean = false) => {
+  const loadDeals = useCallback(async (reset: boolean = false) => {
     // Use ref for immediate, synchronous page tracking
     const currentPage = reset ? 1 : nextPageRef.current
 
@@ -61,11 +57,15 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
       setIsLoading(false)
       setIsLoadingMore(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    loadDeals(true)
+  }, [userId, loadDeals])
 
   // Infinite scroll - automatically load more when scrolling near bottom
   const { observerTarget } = useInfiniteScroll({
-    onLoadMore: () => loadDeals(),
+    onLoadMore: loadDeals,
     hasMore,
     isLoading: isLoadingMore,
   })

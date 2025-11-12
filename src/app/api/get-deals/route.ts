@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' })
       .eq('is_archived', isArchived)
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false }) // Secondary sort for stable pagination
 
     // Apply filters
     if (search) {

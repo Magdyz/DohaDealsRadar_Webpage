@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, User, Package, Shield } from 'lucide-react'
 import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
@@ -26,11 +26,7 @@ export default function FeedPage() {
   // Use ref to track next page - updates immediately, no async issues
   const nextPageRef = useRef(1)
 
-  useEffect(() => {
-    loadDeals(true)
-  }, [search, category])
-
-  const loadDeals = async (reset: boolean = false) => {
+  const loadDeals = useCallback(async (reset: boolean = false) => {
     // Use ref for immediate, synchronous page tracking
     const currentPage = reset ? 1 : nextPageRef.current
 
@@ -68,7 +64,11 @@ export default function FeedPage() {
       setIsLoading(false)
       setIsLoadingMore(false)
     }
-  }
+  }, [search, category])
+
+  useEffect(() => {
+    loadDeals(true)
+  }, [search, category, loadDeals])
 
   const handleLoadMore = () => {
     if (!isLoadingMore && hasMore) {
@@ -88,7 +88,7 @@ export default function FeedPage() {
 
   // Infinite scroll - automatically load more when scrolling near bottom
   const { observerTarget } = useInfiniteScroll({
-    onLoadMore: () => loadDeals(),
+    onLoadMore: loadDeals,
     hasMore,
     isLoading: isLoadingMore,
   })
