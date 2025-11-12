@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import QueryProvider from '@/lib/providers/QueryProvider'
+import ToastContainer from '@/components/ui/ToastContainer'
 import '../styles/globals.css'
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-background text-text-primary antialiased">
         <QueryProvider>{children}</QueryProvider>
+        <ToastContainer />
       </body>
     </html>
   )

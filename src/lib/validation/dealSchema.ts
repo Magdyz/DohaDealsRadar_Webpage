@@ -1,59 +1,89 @@
 import { z } from 'zod'
+import type { DealCategory } from '@/types'
 
-export const dealSchema = z.object({
-  dealType: z.enum(['online', 'physical']),
+const CATEGORIES: DealCategory[] = [
+  'food_dining',
+  'shopping_fashion',
+  'electronics_tech',
+  'health_beauty',
+  'entertainment_activities',
+]
+
+// Schema for deal submission form validation
+export const dealSubmissionSchema = z.object({
   title: z
     .string()
-    .min(3, 'Title must be at least 3 characters')
-    .max(200, 'Title must be less than 200 characters'),
+    .trim()
+    .min(10, 'Title must be at least 10 characters')
+    .max(200, 'Title must not exceed 200 characters'),
   description: z
     .string()
-    .max(2000, 'Description must be less than 2000 characters')
-    .optional(),
-  link: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  location: z
-    .string()
-    .min(3, 'Location must be at least 3 characters')
-    .max(100, 'Location must be less than 100 characters')
+    .trim()
+    .max(2000, 'Description must not exceed 2000 characters')
     .optional()
     .or(z.literal('')),
-  category: z.enum([
-    'food_dining',
-    'shopping_fashion',
-    'electronics_tech',
-    'health_beauty',
-    'entertainment_activities',
-  ]),
+  dealType: z.enum(['online', 'physical']).optional(),
+  imageUrl: z.string().url('Invalid image URL').optional(),
+  link: z
+    .string()
+    .trim()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true
+        try {
+          new URL(val)
+          return true
+        } catch {
+          return false
+        }
+      },
+      { message: 'Please enter a valid URL (e.g., https://example.com)' }
+    )
+    .optional()
+    .or(z.literal('')),
+  location: z
+    .string()
+    .trim()
+    .max(100, 'Location must not exceed 100 characters')
+    .optional()
+    .or(z.literal('')),
+  category: z.enum(CATEGORIES as [DealCategory, ...DealCategory[]], 'Please select a valid category'),
   promoCode: z
     .string()
-    .max(50, 'Promo code must be less than 50 characters')
+    .trim()
+    .max(50, 'Promo code must not exceed 50 characters')
     .optional()
     .or(z.literal('')),
   expiryDays: z
     .number()
-    .min(1, 'Expiry must be at least 1 day')
-    .max(30, 'Expiry cannot exceed 30 days'),
-  imageUrl: z.string().url('Please provide a valid image URL'),
+    .int('Expiry days must be a whole number')
+    .min(1, 'Deal must be valid for at least 1 day')
+    .max(30, 'Deal cannot be valid for more than 30 days'),
 })
 
-export type DealFormData = z.infer<typeof dealSchema>
+export type DealSubmissionData = z.infer<typeof dealSubmissionSchema>
 
-// Refined validation based on deal type
-export const validateDealForm = (data: DealFormData) => {
+// Helper function to format Zod errors for display
+export function formatZodError(error: z.ZodError): string {
+  const firstError = error.issues[0]
+  if (!firstError) return 'Validation failed'
+
+  const field = firstError.path.join('.')
+  const message = firstError.message
+
+  return field ? `${field}: ${message}` : message
+}
+
+// Helper function to get all validation errors as a map
+export function getValidationErrors(error: z.ZodError): Record<string, string> {
   const errors: Record<string, string> = {}
 
-  if (data.dealType === 'online') {
-    if (!data.link || data.link.trim() === '') {
-      errors.link = 'Link is required for online deals'
-    }
-  } else if (data.dealType === 'physical') {
-    if (!data.location || data.location.trim() === '') {
-      errors.location = 'Location is required for physical deals'
+  for (const err of error.issues) {
+    const field = err.path.join('.')
+    if (field) {
+      errors[field] = err.message
     }
   }
 
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors,
-  }
+  return errors
 }
