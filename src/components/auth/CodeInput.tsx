@@ -88,7 +88,7 @@ export default function CodeInput({
 
   return (
     <div className="w-full">
-      <div className="flex gap-3 md:gap-4 justify-center px-2">
+      <div className="flex gap-2 sm:gap-3 md:gap-4 justify-center px-1 sm:px-2">
         {code.map((digit, index) => (
           <input
             key={index}
@@ -104,7 +104,7 @@ export default function CodeInput({
             onPaste={handlePaste}
             disabled={disabled}
             className={cn(
-              'w-12 h-16 md:w-14 md:h-20 text-center text-2xl md:text-3xl font-bold border-2 rounded-xl',
+              'w-10 h-14 sm:w-12 sm:h-16 md:w-16 md:h-20 text-center text-xl sm:text-2xl md:text-3xl font-bold border-2 rounded-xl',
               'focus:outline-none focus:ring-4 focus:ring-primary/30 focus:border-primary',
               'transition-all duration-200 shadow-sm',
               'bg-surface',

@@ -78,7 +78,7 @@ function VerifyForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 md:py-12">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-2xl">
         {/* Header - Brand */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-action-primary to-primary-dark shadow-purple mb-6">
@@ -96,7 +96,7 @@ function VerifyForm() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-surface rounded-2xl shadow-modern-lg border border-border/30 p-8 md:p-10 space-y-8">
+        <div className="bg-surface rounded-2xl shadow-modern-lg border border-border/30 p-6 sm:p-8 md:p-12 space-y-8">
           {/* Code Input Section */}
           <div className="space-y-4">
             <label className="block text-center text-sm font-semibold text-text-secondary uppercase tracking-wide">
