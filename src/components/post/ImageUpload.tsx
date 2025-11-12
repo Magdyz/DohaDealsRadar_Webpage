@@ -89,6 +89,7 @@ export default function ImageUpload({ value, onChange, error }: ImageUploadProps
             src={preview}
             alt="Deal preview"
             fill
+            unoptimized
             className="object-contain"
           />
           <button
