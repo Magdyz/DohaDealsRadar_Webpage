@@ -49,18 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform database fields to match frontend types (snake_case to camelCase)
-    const transformedDeals = await Promise.all((deals || []).map(async (deal: any) => {
-      // Get username from users table
-      let username = null
-      if (deal.user_id) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('username')
-          .eq('id', deal.user_id)
-          .single()
-        username = userData?.username || null
-      }
-
+    const transformedDeals = (deals || []).map((deal: any) => {
       return {
         id: deal.id,
         title: deal.title,
@@ -70,17 +59,17 @@ export async function GET(request: NextRequest) {
         location: deal.location,
         category: deal.category,
         promoCode: deal.promo_code,
-        hotVotes: deal.hot_votes || 0,
-        coldVotes: deal.cold_votes || 0,
-        username: username,
-        userId: deal.user_id,
-        isApproved: deal.is_approved,
+        hotVotes: deal.hot_count || 0,
+        coldVotes: deal.cold_count || 0,
+        username: deal.posted_by || 'Anonymous',
+        userId: deal.submitted_by_user_id,
+        isApproved: deal.status === 'approved',
         isArchived: deal.is_archived,
         createdAt: deal.created_at,
         updatedAt: deal.updated_at,
         expiresAt: deal.expires_at,
       }
-    }))
+    })
 
     const total = count || 0
     const hasMore = total > page * limit

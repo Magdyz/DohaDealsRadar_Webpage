@@ -29,17 +29,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Deal not found' }, { status: 404 })
     }
 
-    // Get username from users table
-    let username = null
-    if (deal.user_id) {
-      const { data: userData } = await supabase
-        .from('users')
-        .select('username')
-        .eq('id', deal.user_id)
-        .single()
-      username = userData?.username || null
-    }
-
     // Transform database fields to match frontend types (snake_case to camelCase)
     const transformedDeal = {
       id: deal.id,
@@ -50,11 +39,11 @@ export async function GET(request: NextRequest) {
       location: deal.location,
       category: deal.category,
       promoCode: deal.promo_code,
-      hotVotes: deal.hot_votes || 0,
-      coldVotes: deal.cold_votes || 0,
-      username: username,
-      userId: deal.user_id,
-      isApproved: deal.is_approved,
+      hotVotes: deal.hot_count || 0,
+      coldVotes: deal.cold_count || 0,
+      username: deal.posted_by || 'Anonymous',
+      userId: deal.submitted_by_user_id,
+      isApproved: deal.status === 'approved',
       isArchived: deal.is_archived,
       createdAt: deal.created_at,
       updatedAt: deal.updated_at,
