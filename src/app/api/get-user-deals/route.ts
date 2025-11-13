@@ -22,11 +22,8 @@ export async function GET(request: NextRequest) {
 
     const { data: deals, error, count } = await supabase
       .from('deals')
-      .select(`
-        *,
-        users!user_id (username)
-      `, { count: 'exact' })
-      .eq('user_id', userId)
+      .select('*', { count: 'exact' })
+      .eq('submitted_by_user_id', userId)
       .order('created_at', { ascending: false })
       .range(from, to)
 
@@ -44,11 +41,11 @@ export async function GET(request: NextRequest) {
       location: deal.location,
       category: deal.category,
       promoCode: deal.promo_code,
-      hotVotes: deal.hot_votes || 0,
-      coldVotes: deal.cold_votes || 0,
-      username: deal.users?.username || null,
-      userId: deal.user_id,
-      isApproved: deal.is_approved,
+      hotVotes: deal.hot_count || 0,
+      coldVotes: deal.cold_count || 0,
+      username: deal.posted_by || 'Anonymous',
+      userId: deal.submitted_by_user_id,
+      isApproved: deal.status === 'approved',
       isArchived: deal.is_archived,
       createdAt: deal.created_at,
       updatedAt: deal.updated_at,
