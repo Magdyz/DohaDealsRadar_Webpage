@@ -97,25 +97,25 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
         </div>
       </Link>
 
-      <div className="px-3 pb-3 space-y-2.5">
+      <div className="px-4 pb-4 pt-3 space-y-3">
         <Link href={`/deals/${deal.id}`}>
-          <h3 className="text-[13px] font-bold text-text-primary leading-5 line-clamp-2 h-10 hover:text-primary-dark">
+          <h3 className="text-sm font-bold text-text-primary leading-[1.4] line-clamp-2 break-words hover:text-primary-dark min-h-[2.8em]">
             {deal.title}
           </h3>
         </Link>
 
-        {/* Admin Action Buttons */}
+        {/* Admin Action Buttons - 2025 Touch-Friendly */}
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handleRestore}
             disabled={isRestoring || isDeleting}
-            className="h-10 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-xl font-bold text-[12px] flex items-center justify-center gap-2 transition-colors"
+            className="min-h-[44px] bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
           >
             {isRestoring ? (
               <span className="animate-spin">⏳</span>
             ) : (
               <>
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-4 h-4" />
                 <span>Restore</span>
               </>
             )}
@@ -124,13 +124,13 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
           <button
             onClick={handleDelete}
             disabled={isRestoring || isDeleting}
-            className="h-10 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-xl font-bold text-[12px] flex items-center justify-center gap-2 transition-colors"
+            className="min-h-[44px] bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
           >
             {isDeleting ? (
               <span className="animate-spin">⏳</span>
             ) : (
               <>
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
               </>
             )}
@@ -138,7 +138,7 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
         </div>
 
         <Link href={`/deals/${deal.id}`} className="block">
-          <button className="w-full h-9 bg-action-primary/70 hover:bg-action-primary text-white rounded-xl font-bold text-[12px] flex items-center justify-center gap-2 transition-colors">
+          <button className="w-full min-h-[44px] bg-action-primary/70 hover:bg-action-primary text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95">
             <Eye className="w-4 h-4" />
             <span>View Details</span>
           </button>

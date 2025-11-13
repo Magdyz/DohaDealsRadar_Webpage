@@ -77,39 +77,39 @@ export default function VoteButtons({
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Hot Vote Button */}
+    <div className="flex items-center gap-3">
+      {/* Hot Vote Button - 2025 Touch-Friendly Design */}
       <button
         onClick={() => handleVote('hot')}
         disabled={hasVoted(dealId) || isVoting}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all',
-          'border text-sm font-medium min-w-[60px]',
+          'flex items-center gap-2 px-4 py-2.5 rounded-full transition-all',
+          'border text-sm font-bold min-w-[72px] min-h-[44px] shadow-sm',
           userVote === 'hot'
-            ? 'bg-white border-hot-content/30'
-            : 'bg-hot-bg border-hot-content/30 hover:bg-hot-content/10',
+            ? 'bg-white border-hot-content/30 scale-105'
+            : 'bg-hot-bg border-hot-content/30 hover:bg-hot-content/10 hover:scale-105 active:scale-95',
           (hasVoted(dealId) || isVoting) && 'opacity-50 cursor-not-allowed'
         )}
       >
-        <span className="text-base">🔥</span>
-        <span className="text-hot-content font-medium">{hotVotes}</span>
+        <span className="text-lg">🔥</span>
+        <span className="text-hot-content">{hotVotes}</span>
       </button>
 
-      {/* Cold Vote Button */}
+      {/* Cold Vote Button - 2025 Touch-Friendly Design */}
       <button
         onClick={() => handleVote('cold')}
         disabled={hasVoted(dealId) || isVoting}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 rounded-full transition-all',
-          'border text-sm font-medium min-w-[60px]',
+          'flex items-center gap-2 px-4 py-2.5 rounded-full transition-all',
+          'border text-sm font-bold min-w-[72px] min-h-[44px] shadow-sm',
           userVote === 'cold'
-            ? 'bg-white border-cold-content/30'
-            : 'bg-cold-bg border-cold-content/30 hover:bg-cold-content/10',
+            ? 'bg-white border-cold-content/30 scale-105'
+            : 'bg-cold-bg border-cold-content/30 hover:bg-cold-content/10 hover:scale-105 active:scale-95',
           (hasVoted(dealId) || isVoting) && 'opacity-50 cursor-not-allowed'
         )}
       >
-        <span className="text-base">❄️</span>
-        <span className="text-cold-content font-medium">{coldVotes}</span>
+        <span className="text-lg">❄️</span>
+        <span className="text-cold-content">{coldVotes}</span>
       </button>
     </div>
   )
