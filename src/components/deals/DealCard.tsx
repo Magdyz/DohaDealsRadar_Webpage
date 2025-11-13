@@ -55,44 +55,44 @@ function DealCard({ deal, priority = false }: DealCardProps) {
               </div>
             )}
 
-            {/* Vote Buttons - Bottom Center with Enhanced Glass-morphism */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-surface/95 backdrop-blur-md rounded-full px-3 py-2 shadow-lg border border-border/30">
-              {/* Hot Vote Button - Better touch target */}
+            {/* Vote Buttons - Bottom Center - Compact 2025 Design */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-surface/95 backdrop-blur-md rounded-full px-2.5 py-1.5 shadow-lg border border-border/30">
+              {/* Hot Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-1.5 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-3 py-1.5 border border-hot-content/30 min-w-[52px] min-h-[36px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm"
+                className="flex items-center gap-1 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-2.5 py-1 border border-hot-content/30 min-w-[44px] min-h-[32px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm"
                 onClick={(e) => {
                   e.preventDefault()
                   // Vote handling would go here
                 }}
               >
-                <span className="text-base">🔥</span>
-                <span className="text-hot-content text-sm font-bold">{deal.hotVotes}</span>
+                <span className="text-sm">🔥</span>
+                <span className="text-hot-content text-xs font-bold">{deal.hotVotes}</span>
               </button>
 
               {/* Divider */}
-              <div className="w-px h-6 bg-border/40"></div>
+              <div className="w-px h-5 bg-border/40"></div>
 
-              {/* Cold Vote Button - Better touch target */}
+              {/* Cold Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-1.5 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-3 py-1.5 border border-cold-content/30 min-w-[52px] min-h-[36px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm"
+                className="flex items-center gap-1 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-2.5 py-1 border border-cold-content/30 min-w-[44px] min-h-[32px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm"
                 onClick={(e) => {
                   e.preventDefault()
                   // Vote handling would go here
                 }}
               >
-                <span className="text-base">❄️</span>
-                <span className="text-cold-content text-sm font-bold">{deal.coldVotes}</span>
+                <span className="text-sm">❄️</span>
+                <span className="text-cold-content text-xs font-bold">{deal.coldVotes}</span>
               </button>
             </div>
           </div>
         </div>
       </Link>
 
-      {/* Content Section - Standardized height */}
-      <div className="px-4 pb-4 space-y-3 flex-1 flex flex-col">
-        {/* Title - Fixed 2 lines with consistent height */}
+      {/* Content Section - Improved Text Flow */}
+      <div className="px-4 pb-4 pt-3 space-y-3 flex-1 flex flex-col">
+        {/* Title - Proper Text Wrapping with 2025 Typography */}
         <Link href={`/deals/${deal.id}`} className="flex-1">
-          <h3 className="text-sm md:text-base font-bold text-text-primary leading-snug line-clamp-2 h-[2.8rem] hover:text-primary-dark transition-colors">
+          <h3 className="text-sm md:text-base font-bold text-text-primary leading-[1.4] line-clamp-2 break-words hover:text-primary-dark transition-colors min-h-[2.8em]">
             {deal.title}
           </h3>
         </Link>
