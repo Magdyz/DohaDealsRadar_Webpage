@@ -4,9 +4,9 @@ import type { DealCategory } from '@/types'
 const CATEGORIES: DealCategory[] = [
   'food_dining',
   'shopping_fashion',
-  'electronics_tech',
-  'health_beauty',
-  'entertainment_activities',
+  'entertainment',
+  'home_services',
+  'other',
 ]
 
 // Schema for deal submission form validation
