@@ -8,11 +8,20 @@ const DAILY_REPORT_LIMIT = 5
 
 export async function POST(request: NextRequest) {
   try {
-    const { dealId, userId, reason } = await request.json()
+    const { dealId, userId, reason, details } = await request.json()
 
     if (!dealId || !userId || !reason) {
       return NextResponse.json(
         { error: 'Deal ID, user ID, and reason are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate that high-severity reports have sufficient details
+    const highSeverityReasons: ReportReason[] = ['spam', 'misleading']
+    if (highSeverityReasons.includes(reason) && (!details || details.trim().length < 30)) {
+      return NextResponse.json(
+        { error: 'High-severity reports require at least 30 characters of details' },
         { status: 400 }
       )
     }
@@ -73,6 +82,7 @@ export async function POST(request: NextRequest) {
         deal_id: dealId,
         reported_by: userId,
         reason: reason,
+        details: details || null,
         created_at: new Date().toISOString(),
       })
 
