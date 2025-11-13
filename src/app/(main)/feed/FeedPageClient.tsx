@@ -30,37 +30,15 @@ export default function FeedPage() {
   const mountId = useRef(Math.random().toString(36).substring(7))
   const isLoadingRef = useRef(false)
 
-  console.log('🔄 Component render, mountId:', mountId.current, 'nextPageRef:', nextPageRef.current)
-
   // Update refs when search/category changes
   useEffect(() => {
-    console.log('📝 Updating search/category refs')
     searchRef.current = search
     categoryRef.current = category
   }, [search, category])
 
-  // Log on mount/unmount
-  useEffect(() => {
-    console.log('🎬 Component MOUNTED, mountId:', mountId.current)
-    return () => {
-      console.log('💀 Component UNMOUNTED, mountId:', mountId.current)
-    }
-  }, [])
-
   const loadDeals = useCallback(async (reset: boolean = false) => {
-    console.log('🔍 loadDeals called:', {
-      mountId: mountId.current,
-      reset,
-      nextPageRefBefore: nextPageRef.current,
-      currentDealsCount: deals.length,
-      isLoadingMore,
-      hasMore,
-      isLoadingRef: isLoadingRef.current
-    })
-
     // Prevent concurrent calls (except for resets which should override)
     if (isLoadingRef.current && !reset) {
-      console.log('⚠️ Already loading, skipping this call')
       return
     }
     isLoadingRef.current = true
@@ -71,18 +49,14 @@ export default function FeedPage() {
     if (reset) {
       setIsLoading(true)
       pageToFetch = 1
-      console.log('⚙️ Setting nextPageRef from', nextPageRef.current, 'to 2 (reset mode)')
       nextPageRef.current = 2 // After page 1, next will be page 2
     } else {
       setIsLoadingMore(true)
       pageToFetch = nextPageRef.current
-      console.log('⚙️ Setting nextPageRef from', nextPageRef.current, 'to', nextPageRef.current + 1, '(load more mode)')
       nextPageRef.current = nextPageRef.current + 1 // Increment for next call
     }
 
     setError('')
-
-    console.log('📡 Fetching page:', pageToFetch, 'nextPageRef now set to:', nextPageRef.current)
 
     try {
       const response = await getDeals({
@@ -93,50 +67,30 @@ export default function FeedPage() {
         isArchived: false,
       })
 
-      console.log('✅ Got response:', {
-        page: pageToFetch,
-        dealsReceived: response.deals.length,
-        hasMore: response.hasMore,
-        totalDeals: response.total,
-        firstDealId: response.deals[0]?.id,
-        lastDealId: response.deals[response.deals.length - 1]?.id
-      })
-
       if (reset) {
         setDeals(response.deals)
       } else {
-        setDeals(prevDeals => {
-          console.log('📦 Appending deals. Before:', prevDeals.length, 'Adding:', response.deals.length)
-          return [...prevDeals, ...response.deals]
-        })
+        setDeals(prevDeals => [...prevDeals, ...response.deals])
       }
 
       setHasMore(response.hasMore)
-      console.log('✅ hasMore set to:', response.hasMore)
     } catch (err: any) {
-      console.error('❌ Error loading deals:', err)
       setError(err.message || 'Failed to load deals')
       // Rollback page counter on error to allow retry
       if (!reset) {
-        console.log('⚙️ ERROR ROLLBACK: Setting nextPageRef from', nextPageRef.current, 'to', pageToFetch)
         nextPageRef.current = pageToFetch
       } else {
-        console.log('⚙️ ERROR ROLLBACK (reset): Setting nextPageRef from', nextPageRef.current, 'to 1')
         nextPageRef.current = 1
       }
     } finally {
-      console.log('🏁 Finally block - nextPageRef:', nextPageRef.current, 'reset was:', reset)
       setIsLoading(false)
       setIsLoadingMore(false)
       isLoadingRef.current = false
-      console.log('🏁 Finally block done - nextPageRef:', nextPageRef.current)
     }
   }, []) // Empty deps - function never recreates, uses refs for current values
 
   // Only reset and reload when search or category changes
   useEffect(() => {
-    console.log('🎯 useEffect triggered - resetting and loading page 1', { search, category })
-    // Don't reset nextPageRef here - let loadDeals(true) handle it
     loadDeals(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, category]) // loadDeals is stable (never changes), safe to omit
@@ -270,8 +224,12 @@ export default function FeedPage() {
           <>
             {/* Deals Grid - 2025 Mobile-first with better spacing */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
-              {deals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} />
+              {deals.map((deal, index) => (
+                <DealCard
+                  key={deal.id}
+                  deal={deal}
+                  priority={index < 8} // Prioritize first 8 images (above the fold)
+                />
               ))}
             </div>
 

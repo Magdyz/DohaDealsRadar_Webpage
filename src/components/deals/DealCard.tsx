@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Eye } from 'lucide-react'
@@ -9,9 +9,10 @@ import type { Deal } from '@/types'
 
 interface DealCardProps {
   deal: Deal
+  priority?: boolean // For above-the-fold images
 }
 
-export default function DealCard({ deal }: DealCardProps) {
+function DealCard({ deal, priority = false }: DealCardProps) {
   const [imageError, setImageError] = useState(false)
 
   // Check if deal is new (within 48 hours)
@@ -36,9 +37,9 @@ export default function DealCard({ deal }: DealCardProps) {
                 src={deal.imageUrl}
                 alt={deal.title}
                 fill
-                unoptimized
+                priority={priority}
                 className="object-cover transition-transform duration-300 hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 33vw"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -107,3 +108,14 @@ export default function DealCard({ deal }: DealCardProps) {
     </div>
   )
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(DealCard, (prevProps, nextProps) => {
+  // Only re-render if the deal data actually changed
+  return (
+    prevProps.deal.id === nextProps.deal.id &&
+    prevProps.deal.hotVotes === nextProps.deal.hotVotes &&
+    prevProps.deal.coldVotes === nextProps.deal.coldVotes &&
+    prevProps.priority === nextProps.priority
+  )
+})
