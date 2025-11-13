@@ -263,12 +263,12 @@ function PostDealContent() {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit Button - 2025 Mobile-Friendly */}
           <Button
             type="submit"
             variant="primary"
             size="lg"
-            className="w-full min-h-[52px] text-base font-bold"
+            className="w-full"
             isLoading={isSubmitting}
           >
             Submit Deal

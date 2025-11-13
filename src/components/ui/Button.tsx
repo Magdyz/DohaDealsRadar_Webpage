@@ -24,7 +24,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // 2025 Modern Button Styles
     const baseStyles =
-      'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-3 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] touch-target'
+      'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-3 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] touch-target whitespace-normal break-words text-center'
 
     const variants = {
       primary: 'bg-action-primary text-white hover:bg-primary-dark shadow-purple hover:shadow-xl focus:ring-primary transform hover:-translate-y-0.5',

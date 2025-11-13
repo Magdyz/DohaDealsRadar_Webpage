@@ -41,12 +41,18 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
   const user = useUser()
   const { toast } = useToast()
   const [selectedReason, setSelectedReason] = useState<ReportReason | null>(null)
+  const [details, setDetails] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!isOpen) return null
 
+  // High-severity reports require at least 30 characters of details
+  const highSeverityReasons: ReportReason[] = ['spam', 'misleading']
+  const requiresDetails = selectedReason && highSeverityReasons.includes(selectedReason)
+  const detailsValid = !requiresDetails || details.trim().length >= 30
+
   const handleSubmit = async () => {
-    if (!selectedReason || !user) return
+    if (!selectedReason || !user || !detailsValid) return
 
     setIsSubmitting(true)
 
@@ -58,6 +64,7 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
           dealId,
           userId: user.id,
           reason: selectedReason,
+          details: details.trim() || undefined,
         }),
       })
 
@@ -140,6 +147,44 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
               </div>
             </div>
 
+            {/* Additional Details - 2025 Mobile-First Design */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-text-primary">
+                  Additional Details {requiresDetails && <span className="text-error">*</span>}
+                </label>
+                <span className={`text-xs font-medium ${
+                  requiresDetails && details.trim().length < 30
+                    ? 'text-error'
+                    : 'text-text-tertiary'
+                }`}>
+                  {details.length}/30
+                </span>
+              </div>
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder={requiresDetails
+                  ? "Please provide specific details about this report (minimum 30 characters)..."
+                  : "Optional: Provide additional context for your report..."
+                }
+                className={`w-full min-h-[120px] px-4 py-3 border-2 rounded-xl bg-surface text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm resize-none ${
+                  requiresDetails && !detailsValid
+                    ? 'border-error focus:border-error'
+                    : 'border-border focus:border-primary'
+                }`}
+                maxLength={500}
+              />
+              {requiresDetails && !detailsValid && (
+                <p className="mt-1.5 text-xs text-error font-medium">
+                  High-severity reports require at least 30 characters of details
+                </p>
+              )}
+              <p className="mt-1.5 text-xs text-text-tertiary">
+                Help moderators understand your concern by providing specific details
+              </p>
+            </div>
+
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
               <p className="text-xs text-yellow-900">
                 <strong>Note:</strong> Reports are reviewed by moderators. False reports may result
@@ -148,19 +193,19 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
             </div>
           </div>
 
-          {/* Footer */}
+          {/* Footer - 2025 Touch-Friendly Buttons */}
           <div className="flex gap-3 p-4 border-t border-border/20">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-border/40 text-text-primary font-semibold hover:bg-surface-variant transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border/40 text-text-primary font-semibold hover:bg-surface-variant transition-colors min-h-[44px]"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!selectedReason || isSubmitting}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold transition-colors"
+              disabled={!selectedReason || !detailsValid || isSubmitting}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold transition-colors min-h-[44px]"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Report'}
             </button>
