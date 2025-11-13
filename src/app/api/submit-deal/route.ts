@@ -38,23 +38,66 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + days)
 
-    // Check if user exists and has auto-approve
-    let autoApprove = false
+    // AUTO-APPROVAL LOGIC (matching Edge Function)
+    let dealStatus = 'pending'
+    let autoApproved = false
+    let requiresReview = true
     let postedBy = 'Anonymous'
+    let userRole = 'user'
+    let userAutoApprove = false
 
+    // Check if user exists and get role and auto_approve
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('auto_approve, username')
+      .select('role, auto_approve, username')
       .eq('id', userId)
       .single()
 
     if (!userError && userData) {
-      autoApprove = userData.auto_approve || false
+      userRole = userData.role
+      userAutoApprove = userData.auto_approve
       postedBy = userData.username || 'Anonymous'
+
+      console.log(`User: ${postedBy} | Role: ${userRole} | Auto-approve: ${userAutoApprove}`)
+
+      // RULE 1: ADMINS ALWAYS AUTO-APPROVE
+      if (userRole === 'admin') {
+        dealStatus = 'approved'
+        autoApproved = true
+        requiresReview = false
+        console.log('ADMIN: Deal auto-approved')
+      } else if (userRole === 'moderator') {
+        dealStatus = 'approved'
+        autoApproved = true
+        requiresReview = false
+        console.log('MODERATOR: Deal auto-approved')
+      } else if (userAutoApprove === true) {
+        const randomReviewChance = Math.random()
+        if (randomReviewChance < 0.15) {
+          // 15% chance: Send to review even for trusted users
+          dealStatus = 'pending'
+          autoApproved = false
+          requiresReview = true
+          console.log('TRUSTED USER: Random review triggered (15% chance)')
+        } else {
+          // 85% chance: Auto-approve
+          dealStatus = 'approved'
+          autoApproved = true
+          requiresReview = false
+          console.log('TRUSTED USER: Deal auto-approved')
+        }
+      } else {
+        dealStatus = 'pending'
+        autoApproved = false
+        requiresReview = true
+        console.log('NEW USER: Deal requires review')
+      }
+    } else {
+      console.warn('User not found, defaulting to pending')
     }
 
     // Prepare deal data for insertion (matching actual database schema)
-    const dealData = {
+    const dealData: any = {
       title: title.trim(),
       description: description?.trim() || null,
       image_url: imageUrl,
@@ -62,12 +105,20 @@ export async function POST(request: NextRequest) {
       location: location?.trim() || null,
       category,
       promo_code: promoCode?.trim() || null,
-      user_id: userId,
+      submitted_by_user_id: userId,
+      posted_by: postedBy,
       expires_at: expiresAt.toISOString(),
-      is_approved: autoApprove,
-      hot_votes: 0,
-      cold_votes: 0,
+      status: dealStatus,
+      requires_review: requiresReview,
+      hot_count: 0,
+      cold_count: 0,
       is_archived: false,
+    }
+
+    // If auto-approved, set approved_at timestamp
+    if (autoApproved) {
+      dealData.approved_at = new Date().toISOString()
+      dealData.approved_by = userId
     }
 
     // Insert deal
@@ -99,24 +150,26 @@ export async function POST(request: NextRequest) {
       location: deal.location,
       category: deal.category,
       promoCode: deal.promo_code,
-      hotVotes: deal.hot_votes || 0,
-      coldVotes: deal.cold_votes || 0,
-      userId: deal.user_id,
-      username: postedBy,
-      isApproved: deal.is_approved || false,
+      hotVotes: deal.hot_count || 0,
+      coldVotes: deal.cold_count || 0,
+      userId: deal.submitted_by_user_id,
+      username: deal.posted_by || postedBy,
+      isApproved: deal.status === 'approved',
       isArchived: deal.is_archived || false,
       createdAt: deal.created_at,
-      updatedAt: deal.created_at,
+      updatedAt: deal.updated_at || deal.created_at,
       expiresAt: deal.expires_at,
     }
 
+    console.log(`Deal submitted: "${deal.title}" | Status: ${dealStatus} | Category: ${category}`)
+
     return NextResponse.json({
       success: true,
-      message: autoApprove
+      message: autoApproved
         ? 'Deal submitted and approved!'
         : 'Deal submitted for review',
       deal: transformedDeal,
-      autoApproved: autoApprove,
+      autoApproved: autoApproved,
     })
   } catch (error: any) {
     console.error('Unexpected error:', error)
