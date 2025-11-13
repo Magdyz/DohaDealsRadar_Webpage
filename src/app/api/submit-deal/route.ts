@@ -49,6 +49,18 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + days)
 
+    // Validate category (matching Edge Function)
+    const validCategories = [
+      'food_dining',
+      'shopping_fashion',
+      'entertainment',
+      'home_services',
+      'other'
+    ]
+    const finalCategory = validCategories.includes(category) ? category : 'other'
+
+    console.log(`Category validation: received='${category}', using='${finalCategory}'`)
+
     // Create Supabase client with service role key for admin operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
@@ -122,7 +134,7 @@ export async function POST(request: NextRequest) {
       image_url: imageUrl,
       link: link?.trim() || null,
       location: location?.trim() || null,
-      category,
+      category: finalCategory,
       promo_code: promoCode?.trim() || null,
       submitted_by_user_id: userId,
       posted_by: postedBy,
@@ -180,7 +192,7 @@ export async function POST(request: NextRequest) {
       expiresAt: deal.expires_at,
     }
 
-    console.log(`Deal submitted: "${deal.title}" | Status: ${dealStatus} | Category: ${category}`)
+    console.log(`Deal submitted: "${deal.title}" | Status: ${dealStatus} | Category: ${finalCategory}`)
 
     return NextResponse.json({
       success: true,

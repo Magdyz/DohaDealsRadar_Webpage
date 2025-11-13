@@ -1,9 +1,9 @@
 export type DealCategory =
   | 'food_dining'
   | 'shopping_fashion'
-  | 'electronics_tech'
-  | 'health_beauty'
-  | 'entertainment_activities'
+  | 'entertainment'
+  | 'home_services'
+  | 'other'
 
 export interface Deal {
   id: string
@@ -81,9 +81,9 @@ export interface CategoryInfo {
 export const CATEGORIES: CategoryInfo[] = [
   { id: 'food_dining', label: 'Food & Dining', emoji: '🍽️' },
   { id: 'shopping_fashion', label: 'Shopping & Fashion', emoji: '🛍️' },
-  { id: 'electronics_tech', label: 'Electronics & Tech', emoji: '💻' },
-  { id: 'health_beauty', label: 'Health & Beauty', emoji: '💄' },
-  { id: 'entertainment_activities', label: 'Entertainment', emoji: '🎉' },
+  { id: 'entertainment', label: 'Entertainment', emoji: '🎉' },
+  { id: 'home_services', label: 'Home & Services', emoji: '🏠' },
+  { id: 'other', label: 'Other', emoji: '📦' },
 ]
 
 export const REPORT_REASONS = [
