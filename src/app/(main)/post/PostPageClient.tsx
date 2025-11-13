@@ -180,15 +180,15 @@ function PostDealContent() {
                     key={category.id}
                     type="button"
                     onClick={() => handleChange('category', category.id)}
-                    className={`p-3 border-2 rounded-xl transition-all text-left ${
+                    className={`p-2.5 md:p-3 border-2 rounded-xl transition-all text-left min-h-[44px] ${
                       formData.category === category.id
                         ? 'border-primary bg-primary/10 shadow-sm'
                         : 'border-border hover:border-primary/50 hover:bg-primary/5'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xl">{category.emoji}</span>
-                      <span className="text-sm font-medium text-text-primary">{category.label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg md:text-xl flex-shrink-0">{category.emoji}</span>
+                      <span className="text-xs md:text-sm font-medium text-text-primary leading-tight break-words">{category.label}</span>
                     </div>
                   </button>
                 ))}
