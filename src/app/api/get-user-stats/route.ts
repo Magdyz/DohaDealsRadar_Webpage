@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Get user data
+    // Get user data to verify user exists
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
@@ -30,11 +30,55 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
 
+    // Get accurate counts by querying the deals table directly
+    // Total deals count
+    const { count: totalDeals, error: totalError } = await supabase
+      .from('deals')
+      .select('*', { count: 'exact', head: true })
+      .eq('submitted_by_user_id', userId)
+
+    if (totalError) {
+      throw totalError
+    }
+
+    // Approved deals count
+    const { count: approvedDeals, error: approvedError } = await supabase
+      .from('deals')
+      .select('*', { count: 'exact', head: true })
+      .eq('submitted_by_user_id', userId)
+      .eq('status', 'approved')
+
+    if (approvedError) {
+      throw approvedError
+    }
+
+    // Pending deals count
+    const { count: pendingDeals, error: pendingError } = await supabase
+      .from('deals')
+      .select('*', { count: 'exact', head: true })
+      .eq('submitted_by_user_id', userId)
+      .eq('status', 'pending')
+
+    if (pendingError) {
+      throw pendingError
+    }
+
+    // Rejected deals count
+    const { count: rejectedDeals, error: rejectedError } = await supabase
+      .from('deals')
+      .select('*', { count: 'exact', head: true })
+      .eq('submitted_by_user_id', userId)
+      .eq('status', 'rejected')
+
+    if (rejectedError) {
+      throw rejectedError
+    }
+
     const stats = {
-      totalDeals: user.submitted_deals_count || 0,
-      approvedDeals: user.approved_deals_count || 0,
-      rejectedDeals: user.rejected_deals_count || 0,
-      memberSince: user.created_at,
+      total_deals: totalDeals || 0,
+      approved_deals: approvedDeals || 0,
+      pending_deals: pendingDeals || 0,
+      rejected_deals: rejectedDeals || 0,
     }
 
     return NextResponse.json({ stats })
