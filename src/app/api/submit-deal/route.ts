@@ -1,6 +1,9 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,10 +20,18 @@ export async function POST(request: NextRequest) {
       userId,
     } = body
 
-    // Validation
+    // Validation - Required fields
     if (!title || !imageUrl || !category || !expiryDays || !userId) {
       return NextResponse.json(
         { success: false, message: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validation - Must have either link OR location
+    if (!link && !location) {
+      return NextResponse.json(
+        { success: false, message: 'Must provide either link or location' },
         { status: 400 }
       )
     }
@@ -37,6 +48,14 @@ export async function POST(request: NextRequest) {
     // Calculate expiry date
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + days)
+
+    // Create Supabase client with service role key for admin operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
     // AUTO-APPROVAL LOGIC (matching Edge Function)
     let dealStatus = 'pending'
