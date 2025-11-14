@@ -35,12 +35,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize reason to lowercase (Postgres ENUM is case-sensitive)
+    const normalizedReason = reason.toLowerCase()
+
     // Check if user has already reported this deal
     const { data: existingReport } = await supabase
-      .from('deal_reports')
+      .from('reports')
       .select('id')
       .eq('deal_id', dealId)
-      .eq('reported_by', userId)
+      .eq('device_id', userId)
       .single()
 
     if (existingReport) {
@@ -55,9 +58,9 @@ export async function POST(request: NextRequest) {
     today.setHours(0, 0, 0, 0)
 
     const { data: todayReports, error: countError } = await supabase
-      .from('deal_reports')
+      .from('reports')
       .select('id')
-      .eq('reported_by', userId)
+      .eq('device_id', userId)
       .gte('created_at', today.toISOString())
 
     if (countError) {
@@ -77,12 +80,12 @@ export async function POST(request: NextRequest) {
 
     // Create the report
     const { error: insertError } = await supabase
-      .from('deal_reports')
+      .from('reports')
       .insert({
         deal_id: dealId,
-        reported_by: userId,
-        reason: reason,
-        details: details || null,
+        device_id: userId,
+        reason: normalizedReason,
+        note: details || null,
         created_at: new Date().toISOString(),
       })
 
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     // Get the total report count for this deal
     const { count } = await supabase
-      .from('deal_reports')
+      .from('reports')
       .select('id', { count: 'exact', head: true })
       .eq('deal_id', dealId)
 
