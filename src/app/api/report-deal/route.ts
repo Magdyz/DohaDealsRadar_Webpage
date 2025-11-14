@@ -1,10 +1,12 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
 
 export type ReportReason = 'spam' | 'inappropriate' | 'expired' | 'misleading'
 
 const DAILY_REPORT_LIMIT = 5
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,6 +18,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Create Supabase client with service role key to bypass RLS
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Validate that high-severity reports have sufficient details
     const highSeverityReasons: ReportReason[] = ['spam', 'misleading']
