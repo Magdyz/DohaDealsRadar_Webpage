@@ -118,19 +118,19 @@ function PostDealContent() {
     <div className="min-h-screen bg-background-secondary">
       {/* Header */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="md" onClick={() => router.back()}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-2xl font-bold text-text-primary">Post a Deal</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-text-primary">Post a Deal</h1>
           </div>
         </div>
       </div>
 
       {/* Form */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-modern-lg p-6 md:p-8 space-y-8">
+      <div className="max-w-2xl mx-auto px-4 py-4 md:py-8">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-modern-lg p-4 md:p-8 space-y-4 md:space-y-8">
           {/* Image Upload - Moved to top */}
           <ImageUpload
             value={formData.imageUrl || ''}
@@ -160,7 +160,7 @@ function PostDealContent() {
           />
 
           {/* Deal Type & Category - Side by side on larger screens */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Deal Type */}
             <div>
               <DealTypeSelector
@@ -171,30 +171,30 @@ function PostDealContent() {
 
             {/* Category */}
             <div>
-              <label className="block text-base font-semibold text-text-primary mb-3">
+              <label className="block text-sm md:text-base font-semibold text-text-primary mb-2">
                 Category *
               </label>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-1.5 md:gap-2">
                 {CATEGORIES.map((category) => (
                   <button
                     key={category.id}
                     type="button"
                     onClick={() => handleChange('category', category.id)}
-                    className={`p-2.5 md:p-3 border-2 rounded-xl transition-all text-left min-h-[44px] ${
+                    className={`px-2.5 py-2 md:p-3 border-2 rounded-lg md:rounded-xl transition-all text-left min-h-[40px] md:min-h-[44px] ${
                       formData.category === category.id
                         ? 'border-primary bg-primary/10 shadow-sm'
                         : 'border-border hover:border-primary/50 hover:bg-primary/5'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg md:text-xl flex-shrink-0">{category.emoji}</span>
-                      <span className="text-xs md:text-sm font-medium text-text-primary leading-tight break-words">{category.label}</span>
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <span className="text-base md:text-xl flex-shrink-0">{category.emoji}</span>
+                      <span className="text-xs md:text-sm font-medium text-text-primary leading-snug">{category.label}</span>
                     </div>
                   </button>
                 ))}
               </div>
               {errors.category && (
-                <p className="mt-2 text-sm font-medium text-error">{errors.category}</p>
+                <p className="mt-1.5 text-xs md:text-sm font-medium text-error">{errors.category}</p>
               )}
             </div>
           </div>
@@ -233,7 +233,7 @@ function PostDealContent() {
 
           {/* Expiry */}
           <div>
-            <label className="block text-base font-semibold text-text-primary mb-3">
+            <label className="block text-sm md:text-base font-semibold text-text-primary mb-2">
               Deal Expires In (Days) *
             </label>
             <input
@@ -244,22 +244,22 @@ function PostDealContent() {
               onChange={(e) => handleChange('expiryDays', parseInt(e.target.value))}
               className="w-full h-2 bg-background-secondary rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
             />
-            <div className="flex justify-between items-center text-sm text-text-secondary mt-3">
+            <div className="flex justify-between items-center text-xs md:text-sm text-text-secondary mt-2">
               <span className="font-medium">1 day</span>
-              <Badge variant="purple" className="px-4 py-1.5 text-base font-bold">
+              <Badge variant="purple" className="px-3 py-1 md:px-4 md:py-1.5 text-sm md:text-base font-bold">
                 {formData.expiryDays || 10} days
               </Badge>
               <span className="font-medium">30 days</span>
             </div>
             {errors.expiryDays && (
-              <p className="mt-2 text-sm font-medium text-error">{errors.expiryDays}</p>
+              <p className="mt-1.5 text-xs md:text-sm font-medium text-error">{errors.expiryDays}</p>
             )}
           </div>
 
           {/* Submit Error */}
           {errors.submit && (
-            <div className="p-4 bg-error/10 border-2 border-error/30 rounded-xl">
-              <p className="text-sm font-medium text-error">{errors.submit}</p>
+            <div className="p-3 md:p-4 bg-error/10 border-2 border-error/30 rounded-lg md:rounded-xl">
+              <p className="text-xs md:text-sm font-medium text-error">{errors.submit}</p>
             </div>
           )}
 
