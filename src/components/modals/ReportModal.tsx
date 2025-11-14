@@ -52,7 +52,12 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
   const detailsValid = !requiresDetails || details.trim().length >= 30
 
   const handleSubmit = async () => {
-    if (!selectedReason || !user || !detailsValid) return
+    if (!user) {
+      toast.error('You must be logged in to report a deal')
+      return
+    }
+
+    if (!selectedReason || !detailsValid) return
 
     setIsSubmitting(true)
 
@@ -204,7 +209,7 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!selectedReason || !detailsValid || isSubmitting}
+              disabled={!user || !selectedReason || !detailsValid || isSubmitting}
               className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold transition-colors min-h-[44px]"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Report'}
