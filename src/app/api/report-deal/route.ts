@@ -91,7 +91,6 @@ export async function POST(request: NextRequest) {
         device_id: userId,
         reason: normalizedReason,
         note: details || null,
-        created_at: new Date().toISOString(),
       })
 
     if (insertError) {
