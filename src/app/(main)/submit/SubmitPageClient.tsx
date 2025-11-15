@@ -276,27 +276,45 @@ function SubmitDealContent() {
                 )}
               </div>
 
-              {/* Category - 2025 Modern Selection */}
+              {/* Category - 2025 Mobile-First Modern Selection */}
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-3">
+                <label className="block text-sm font-semibold text-text-primary mb-2.5">
                   Category *
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}
                       type="button"
                       onClick={() => setCategory(cat.id)}
                       disabled={isSubmitting}
-                      className={`p-4 rounded-xl border-2 transition-all duration-300 min-h-[56px] ${
-                        category === cat.id
-                          ? 'border-primary bg-primary-light shadow-purple scale-105'
-                          : 'border-border hover:border-primary/50 hover:bg-surface-variant hover:scale-102'
-                      }`}
+                      className={`
+                        relative overflow-hidden
+                        px-3 py-3 md:px-4 md:py-4
+                        rounded-xl border-2
+                        transition-all duration-300
+                        min-h-[48px] md:min-h-[56px]
+                        ${
+                          category === cat.id
+                            ? 'border-primary bg-gradient-to-br from-primary-light to-primary-light/70 shadow-md scale-[1.02] md:scale-105'
+                            : 'border-border/60 bg-surface hover:border-primary/40 hover:bg-surface-variant active:scale-[0.98] md:hover:scale-[1.02]'
+                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                      `}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-2xl">{cat.emoji}</span>
-                        <span className="text-sm font-semibold">{cat.label}</span>
+                      {/* Selected indicator - modern subtle glow */}
+                      {category === cat.id && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-action-primary/5 to-primary-dark/5 animate-pulse-slow" />
+                      )}
+
+                      <div className="relative flex items-center justify-start md:justify-center gap-2 md:gap-2.5">
+                        <span className="text-xl md:text-2xl flex-shrink-0">{cat.emoji}</span>
+                        <span className={`
+                          text-xs md:text-sm font-semibold text-left md:text-center
+                          ${category === cat.id ? 'text-primary-dark' : 'text-text-primary'}
+                        `}>
+                          {cat.label}
+                        </span>
                       </div>
                     </button>
                   ))}
