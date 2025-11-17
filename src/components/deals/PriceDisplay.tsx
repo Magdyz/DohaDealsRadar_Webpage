@@ -1,10 +1,14 @@
 interface PriceDisplayProps {
-  originalPrice: number | null
-  discountedPrice: number | null
+  originalPrice: string | null
+  discountedPrice: string | null
   variant?: 'card' | 'details'  // New prop for size variant
 }
 
 export default function PriceDisplay({ originalPrice, discountedPrice, variant = 'card' }: PriceDisplayProps) {
+  // Convert string prices to numbers for calculations
+  const originalNum = originalPrice ? parseFloat(originalPrice) : null
+  const discountedNum = discountedPrice ? parseFloat(discountedPrice) : null
+
   // Helper function to format price with QR prefix and thousands separator
   const formatPrice = (price: number): string => {
     // Check if it's a whole number
@@ -39,25 +43,25 @@ export default function PriceDisplay({ originalPrice, discountedPrice, variant =
       }
 
   // Case 4: No price
-  if (!originalPrice && !discountedPrice) {
+  if (!originalNum && !discountedNum) {
     return <div className="h-[40px]" />
   }
 
   // Case 1: Both prices exist (discount scenario)
-  if (originalPrice && discountedPrice) {
-    const discountPercentage = getDiscountPercentage(originalPrice, discountedPrice)
+  if (originalNum && discountedNum) {
+    const discountPercentage = getDiscountPercentage(originalNum, discountedNum)
 
     return (
       <div className={`h-[40px] flex flex-col justify-center ${sizes.gap}`}>
         {/* Line 1: Discounted price (prominent) */}
         <div className={`${sizes.discounted} font-bold text-[#E91E63] leading-tight`}>
-          {formatPrice(discountedPrice)}
+          {formatPrice(discountedNum)}
         </div>
 
         {/* Line 2: Original price (strikethrough) + Discount percentage */}
         <div className="flex items-center gap-1.5">
           <span className={`${sizes.original} text-gray-500 dark:text-gray-400 line-through leading-tight`}>
-            {formatPrice(originalPrice)}
+            {formatPrice(originalNum)}
           </span>
           <span className={`${sizes.percentage} font-bold text-[#10B981] leading-tight`}>
             -{discountPercentage}%
@@ -68,22 +72,22 @@ export default function PriceDisplay({ originalPrice, discountedPrice, variant =
   }
 
   // Case 2: Only original price
-  if (originalPrice && !discountedPrice) {
+  if (originalNum && !discountedNum) {
     return (
       <div className="h-[40px] flex items-center">
         <div className={`${sizes.single} font-semibold text-zinc-900 dark:text-zinc-100`}>
-          {formatPrice(originalPrice)}
+          {formatPrice(originalNum)}
         </div>
       </div>
     )
   }
 
   // Case 3: Only discounted price
-  if (!originalPrice && discountedPrice) {
+  if (!originalNum && discountedNum) {
     return (
       <div className="h-[40px] flex items-center">
         <div className={`${sizes.discounted} font-bold text-[#E91E63]`}>
-          {formatPrice(discountedPrice)}
+          {formatPrice(discountedNum)}
         </div>
       </div>
     )
