@@ -59,7 +59,31 @@ export const dealSubmissionSchema = z.object({
     .int('Expiry days must be a whole number')
     .min(1, 'Deal must be valid for at least 1 day')
     .max(30, 'Deal cannot be valid for more than 30 days'),
-})
+  originalPrice: z
+    .number()
+    .positive('Original price must be a positive number')
+    .optional()
+    .or(z.literal(0))
+    .transform((val) => val === 0 ? undefined : val),
+  discountedPrice: z
+    .number()
+    .positive('Discounted price must be a positive number')
+    .optional()
+    .or(z.literal(0))
+    .transform((val) => val === 0 ? undefined : val),
+}).refine(
+  (data) => {
+    // If both prices exist, discounted must be less than original
+    if (data.originalPrice && data.discountedPrice) {
+      return data.discountedPrice < data.originalPrice
+    }
+    return true
+  },
+  {
+    message: 'Discounted price must be less than original price',
+    path: ['discountedPrice'],
+  }
+)
 
 export type DealSubmissionData = z.infer<typeof dealSubmissionSchema>
 

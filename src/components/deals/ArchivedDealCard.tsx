@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Eye, RotateCcw, Trash2 } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
 import type { Deal } from '@/types'
+import PriceDisplay from './PriceDisplay'
 
 interface ArchivedDealCardProps {
   deal: Deal
@@ -103,6 +104,9 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
             {deal.title}
           </h3>
         </Link>
+
+        {/* Price Display */}
+        <PriceDisplay originalPrice={deal.originalPrice} discountedPrice={deal.discountedPrice} />
 
         {/* Admin Action Buttons - 2025 Touch-Friendly */}
         <div className="grid grid-cols-2 gap-2">
