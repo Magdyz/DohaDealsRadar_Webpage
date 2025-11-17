@@ -14,6 +14,8 @@ export interface Deal {
   location: string | null
   category: DealCategory
   promoCode: string | null
+  originalPrice: number | null
+  discountedPrice: number | null
   hotVotes: number
   coldVotes: number
   username: string | null // posted_by username

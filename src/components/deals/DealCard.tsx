@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Eye } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
 import type { Deal } from '@/types'
+import PriceDisplay from './PriceDisplay'
 
 interface DealCardProps {
   deal: Deal
@@ -97,6 +98,9 @@ function DealCard({ deal, priority = false }: DealCardProps) {
           </h3>
         </Link>
 
+        {/* Price Display */}
+        <PriceDisplay originalPrice={deal.originalPrice} discountedPrice={deal.discountedPrice} />
+
         {/* View Deal Button - Modern 2025 style with better touch target */}
         <Link href={`/deals/${deal.id}`} className="block mt-auto">
           <button className="w-full min-h-[44px] bg-gradient-to-r from-action-primary to-primary-dark hover:from-primary-dark hover:to-action-primary text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-purple hover:shadow-xl transform hover:-translate-y-0.5 active:scale-98">
@@ -116,6 +120,8 @@ export default memo(DealCard, (prevProps, nextProps) => {
     prevProps.deal.id === nextProps.deal.id &&
     prevProps.deal.hotVotes === nextProps.deal.hotVotes &&
     prevProps.deal.coldVotes === nextProps.deal.coldVotes &&
+    prevProps.deal.originalPrice === nextProps.deal.originalPrice &&
+    prevProps.deal.discountedPrice === nextProps.deal.discountedPrice &&
     prevProps.priority === nextProps.priority
   )
 })
