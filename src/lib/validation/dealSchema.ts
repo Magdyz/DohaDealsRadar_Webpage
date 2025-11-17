@@ -60,22 +60,38 @@ export const dealSubmissionSchema = z.object({
     .min(1, 'Deal must be valid for at least 1 day')
     .max(30, 'Deal cannot be valid for more than 30 days'),
   originalPrice: z
-    .number()
-    .positive('Original price must be a positive number')
+    .string()
+    .trim()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true
+        const num = parseFloat(val)
+        return !isNaN(num) && num > 0
+      },
+      { message: 'Original price must be a positive number' }
+    )
     .optional()
-    .or(z.literal(0))
-    .transform((val) => val === 0 ? undefined : val),
+    .or(z.literal('')),
   discountedPrice: z
-    .number()
-    .positive('Discounted price must be a positive number')
+    .string()
+    .trim()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true
+        const num = parseFloat(val)
+        return !isNaN(num) && num > 0
+      },
+      { message: 'Discounted price must be a positive number' }
+    )
     .optional()
-    .or(z.literal(0))
-    .transform((val) => val === 0 ? undefined : val),
+    .or(z.literal('')),
 }).refine(
   (data) => {
     // If both prices exist, discounted must be less than original
     if (data.originalPrice && data.discountedPrice) {
-      return data.discountedPrice < data.originalPrice
+      const original = parseFloat(data.originalPrice)
+      const discounted = parseFloat(data.discountedPrice)
+      return !isNaN(original) && !isNaN(discounted) && discounted < original
     }
     return true
   },

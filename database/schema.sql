@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS public.deals (
     location TEXT,
     category TEXT NOT NULL,
     promo_code TEXT,
+    original_price NUMERIC(10, 2),
+    discounted_price NUMERIC(10, 2),
     hot_votes INTEGER NOT NULL DEFAULT 0,
     cold_votes INTEGER NOT NULL DEFAULT 0,
     user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,

@@ -39,11 +39,11 @@ function PostDealContent() {
   }
 
   const validateForm = (): boolean => {
-    // Convert price strings to numbers for validation
+    // Pass price strings directly for validation
     const dataToValidate = {
       ...formData,
-      originalPrice: originalPriceStr ? parseFloat(originalPriceStr) : 0,
-      discountedPrice: discountedPriceStr ? parseFloat(discountedPriceStr) : 0,
+      originalPrice: originalPriceStr,
+      discountedPrice: discountedPriceStr,
     }
 
     const result = dealSubmissionSchema.safeParse(dataToValidate)
@@ -82,8 +82,8 @@ function PostDealContent() {
         location: formData.location,
         category: formData.category!,
         promoCode: formData.promoCode,
-        originalPrice: originalPriceStr ? parseFloat(originalPriceStr) : undefined,
-        discountedPrice: discountedPriceStr ? parseFloat(discountedPriceStr) : undefined,
+        originalPrice: originalPriceStr || undefined,
+        discountedPrice: discountedPriceStr || undefined,
         expiryDays: formData.expiryDays!,
         userId: user.id,
       })

@@ -26,8 +26,8 @@ export interface SubmitDealData {
   location?: string
   category: DealCategory
   promoCode?: string
-  originalPrice?: number
-  discountedPrice?: number
+  originalPrice?: string
+  discountedPrice?: string
   expiryDays: number
   userId: string
 }
