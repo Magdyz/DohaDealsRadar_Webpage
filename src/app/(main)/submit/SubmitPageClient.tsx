@@ -4,6 +4,8 @@ import { Suspense, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, X, Eye } from 'lucide-react'
 import { Button, Card, CardBody, Input, Badge, Spinner } from '@/components/ui'
+import { PriceInput } from '@/components/post'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { submitDeal, uploadImage } from '@/lib/api/deals'
 import { useAuthStore } from '@/lib/store/authStore'
 import { useDeviceId } from '@/lib/hooks/useDeviceId'
@@ -27,6 +29,8 @@ function SubmitDealContent() {
   const [location, setLocation] = useState('')
   const [category, setCategory] = useState<DealCategory>('food_dining')
   const [promoCode, setPromoCode] = useState('')
+  const [originalPrice, setOriginalPrice] = useState('')
+  const [discountedPrice, setDiscountedPrice] = useState('')
   const [expiryDays, setExpiryDays] = useState('7')
 
   // UI state
@@ -90,6 +94,8 @@ function SubmitDealContent() {
       location,
       category,
       promoCode,
+      originalPrice,
+      discountedPrice,
       expiryDays: days,
     })
 
@@ -130,6 +136,8 @@ function SubmitDealContent() {
         location: location.trim() || undefined,
         category,
         promoCode: promoCode.trim() || undefined,
+        originalPrice: originalPrice.trim() || undefined,
+        discountedPrice: discountedPrice.trim() || undefined,
         expiryDays: parseInt(expiryDays),
         userId: user?.id || deviceId,
       }
@@ -210,6 +218,41 @@ function SubmitDealContent() {
                 <p className="mt-1 text-xs text-text-tertiary">
                   {title.length}/200 characters
                 </p>
+              </div>
+
+              {/* Price Fields - Matches Android app positioning */}
+              <div>
+                <label className="block text-sm md:text-base font-semibold text-text-primary mb-3">
+                  Price (Optional)
+                </label>
+                <div className="flex gap-4">
+                  <PriceInput
+                    label="Original"
+                    value={originalPrice}
+                    onChange={setOriginalPrice}
+                    placeholder="100"
+                  />
+                  <PriceInput
+                    label="Discounted"
+                    value={discountedPrice}
+                    onChange={setDiscountedPrice}
+                    placeholder="80"
+                  />
+                </div>
+
+                {/* Price Preview */}
+                {(originalPrice || discountedPrice) && (
+                  <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
+                    <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
+                      Price Preview:
+                    </div>
+                    <PriceDisplay
+                      originalPrice={originalPrice || null}
+                      discountedPrice={discountedPrice || null}
+                      variant="details"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Description */}
