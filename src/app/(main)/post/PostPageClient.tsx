@@ -162,6 +162,53 @@ function PostDealContent() {
             helperText="3-200 characters"
           />
 
+          {/* Price Fields - Matches Android app positioning */}
+          <div>
+            <label className="block text-sm md:text-base font-semibold text-text-primary mb-3">
+              Price (Optional)
+            </label>
+            <div className="flex gap-4">
+              <PriceInput
+                label="Original"
+                value={originalPriceStr}
+                onChange={(value) => {
+                  setOriginalPriceStr(value)
+                  if (errors.originalPrice) {
+                    setErrors({ ...errors, originalPrice: '' })
+                  }
+                }}
+                placeholder="100"
+                error={errors.originalPrice}
+              />
+              <PriceInput
+                label="Discounted"
+                value={discountedPriceStr}
+                onChange={(value) => {
+                  setDiscountedPriceStr(value)
+                  if (errors.discountedPrice) {
+                    setErrors({ ...errors, discountedPrice: '' })
+                  }
+                }}
+                placeholder="80"
+                error={errors.discountedPrice}
+              />
+            </div>
+
+            {/* Price Preview */}
+            {(originalPriceStr || discountedPriceStr) && (
+              <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
+                <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
+                  Price Preview:
+                </div>
+                <PriceDisplay
+                  originalPrice={originalPriceStr || null}
+                  discountedPrice={discountedPriceStr || null}
+                  variant="details"
+                />
+              </div>
+            )}
+          </div>
+
           {/* Description */}
           <Textarea
             label="Description (Optional)"
@@ -244,53 +291,6 @@ function PostDealContent() {
             error={errors.promoCode}
             helperText="If applicable"
           />
-
-          {/* Price Fields */}
-          <div>
-            <label className="block text-sm md:text-base font-semibold text-text-primary mb-3">
-              Price (Optional)
-            </label>
-            <div className="flex gap-4">
-              <PriceInput
-                label="Original"
-                value={originalPriceStr}
-                onChange={(value) => {
-                  setOriginalPriceStr(value)
-                  if (errors.originalPrice) {
-                    setErrors({ ...errors, originalPrice: '' })
-                  }
-                }}
-                placeholder="100"
-                error={errors.originalPrice}
-              />
-              <PriceInput
-                label="Discounted"
-                value={discountedPriceStr}
-                onChange={(value) => {
-                  setDiscountedPriceStr(value)
-                  if (errors.discountedPrice) {
-                    setErrors({ ...errors, discountedPrice: '' })
-                  }
-                }}
-                placeholder="80"
-                error={errors.discountedPrice}
-              />
-            </div>
-
-            {/* Price Preview */}
-            {(originalPriceStr || discountedPriceStr) && (
-              <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
-                <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
-                  Price Preview:
-                </div>
-                <PriceDisplay
-                  originalPrice={originalPriceStr || null}
-                  discountedPrice={discountedPriceStr || null}
-                  variant="details"
-                />
-              </div>
-            )}
-          </div>
 
           {/* Expiry */}
           <div>
