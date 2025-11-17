@@ -74,21 +74,29 @@ export default function AccountPageClient() {
       {/* Header - 2025 Modern Design */}
       <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
         <div className="max-w-4xl mx-auto px-4 py-4 md:px-6 md:py-5">
-          <div className="flex items-center justify-between">
+          <div className="grid grid-cols-3 items-center gap-2">
+            {/* Left: Back Button */}
             <button
               onClick={() => router.push('/feed')}
-              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
+              className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105 justify-self-start"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back to Feed</span>
+              <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+              <span className="font-medium hidden sm:inline">Back</span>
+              <span className="font-medium hidden md:inline">to Feed</span>
             </button>
-            <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">My Account</h1>
+
+            {/* Center: Title */}
+            <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-text-primary tracking-tight text-center">
+              My Account
+            </h1>
+
+            {/* Right: Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] border-2 border-border hover:bg-error/5 hover:border-error/50 text-text-primary hover:text-error rounded-xl transition-all"
+              className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 min-h-[44px] border-2 border-border hover:bg-error/5 hover:border-error/50 text-text-primary hover:text-error rounded-xl transition-all justify-self-end"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              <span className="font-medium hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
