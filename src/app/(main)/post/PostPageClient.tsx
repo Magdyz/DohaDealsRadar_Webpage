@@ -6,6 +6,7 @@ import { ArrowLeft, Check } from 'lucide-react'
 import { Button, Input, Textarea, Badge } from '@/components/ui'
 import { DealTypeSelector, ImageUpload, PriceInput } from '@/components/post'
 import { ProtectedRoute } from '@/components/auth'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { useAuthStore } from '@/lib/store/authStore'
 import { submitDeal } from '@/lib/api/deals'
 import { dealSubmissionSchema, formatZodError, type DealSubmissionData } from '@/lib/validation/dealSchema'
@@ -275,6 +276,20 @@ function PostDealContent() {
                 error={errors.discountedPrice}
               />
             </div>
+
+            {/* Price Preview */}
+            {(originalPriceStr || discountedPriceStr) && (
+              <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
+                <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
+                  Price Preview:
+                </div>
+                <PriceDisplay
+                  originalPrice={originalPriceStr || null}
+                  discountedPrice={discountedPriceStr || null}
+                  variant="details"
+                />
+              </div>
+            )}
           </div>
 
           {/* Expiry */}
