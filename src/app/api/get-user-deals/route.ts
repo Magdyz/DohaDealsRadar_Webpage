@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
       location: deal.location,
       category: deal.category,
       promoCode: deal.promo_code,
+      originalPrice: deal.original_price ? String(deal.original_price) : null,
+      discountedPrice: deal.discounted_price ? String(deal.discounted_price) : null,
       hotVotes: deal.hot_count || 0,
       coldVotes: deal.cold_count || 0,
       username: deal.posted_by || 'Anonymous',
