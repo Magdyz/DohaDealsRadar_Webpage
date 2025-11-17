@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useMemo, memo } from 'react'
+import { useState, useMemo, memo, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Eye } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
+import { getShimmerDataURL } from '@/lib/utils/imageUtils'
 import type { Deal } from '@/types'
 import PriceDisplay from './PriceDisplay'
 
@@ -14,7 +16,9 @@ interface DealCardProps {
 }
 
 function DealCard({ deal, priority = false }: DealCardProps) {
+  const router = useRouter()
   const [imageError, setImageError] = useState(false)
+  const prefetchedRef = useRef(false)
 
   // Check if deal is new (within 48 hours)
   const isNewDeal = useMemo(() => {
@@ -27,8 +31,19 @@ function DealCard({ deal, priority = false }: DealCardProps) {
   // Check if image URL is valid
   const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
 
+  // Prefetch deal details on hover for instant navigation
+  const handleMouseEnter = () => {
+    if (!prefetchedRef.current) {
+      router.prefetch(`/deals/${deal.id}`)
+      prefetchedRef.current = true
+    }
+  }
+
   return (
-    <div className="bg-surface rounded-2xl overflow-hidden border border-border/30 transition-all duration-300 hover:shadow-modern-lg hover:-translate-y-1 animate-fade-in flex flex-col h-full">
+    <div
+      className="bg-surface rounded-2xl overflow-hidden border border-border/30 transition-all duration-300 hover:shadow-modern-lg hover:-translate-y-1 animate-fade-in flex flex-col h-full"
+      onMouseEnter={handleMouseEnter}
+    >
       {/* Image Section with Vote Buttons Overlay */}
       <Link href={`/deals/${deal.id}`} className="block">
         <div className="relative w-full aspect-square p-2.5">
@@ -39,6 +54,8 @@ function DealCard({ deal, priority = false }: DealCardProps) {
                 alt={deal.title}
                 fill
                 priority={priority}
+                placeholder="blur"
+                blurDataURL={getShimmerDataURL(400, 400)}
                 className="object-cover transition-transform duration-300 hover:scale-105"
                 sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 onError={() => setImageError(true)}
