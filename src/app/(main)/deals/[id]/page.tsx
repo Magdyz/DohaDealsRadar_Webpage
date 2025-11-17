@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { ArrowLeft, ExternalLink, MapPin, Tag, Calendar, Clock, Share2, Copy, Flag, User } from 'lucide-react'
 import { Button, Badge, Card, CardBody, Spinner } from '@/components/ui'
 import VoteButtons from '@/components/deals/VoteButtons'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { ReportModal } from '@/components/modals'
 import { getDealById } from '@/lib/api/deals'
 import { formatDate, formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
@@ -200,6 +201,15 @@ export default function DealDetailsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
               {deal.title}
             </h1>
+
+            {/* Price Display */}
+            <div className="mb-6">
+              <PriceDisplay
+                originalPrice={deal.originalPrice}
+                discountedPrice={deal.discountedPrice}
+                variant="details"
+              />
+            </div>
 
             {/* Description */}
             {deal.description && (

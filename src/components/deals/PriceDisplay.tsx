@@ -1,9 +1,10 @@
 interface PriceDisplayProps {
   originalPrice: number | null
   discountedPrice: number | null
+  variant?: 'card' | 'details'  // New prop for size variant
 }
 
-export default function PriceDisplay({ originalPrice, discountedPrice }: PriceDisplayProps) {
+export default function PriceDisplay({ originalPrice, discountedPrice, variant = 'card' }: PriceDisplayProps) {
   // Helper function to format price with QR prefix and thousands separator
   const formatPrice = (price: number): string => {
     // Check if it's a whole number
@@ -20,6 +21,23 @@ export default function PriceDisplay({ originalPrice, discountedPrice }: PriceDi
     return Math.floor(((original - discounted) / original) * 100)
   }
 
+  // Font sizes based on variant
+  const sizes = variant === 'details'
+    ? {
+        discounted: 'text-[26px]',
+        original: 'text-[16px]',
+        percentage: 'text-[16px]',
+        single: 'text-[24px]',
+        gap: 'gap-1',
+      }
+    : {
+        discounted: 'text-[14px]',
+        original: 'text-[11px]',
+        percentage: 'text-[11px]',
+        single: 'text-[13px]',
+        gap: 'gap-1',
+      }
+
   // Case 4: No price
   if (!originalPrice && !discountedPrice) {
     return <div className="h-[40px]" />
@@ -30,18 +48,18 @@ export default function PriceDisplay({ originalPrice, discountedPrice }: PriceDi
     const discountPercentage = getDiscountPercentage(originalPrice, discountedPrice)
 
     return (
-      <div className="h-[40px] flex flex-col justify-center gap-1">
+      <div className={`h-[40px] flex flex-col justify-center ${sizes.gap}`}>
         {/* Line 1: Discounted price (prominent) */}
-        <div className="text-[14px] font-bold text-[#E91E63]">
+        <div className={`${sizes.discounted} font-bold text-[#E91E63] leading-tight`}>
           {formatPrice(discountedPrice)}
         </div>
 
         {/* Line 2: Original price (strikethrough) + Discount percentage */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 line-through">
+          <span className={`${sizes.original} text-gray-500 dark:text-gray-400 line-through leading-tight`}>
             {formatPrice(originalPrice)}
           </span>
-          <span className="text-[11px] font-bold text-[#10B981]">
+          <span className={`${sizes.percentage} font-bold text-[#10B981] leading-tight`}>
             -{discountPercentage}%
           </span>
         </div>
@@ -53,7 +71,7 @@ export default function PriceDisplay({ originalPrice, discountedPrice }: PriceDi
   if (originalPrice && !discountedPrice) {
     return (
       <div className="h-[40px] flex items-center">
-        <div className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className={`${sizes.single} font-semibold text-zinc-900 dark:text-zinc-100`}>
           {formatPrice(originalPrice)}
         </div>
       </div>
@@ -64,7 +82,7 @@ export default function PriceDisplay({ originalPrice, discountedPrice }: PriceDi
   if (!originalPrice && discountedPrice) {
     return (
       <div className="h-[40px] flex items-center">
-        <div className="text-[14px] font-bold text-[#E91E63]">
+        <div className={`${sizes.discounted} font-bold text-[#E91E63]`}>
           {formatPrice(discountedPrice)}
         </div>
       </div>
