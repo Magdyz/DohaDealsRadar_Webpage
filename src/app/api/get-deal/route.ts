@@ -49,11 +49,11 @@ export async function GET(request: NextRequest) {
 
         if (!authError && user) {
           // Get user details from database to check role
-          const { data: userData } = await supabase
+          const { data: userData, error: userLookupError } = await supabase
             .from('users')
             .select('role, id')
             .eq('id', user.id)
-            .single()
+            .maybeSingle() // Use maybeSingle() instead of single() to handle missing users gracefully
 
           if (userData) {
             // Allow if user is moderator, admin, or deal owner
@@ -61,6 +61,9 @@ export async function GET(request: NextRequest) {
               userData.role === 'moderator' ||
               userData.role === 'admin' ||
               userData.id === deal.submitted_by_user_id
+          } else if (user.id === deal.submitted_by_user_id) {
+            // Allow users to view their own pending deals even if not in users table yet
+            isAuthorized = true
           }
         }
       }
