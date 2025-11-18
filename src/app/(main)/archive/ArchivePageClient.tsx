@@ -85,13 +85,22 @@ function ArchivePageContent() {
 
   const handleRestore = async (dealId: string) => {
     try {
+      // SECURITY FIX: Use JWT token from auth store
+      const { useAuthStore } = await import('@/lib/store/authStore')
+      const token = useAuthStore.getState().getAccessToken()
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch('/api/restore-deal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dealId,
-          moderatorUserId: user?.id,
-        }),
+        headers,
+        body: JSON.stringify({ dealId }), // Remove moderatorUserId, use token
       })
 
       const data = await response.json()
@@ -111,13 +120,22 @@ function ArchivePageContent() {
 
   const handleDelete = async (dealId: string) => {
     try {
+      // SECURITY FIX: Use JWT token from auth store
+      const { useAuthStore } = await import('@/lib/store/authStore')
+      const token = useAuthStore.getState().getAccessToken()
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch('/api/delete-deal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dealId,
-          moderatorUserId: user?.id,
-        }),
+        headers,
+        body: JSON.stringify({ dealId }), // Remove moderatorUserId, use token
       })
 
       const data = await response.json()

@@ -45,7 +45,12 @@ function VerifyForm() {
       const response = await verifyCode(email, code, deviceId)
 
       if (response.success && response.user) {
-        login(response.user)
+        // SECURITY FIX: Store JWT tokens for authenticated API calls
+        login(
+          response.user,
+          response.session?.accessToken,
+          response.session?.refreshToken
+        )
 
         // If new user without username, redirect to username setup
         if (response.isNewUser && !response.user.username) {

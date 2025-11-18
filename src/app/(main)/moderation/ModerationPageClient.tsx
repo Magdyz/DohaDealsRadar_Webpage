@@ -82,13 +82,22 @@ function ModerationContent() {
 
     setProcessingId(dealId)
     try {
+      // SECURITY FIX: Use JWT token from auth store
+      const { useAuthStore } = await import('@/lib/store/authStore')
+      const token = useAuthStore.getState().getAccessToken()
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch('/api/approve-deal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          moderatorUserId: user.id,
-          dealId,
-        }),
+        headers,
+        body: JSON.stringify({ dealId }), // Remove moderatorUserId, use token
       })
 
       const data = await response.json()
@@ -115,14 +124,22 @@ function ModerationContent() {
 
     setProcessingId(dealId)
     try {
+      // SECURITY FIX: Use JWT token from auth store
+      const { useAuthStore } = await import('@/lib/store/authStore')
+      const token = useAuthStore.getState().getAccessToken()
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch('/api/reject-deal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          moderatorUserId: user.id,
-          dealId,
-          reason,
-        }),
+        headers,
+        body: JSON.stringify({ dealId, reason }), // Remove moderatorUserId, use token
       })
 
       const data = await response.json()

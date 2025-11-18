@@ -72,42 +72,10 @@ export async function verifyAuthentication(
       }
     }
 
-    // Fallback: Check for userId in request body (backwards compatibility)
-    // This will be removed in future versions
-    const body = await request.clone().json()
-    const userId =
-      body.userId || body.moderatorUserId || body.adminUserId || body.deviceId
-
-    if (userId && isValidUUID(userId)) {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, email, username, role, auto_approve')
-        .eq('id', userId)
-        .single()
-
-      if (userError || !userData) {
-        // If userId is provided but user doesn't exist, allow it for device_id operations
-        // This maintains backwards compatibility for voting/reporting
-        return {
-          id: userId,
-          email: '',
-          role: 'user',
-          autoApprove: false,
-        }
-      }
-
-      return {
-        id: userData.id,
-        email: userData.email,
-        role: userData.role as 'user' | 'moderator' | 'admin',
-        username: userData.username || undefined,
-        autoApprove: userData.auto_approve || false,
-      }
-    }
-
-    throw new AuthError('No authentication provided', 401)
+    // SECURITY: Backwards compatibility REMOVED
+    // Voting and reporting operations use device IDs directly and don't call verifyAuthentication
+    // All other operations (deal submission, moderation, admin actions) REQUIRE JWT tokens
+    throw new AuthError('Authentication required - please log in', 401)
   } catch (error) {
     if (error instanceof AuthError) {
       throw error
