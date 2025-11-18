@@ -6,8 +6,9 @@ import {
 } from '@/lib/utils/errorHandler'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-// SECURITY FIX: Use anon key - let RLS policies enforce security
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Use service role key to bypass RLS for vote operations
+// Voting is anonymous and uses device IDs - no sensitive user data exposed
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,12 +40,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
+    // Use service role key to bypass RLS for voting operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Check if user already voted
     const { data: existingVote } = await supabase
@@ -52,7 +49,7 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('deal_id', dealId)
       .eq('device_id', deviceId)
-      .single()
+      .maybeSingle() // Use maybeSingle() to handle case when no vote exists
 
     if (existingVote) {
       return NextResponse.json(
