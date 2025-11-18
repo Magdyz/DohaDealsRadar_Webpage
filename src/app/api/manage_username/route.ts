@@ -1,26 +1,42 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { verifyAuthentication, AuthError } from '@/lib/auth/serverAuth'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
+import { sanitizeUsername } from '@/lib/utils/sanitize'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { userId, username } = body
+    // CRITICAL SECURITY FIX: Verify user from session, not request body
+    const user = await verifyAuthentication(request)
 
-    if (!userId || !username) {
+    const body = await request.json()
+    const { username } = body
+
+    // Validate required fields
+    const validation = validateRequiredFields(body, ['username'])
+    if (!validation.valid) {
       return NextResponse.json(
-        { success: false, message: 'User ID and username are required' },
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
       )
     }
 
-    // Validate username
-    const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/
-    if (!usernameRegex.test(username)) {
+    // Validate and sanitize username
+    const sanitizedUsername = sanitizeUsername(username)
+    if (!sanitizedUsername) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Username must be 3-20 characters and contain only letters, numbers, underscores, and hyphens',
+          message:
+            'Invalid username. Must be 3-20 characters and contain only letters, numbers, underscores, and hyphens. Reserved usernames (admin, moderator, system) are not allowed.',
         },
         { status: 400 }
       )
@@ -30,7 +46,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
-      .eq('username', username)
+      .eq('username', sanitizedUsername)
       .single()
 
     if (existingUser) {
@@ -40,32 +56,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update user with username
+    // Update user with username (use verified user ID from session)
     const { data: updatedUser, error: updateError } = await supabase
       .from('users')
-      .update({ username })
-      .eq('id', userId)
+      .update({ username: sanitizedUsername })
+      .eq('id', user.id) // Use verified user ID from session
       .select()
       .single()
 
     if (updateError) {
       console.error('Error updating username:', updateError)
       return NextResponse.json(
-        { success: false, message: 'Failed to update username', error: updateError.message },
+        { success: false, message: 'Failed to update username' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Username registered successfully',
-      username: updatedUser.username,
-    })
-  } catch (error: any) {
-    console.error('Manage username error:', error)
-    return NextResponse.json(
-      { success: false, message: 'Internal server error', error: error.message },
-      { status: 500 }
+    return createSuccessResponse(
+      { username: updatedUser.username },
+      'Username registered successfully'
     )
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: error.statusCode }
+      )
+    }
+
+    return createErrorResponse(error, 500, 'Manage Username API')
   }
 }

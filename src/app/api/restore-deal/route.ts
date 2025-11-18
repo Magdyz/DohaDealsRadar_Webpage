@@ -1,33 +1,29 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { verifyAdmin, AuthError } from '@/lib/auth/serverAuth'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
 
 export async function POST(request: NextRequest) {
   try {
-    const { dealId, moderatorUserId } = await request.json()
+    // CRITICAL SECURITY FIX: Verify admin from session, not request body
+    const admin = await verifyAdmin(request)
 
-    if (!dealId || !moderatorUserId) {
+    const { dealId } = await request.json()
+
+    // Validate required fields
+    const validation = validateRequiredFields({ dealId }, ['dealId'])
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: 'Deal ID and moderator user ID are required' },
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
-      )
-    }
-
-    // Verify moderator is admin
-    const { data: moderator, error: modError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', moderatorUserId)
-      .single<{ role: string }>()
-
-    if (modError || !moderator) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    if (moderator.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Only admins can restore deals' },
-        { status: 403 }
       )
     }
 
@@ -44,20 +40,21 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error('Error restoring deal:', updateError)
       return NextResponse.json(
-        { error: 'Failed to restore deal' },
+        { success: false, message: 'Failed to restore deal' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Deal restored successfully',
-    })
+    return createSuccessResponse({}, 'Deal restored successfully')
   } catch (error: any) {
-    console.error('Error in restore-deal API:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    // Handle authentication errors specifically
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: error.statusCode }
+      )
+    }
+
+    return createErrorResponse(error, 500, 'Restore Deal API')
   }
 }

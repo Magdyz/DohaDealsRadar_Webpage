@@ -1,21 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { verifyAuthentication, AuthError } from '@/lib/auth/serverAuth'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
+import {
+  validateImageFile,
+  generateSecureFilename,
+  sanitizeFilename,
+} from '@/lib/validation/fileValidation'
+import { checkRateLimit, imageUploadLimit } from '@/lib/utils/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Require authentication for image uploads
+    const user = await verifyAuthentication(request)
+
+    // SECURITY: Rate limiting to prevent storage abuse
+    const rateLimitResult = checkRateLimit(
+      request,
+      imageUploadLimit,
+      `upload:${user.id}`
+    )
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: imageUploadLimit.message || 'Too many uploads',
+          resetAt: rateLimitResult.resetAt,
+        },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
+
+    // Validate required fields
+    const validation = validateRequiredFields(body, ['image', 'filename'])
+    if (!validation.valid) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
+        { status: 400 }
+      )
+    }
+
     const { image, filename } = body
 
-    if (!image || !filename) {
+    // CRITICAL SECURITY: Validate file is actually an image
+    const fileValidation = validateImageFile(image, filename)
+    if (!fileValidation.valid) {
       return NextResponse.json(
-        { message: 'Missing image or filename' },
+        { success: false, message: fileValidation.error },
         { status: 400 }
       )
     }
 
     // Convert base64 to blob
     const base64Data = image.split(',')[1]
-    const mimeType = image.split(',')[0].split(':')[1].split(';')[0]
+    const mimeType = fileValidation.mimeType!
 
     // Decode base64
     const binaryString = atob(base64Data)
@@ -25,9 +72,8 @@ export async function POST(request: NextRequest) {
     }
     const blob = new Blob([bytes], { type: mimeType })
 
-    // Generate unique filename
-    const fileExt = filename.split('.').pop()
-    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+    // SECURITY: Generate secure filename (prevents path traversal)
+    const uniqueFilename = generateSecureFilename(sanitizeFilename(filename))
     const filePath = `images/${uniqueFilename}`
 
     // Upload to Supabase Storage
@@ -42,7 +88,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Upload error:', error)
       return NextResponse.json(
-        { message: 'Failed to upload image', error: error.message },
+        { success: false, message: 'Failed to upload image' },
         { status: 500 }
       )
     }
@@ -52,16 +98,22 @@ export async function POST(request: NextRequest) {
       .from('deals')
       .getPublicUrl(filePath)
 
-    return NextResponse.json({
-      success: true,
-      url: urlData.publicUrl,
-      path: filePath,
-    })
-  } catch (error: any) {
-    console.error('Unexpected error:', error)
-    return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
-      { status: 500 }
+    return createSuccessResponse(
+      {
+        url: urlData.publicUrl,
+        path: filePath,
+      },
+      'Image uploaded successfully'
     )
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: error.statusCode }
+      )
+    }
+
+    return createErrorResponse(error, 500, 'Upload Image API')
   }
 }
