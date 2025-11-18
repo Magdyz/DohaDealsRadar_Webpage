@@ -52,9 +52,12 @@ export interface RateLimitResult {
  * Get client identifier from request (IP address or user ID)
  */
 function getClientIdentifier(request: NextRequest, prefix: string): string {
-  // Try to get IP address
+  // Try to get IP address from headers
   const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown'
+  const realIp = request.headers.get('x-real-ip')
+
+  // Use the first IP from x-forwarded-for, or x-real-ip, or default to 'unknown'
+  const ip = forwarded ? forwarded.split(',')[0].trim() : realIp || 'unknown'
 
   return `${prefix}:${ip}`
 }
