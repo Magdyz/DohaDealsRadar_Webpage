@@ -18,17 +18,33 @@ function ModerationContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [needsRelogin, setNeedsRelogin] = useState(false)
 
   // Check if user is moderator or admin
   useEffect(() => {
     if (!user || (user.role !== 'moderator' && user.role !== 'admin')) {
       router.push('/feed')
+      return
+    }
+
+    // SECURITY FIX: Check if user has JWT token stored
+    // Users who logged in before JWT token storage was implemented won't have tokens
+    const { getAccessToken } = useAuthStore.getState()
+    const token = getAccessToken()
+
+    if (!token) {
+      console.warn('No JWT token found - moderator needs to re-login')
+      setNeedsRelogin(true)
+      setError('Your session has expired. Please log out and log back in to continue.')
     }
   }, [user, router])
 
   useEffect(() => {
-    loadPendingDeals()
-  }, [])
+    if (!needsRelogin) {
+      loadPendingDeals()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsRelogin])
 
   const loadPendingDeals = async () => {
     setIsLoading(true)
