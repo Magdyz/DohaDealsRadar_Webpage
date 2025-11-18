@@ -73,33 +73,33 @@ function DealCard({ deal, priority = false }: DealCardProps) {
               </div>
             )}
 
-            {/* Vote Buttons - Bottom Center - Compact 2025 Design */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-surface/95 backdrop-blur-md rounded-full px-2.5 py-1.5 shadow-lg border border-border/30">
+            {/* Vote Buttons - Bottom Center - Optimized Compact Design */}
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-surface/90 backdrop-blur-md rounded-full px-1.5 py-1 shadow-md border border-border/20">
               {/* Hot Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-1 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-2.5 py-1 border border-hot-content/30 min-w-[44px] min-h-[32px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm"
+                className="flex items-center gap-0.5 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-2 py-0.5 border border-hot-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm"
                 onClick={(e) => {
                   e.preventDefault()
                   // Vote handling would go here
                 }}
               >
-                <span className="text-sm">🔥</span>
-                <span className="text-hot-content text-xs font-bold">{deal.hotVotes}</span>
+                <span className="text-xs">🔥</span>
+                <span className="text-hot-content text-xs font-semibold">{deal.hotVotes}</span>
               </button>
 
               {/* Divider */}
-              <div className="w-px h-5 bg-border/40"></div>
+              <div className="w-px h-4 bg-border/30"></div>
 
               {/* Cold Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-1 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-2.5 py-1 border border-cold-content/30 min-w-[44px] min-h-[32px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm"
+                className="flex items-center gap-0.5 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-2 py-0.5 border border-cold-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm"
                 onClick={(e) => {
                   e.preventDefault()
                   // Vote handling would go here
                 }}
               >
-                <span className="text-sm">❄️</span>
-                <span className="text-cold-content text-xs font-bold">{deal.coldVotes}</span>
+                <span className="text-xs">❄️</span>
+                <span className="text-cold-content text-xs font-semibold">{deal.coldVotes}</span>
               </button>
             </div>
           </div>

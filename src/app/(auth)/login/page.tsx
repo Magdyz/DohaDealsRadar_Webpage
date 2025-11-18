@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import { Button, Input, Spinner } from '@/components/ui'
 import { sendVerificationCode } from '@/lib/api/auth'
 
@@ -49,16 +50,28 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-6">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3">
-            Doha Deals Radar
-          </h1>
-          <p className="text-base text-text-secondary">
-            Sign in to post deals and vote
-          </p>
-        </div>
+    <div className="min-h-screen bg-background px-4 py-6">
+      {/* Back Button */}
+      <div className="max-w-md mx-auto mb-4">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-3">
+              Doha Deals Radar
+            </h1>
+            <p className="text-base text-text-secondary">
+              Sign in to post deals and vote
+            </p>
+          </div>
 
         <div className="bg-surface rounded-2xl shadow-lg border border-border/30 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-6">
@@ -91,6 +104,7 @@ function LoginForm() {
           <p className="text-sm text-text-tertiary text-center mt-6">
             We'll send you a verification code to your email
           </p>
+        </div>
         </div>
       </div>
     </div>

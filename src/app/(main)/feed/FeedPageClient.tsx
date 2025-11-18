@@ -122,7 +122,7 @@ export default function FeedPage() {
     <div className="min-h-screen bg-background">
       {/* Header - 2025 Modern Design */}
       <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
-        <div className="max-w-7xl mx-auto px-4 py-4 md:px-6 md:py-5">
+        <div className="max-w-7xl mx-auto px-3 py-3 md:px-6 md:py-5">
           {/* Top Bar - Title & Icons */}
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary tracking-tight">
@@ -176,10 +176,10 @@ export default function FeedPage() {
         </div>
       </div>
 
-      {/* Content - 2025 Modern Mobile-first grid with better spacing */}
-      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
+      {/* Content - 2025 Modern Mobile-first grid with optimized spacing */}
+      <div className="max-w-7xl mx-auto px-3 py-4 md:px-6 md:py-8">
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 auto-rows-fr">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <DealCardSkeleton key={i} />
             ))}
@@ -222,8 +222,8 @@ export default function FeedPage() {
           </div>
         ) : (
           <>
-            {/* Deals Grid - 2025 Mobile-first with better spacing */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-fr">
+            {/* Deals Grid - 2025 Mobile-first with optimized spacing */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 auto-rows-fr">
               {deals.map((deal, index) => (
                 <DealCard
                   key={deal.id}

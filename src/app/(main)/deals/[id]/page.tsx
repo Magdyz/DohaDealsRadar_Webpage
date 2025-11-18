@@ -126,7 +126,7 @@ export default function DealDetailsPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-surface shadow-md sticky top-0 z-20 border-b border-border/50 backdrop-blur-sm bg-surface/95">
-        <div className="max-w-4xl mx-auto px-4 py-4 md:px-6 md:py-5">
+        <div className="max-w-4xl mx-auto px-3 py-3 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <button
               onClick={() => router.back()}
@@ -156,7 +156,7 @@ export default function DealDetailsPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
+      <div className="max-w-4xl mx-auto px-3 py-4 md:px-6 md:py-8">
         <div className="bg-surface rounded-2xl overflow-hidden shadow-lg border-2 border-border/30">
           {/* Image */}
           <div className="relative w-full aspect-square md:aspect-video bg-white">

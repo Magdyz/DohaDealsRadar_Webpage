@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import { Button, Spinner } from '@/components/ui'
 import CodeInput from '@/components/auth/CodeInput'
 import { verifyCode, sendVerificationCode } from '@/lib/api/auth'
@@ -77,10 +78,22 @@ function VerifyForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 md:py-12">
-      <div className="w-full max-w-2xl">
-        {/* Header - Brand */}
-        <div className="text-center mb-12 md:mb-16">
+    <div className="min-h-screen bg-background px-4 py-6 md:py-8">
+      {/* Back Button */}
+      <div className="max-w-2xl mx-auto mb-4">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center">
+        <div className="w-full max-w-2xl">
+          {/* Header - Brand */}
+          <div className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-action-primary to-primary-dark shadow-purple mb-6">
             <span className="text-3xl md:text-4xl">📧</span>
           </div>
@@ -161,6 +174,7 @@ function VerifyForm() {
           <p className="text-sm text-text-tertiary leading-relaxed px-4">
             Make sure to check your spam folder if you don't see the email
           </p>
+        </div>
         </div>
       </div>
     </div>
