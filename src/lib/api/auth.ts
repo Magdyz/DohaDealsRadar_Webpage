@@ -12,6 +12,10 @@ export interface VerifyCodeResponse {
   message: string
   user?: User
   isNewUser?: boolean
+  session?: {
+    accessToken: string
+    refreshToken: string
+  }
 }
 
 export interface RegisterUsernameResponse {
@@ -73,16 +77,25 @@ export async function verifyCode(
 }
 
 export async function registerUsername(
-  userId: string,
   username: string
 ): Promise<RegisterUsernameResponse> {
   try {
+    // Get auth token from store
+    const { useAuthStore } = await import('@/lib/store/authStore')
+    const token = useAuthStore.getState().getAccessToken()
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    }
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
     const response = await fetch(`${API_BASE_URL}/manage_username`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId, username }),
+      headers,
+      body: JSON.stringify({ username }), // Remove userId, use token
     })
 
     const data = await response.json()

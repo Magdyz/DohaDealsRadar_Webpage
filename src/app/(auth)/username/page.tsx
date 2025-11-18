@@ -56,7 +56,8 @@ function UsernameForm() {
     setIsLoading(true)
 
     try {
-      const response = await registerUsername(user.id, username)
+      // SECURITY FIX: Use JWT token instead of userId
+      const response = await registerUsername(username)
 
       if (response.success) {
         updateUsername(username)

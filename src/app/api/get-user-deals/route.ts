@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createErrorResponse } from '@/lib/utils/errorHandler'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +17,44 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 })
     }
 
+    // SECURITY CHECK: Verify authentication for accessing user deals
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    let isAuthorized = false
+
+    if (token) {
+      // Verify user from JWT token
+      const authSupabase = createClient(supabaseUrl, supabaseAnonKey)
+      const { data: { user }, error: authError } = await authSupabase.auth.getUser(token)
+
+      if (!authError && user) {
+        // Use service role key to get user role
+        const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey)
+        const { data: userData } = await serviceSupabase
+          .from('users')
+          .select('role, id')
+          .eq('id', user.id)
+          .single()
+
+        if (userData) {
+          // Allow if user is viewing their own deals or is moderator/admin
+          isAuthorized =
+            userData.id === userId ||
+            userData.role === 'moderator' ||
+            userData.role === 'admin'
+        }
+      }
+    }
+
+    if (!isAuthorized) {
+      return NextResponse.json(
+        { message: 'You do not have permission to view these deals' },
+        { status: 403 }
+      )
+    }
+
+    // SECURITY FIX: Use service role key to fetch all deal statuses (pending, approved, rejected, archived)
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const from = (page - 1) * limit
@@ -65,10 +105,6 @@ export async function GET(request: NextRequest) {
       hasMore,
     })
   } catch (error: any) {
-    console.error('Get user deals API error:', error)
-    return NextResponse.json(
-      { message: error.message || 'Failed to fetch user deals' },
-      { status: 500 }
-    )
+    return createErrorResponse(error, 500, 'Get User Deals API')
   }
 }

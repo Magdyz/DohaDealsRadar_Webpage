@@ -5,17 +5,23 @@ import type { User, UserRole } from '@/types'
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
+  accessToken: string | null
+  refreshToken: string | null
   setUser: (user: User | null) => void
-  login: (user: User) => void
+  login: (user: User, accessToken?: string, refreshToken?: string) => void
   logout: () => void
   updateUsername: (username: string) => void
+  updateTokens: (accessToken: string, refreshToken: string) => void
+  getAccessToken: () => string | null
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
+      accessToken: null,
+      refreshToken: null,
 
       setUser: (user) =>
         set({
@@ -23,22 +29,34 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: !!user,
         }),
 
-      login: (user) =>
+      login: (user, accessToken, refreshToken) =>
         set({
           user,
           isAuthenticated: true,
+          accessToken: accessToken || null,
+          refreshToken: refreshToken || null,
         }),
 
       logout: () =>
         set({
           user: null,
           isAuthenticated: false,
+          accessToken: null,
+          refreshToken: null,
         }),
 
       updateUsername: (username) =>
         set((state) => ({
           user: state.user ? { ...state.user, username } : null,
         })),
+
+      updateTokens: (accessToken, refreshToken) =>
+        set({
+          accessToken,
+          refreshToken,
+        }),
+
+      getAccessToken: () => get().accessToken,
     }),
     {
       name: 'doha-deals-auth',

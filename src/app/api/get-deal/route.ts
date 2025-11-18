@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createErrorResponse } from '@/lib/utils/errorHandler'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +15,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Deal ID is required' }, { status: 400 })
     }
 
+    // SECURITY FIX: Use service role key to fetch deal, then verify access
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const { data: deal, error } = await supabase
@@ -27,6 +30,47 @@ export async function GET(request: NextRequest) {
 
     if (!deal) {
       return NextResponse.json({ message: 'Deal not found' }, { status: 404 })
+    }
+
+    // SECURITY CHECK: Verify access permissions for non-public deals
+    const isPublicDeal = deal.status === 'approved' && !deal.is_archived
+
+    if (!isPublicDeal) {
+      // Deal is pending, rejected, or archived - requires authentication
+      const authHeader = request.headers.get('authorization')
+      const token = authHeader?.replace('Bearer ', '')
+
+      let isAuthorized = false
+
+      if (token) {
+        // Verify user from JWT token
+        const authSupabase = createClient(supabaseUrl, supabaseAnonKey)
+        const { data: { user }, error: authError } = await authSupabase.auth.getUser(token)
+
+        if (!authError && user) {
+          // Get user details from database to check role
+          const { data: userData } = await supabase
+            .from('users')
+            .select('role, id')
+            .eq('id', user.id)
+            .single()
+
+          if (userData) {
+            // Allow if user is moderator, admin, or deal owner
+            isAuthorized =
+              userData.role === 'moderator' ||
+              userData.role === 'admin' ||
+              userData.id === deal.submitted_by_user_id
+          }
+        }
+      }
+
+      if (!isAuthorized) {
+        return NextResponse.json(
+          { message: 'You do not have permission to view this deal' },
+          { status: 403 }
+        )
+      }
     }
 
     // Transform database fields to match frontend types (snake_case to camelCase)
@@ -61,10 +105,6 @@ export async function GET(request: NextRequest) {
       }
     )
   } catch (error: any) {
-    console.error('Get deal API error:', error)
-    return NextResponse.json(
-      { message: error.message || 'Failed to fetch deal' },
-      { status: 500 }
-    )
+    return createErrorResponse(error, 500, 'Get Deal API')
   }
 }

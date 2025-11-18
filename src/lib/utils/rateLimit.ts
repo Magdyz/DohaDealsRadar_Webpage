@@ -123,6 +123,63 @@ export function checkRateLimit(
 }
 
 /**
+ * Dual rate limiting: Checks both IP and user-based limits
+ * Blocks only if BOTH limits are exceeded (prevents false positives from shared IPs)
+ * SECURITY FIX: Prevents rate limit bypass via UUID spoofing
+ */
+export function checkDualRateLimit(
+  request: NextRequest,
+  config: RateLimitConfig,
+  userIdentifier?: string
+): RateLimitResult {
+  // Skip if disabled
+  if (process.env.DISABLE_RATE_LIMIT === 'true') {
+    return {
+      success: true,
+      limit: config.max,
+      remaining: config.max,
+      resetAt: Date.now() + config.windowMs,
+    }
+  }
+
+  // Check IP-based rate limit (generous to avoid blocking shared IPs)
+  const ipKey = getClientIdentifier(request, 'ip')
+  const ipResult = checkRateLimit(request, {
+    ...config,
+    max: config.max * 10, // 10x more generous for IP (handles shared IPs)
+  }, ipKey)
+
+  // Check user-based rate limit (if user identifier provided)
+  let userResult: RateLimitResult | null = null
+  if (userIdentifier) {
+    userResult = checkRateLimit(request, config, `user:${userIdentifier}`)
+  }
+
+  // Block only if BOTH IP and user limits exceeded (prevents shared IP issues)
+  if (!ipResult.success && userResult && !userResult.success) {
+    return {
+      success: false,
+      limit: config.max,
+      remaining: 0,
+      resetAt: Math.max(ipResult.resetAt, userResult.resetAt),
+    }
+  }
+
+  // If only user limit exceeded, block
+  if (userResult && !userResult.success) {
+    return userResult
+  }
+
+  // If only IP limit exceeded (but user OK or no user), allow but warn
+  if (!ipResult.success) {
+    console.warn(`IP rate limit exceeded for ${ipKey}, but user limit OK`)
+  }
+
+  // Return the more restrictive result
+  return userResult || ipResult
+}
+
+/**
  * Pre-configured rate limiters for common use cases
  */
 

@@ -1,6 +1,25 @@
 import type { Deal, DealCategory, VoteType, UserStats } from '@/types'
+import { useAuthStore } from '@/lib/store/authStore'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api'
+
+/**
+ * Get authentication headers for API calls
+ * Returns Authorization header with JWT token if user is authenticated
+ */
+function getAuthHeaders(): HeadersInit {
+  const token = useAuthStore.getState().getAccessToken()
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  return headers
+}
 
 export interface GetDealsParams {
   page?: number
@@ -96,9 +115,7 @@ export async function getDealById(dealId: string): Promise<Deal> {
   try {
     const response = await fetch(`${API_BASE_URL}/get-deal?dealId=${dealId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Include auth token for viewing pending/archived deals
     })
 
     const data = await response.json()
@@ -119,9 +136,7 @@ export async function submitDeal(dealData: SubmitDealData): Promise<SubmitDealRe
   try {
     const response = await fetch(`${API_BASE_URL}/submit-deal`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Requires authentication
       body: JSON.stringify(dealData),
     })
 
@@ -205,9 +220,7 @@ export async function getUserDeals(
   try {
     const response = await fetch(`${API_BASE_URL}/get-user-deals?${queryParams}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Requires authentication
     })
 
     const data = await response.json()
@@ -228,9 +241,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   try {
     const response = await fetch(`${API_BASE_URL}/get-user-stats?userId=${userId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Requires authentication
     })
 
     const data = await response.json()
@@ -254,9 +265,7 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
 
     const response = await fetch(`${API_BASE_URL}/upload-image`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Requires authentication
       body: JSON.stringify({ image: base64, filename: file.name }),
     })
 
@@ -284,14 +293,12 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 // Moderator functions
-export async function approveDeal(moderatorUserId: string, dealId: string): Promise<any> {
+export async function approveDeal(dealId: string): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/approve-deal`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ moderatorUserId, dealId }),
+      headers: getAuthHeaders(), // Requires moderator authentication
+      body: JSON.stringify({ dealId }), // Remove moderatorUserId, use token
     })
 
     const data = await response.json()
@@ -308,17 +315,14 @@ export async function approveDeal(moderatorUserId: string, dealId: string): Prom
 }
 
 export async function rejectDeal(
-  moderatorUserId: string,
   dealId: string,
   reason: string
 ): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/reject-deal`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ moderatorUserId, dealId, reason }),
+      headers: getAuthHeaders(), // Requires moderator authentication
+      body: JSON.stringify({ dealId, reason }), // Remove moderatorUserId, use token
     })
 
     const data = await response.json()
@@ -335,17 +339,13 @@ export async function rejectDeal(
 }
 
 export async function deleteDeal(
-  moderatorUserId: string,
-  dealId: string,
-  reason: string
+  dealId: string
 ): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/delete-deal`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ moderatorUserId, dealId, reason }),
+      headers: getAuthHeaders(), // Requires admin authentication
+      body: JSON.stringify({ dealId }), // Remove moderatorUserId, use token
     })
 
     const data = await response.json()
@@ -362,12 +362,10 @@ export async function deleteDeal(
 }
 
 export async function getPendingDeals(
-  userId: string,
   page: number = 1,
   limit: number = 20
 ): Promise<GetDealsResponse> {
   const queryParams = new URLSearchParams({
-    userId,
     page: page.toString(),
     limit: limit.toString(),
   })
@@ -375,9 +373,7 @@ export async function getPendingDeals(
   try {
     const response = await fetch(`${API_BASE_URL}/get-pending-deals?${queryParams}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(), // Requires moderator authentication
     })
 
     const data = await response.json()
@@ -395,17 +391,14 @@ export async function getPendingDeals(
 
 // Admin functions
 export async function returnToFeed(
-  adminUserId: string,
   dealId: string,
   newExpiryDays: number
 ): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/return-to-feed`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ adminUserId, dealId, newExpiryDays }),
+      headers: getAuthHeaders(), // Requires admin authentication
+      body: JSON.stringify({ dealId, newExpiryDays }), // Remove adminUserId, use token
     })
 
     const data = await response.json()
@@ -421,14 +414,12 @@ export async function returnToFeed(
   }
 }
 
-export async function permanentDeleteDeal(adminUserId: string, dealId: string): Promise<any> {
+export async function permanentDeleteDeal(dealId: string): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/permanent-delete-deal`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ adminUserId, dealId }),
+      headers: getAuthHeaders(), // Requires admin authentication
+      body: JSON.stringify({ dealId }), // Remove adminUserId, use token
     })
 
     const data = await response.json()
