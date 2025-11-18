@@ -50,7 +50,14 @@ export async function GET(request: NextRequest) {
       expiresAt: deal.expires_at,
     }
 
-    return NextResponse.json({ deal: transformedDeal })
+    return NextResponse.json(
+      { deal: transformedDeal },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    )
   } catch (error: any) {
     console.error('Get deal API error:', error)
     return NextResponse.json(

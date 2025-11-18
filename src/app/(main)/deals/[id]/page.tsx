@@ -158,9 +158,9 @@ export default function DealDetailsPage() {
                 src={deal.imageUrl}
                 alt={deal.title}
                 fill
-                unoptimized
                 className="object-contain"
                 priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-50">

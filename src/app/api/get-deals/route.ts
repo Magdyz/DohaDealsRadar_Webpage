@@ -74,13 +74,20 @@ export async function GET(request: NextRequest) {
     const total = count || 0
     const hasMore = total > page * limit
 
-    return NextResponse.json({
-      deals: transformedDeals,
-      total,
-      page,
-      limit,
-      hasMore,
-    })
+    return NextResponse.json(
+      {
+        deals: transformedDeals,
+        total,
+        page,
+        limit,
+        hasMore,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+        },
+      }
+    )
   } catch (error: any) {
     console.error('Get deals API error:', error)
     return NextResponse.json(

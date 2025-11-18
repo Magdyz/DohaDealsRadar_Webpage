@@ -62,3 +62,11 @@ export function truncateText(text: string, maxLength: number): string {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+// Export image compression utilities
+export {
+  compressImageForUpload,
+  validateImageFile,
+  getImageDimensions,
+  type CompressionOptions,
+} from './imageCompression'

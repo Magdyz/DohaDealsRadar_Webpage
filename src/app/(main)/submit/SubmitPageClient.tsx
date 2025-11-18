@@ -9,6 +9,7 @@ import { useAuthStore } from '@/lib/store/authStore'
 import { useDeviceId } from '@/lib/hooks/useDeviceId'
 import { useToast } from '@/lib/hooks/useToast'
 import { dealSubmissionSchema, formatZodError } from '@/lib/validation/dealSchema'
+import { compressImageForUpload, validateImageFile } from '@/lib/utils'
 import { CATEGORIES } from '@/types'
 import type { DealCategory } from '@/types'
 
@@ -39,15 +40,10 @@ function SubmitDealContent() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size must be less than 5MB')
-      return
-    }
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file')
+    // Validate image file (max 10MB before compression)
+    const validation = validateImageFile(file, 10)
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid image file')
       return
     }
 
@@ -114,10 +110,13 @@ function SubmitDealContent() {
     setIsSubmitting(true)
 
     try {
-      // Upload image first
+      // Upload image first (with compression)
       let imageUrl = imagePreview
       if (imageFile) {
-        const uploadResult = await uploadImage(imageFile)
+        // Compress image before upload (inspired by Android app approach)
+        console.log('📦 Compressing image before upload...')
+        const compressedFile = await compressImageForUpload(imageFile)
+        const uploadResult = await uploadImage(compressedFile)
         imageUrl = uploadResult.url
       }
 
@@ -245,7 +244,7 @@ function SubmitDealContent() {
                       <p className="mb-2 text-base text-text-primary">
                         <span className="font-bold">Click to upload</span> or drag and drop
                       </p>
-                      <p className="text-sm text-text-secondary">PNG, JPG, GIF up to 5MB</p>
+                      <p className="text-sm text-text-secondary">PNG, JPG, GIF up to 10MB (auto-compressed)</p>
                     </div>
                     <input
                       type="file"
