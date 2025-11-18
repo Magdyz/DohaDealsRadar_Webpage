@@ -23,9 +23,9 @@ function VerifyForm() {
 
   useEffect(() => {
     if (!email) {
-      router.replace('/login')
+      router.replace(`/login?returnUrl=${encodeURIComponent(returnUrl)}`)
     }
-  }, [email, router])
+  }, [email, router, returnUrl])
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -82,7 +82,7 @@ function VerifyForm() {
       {/* Back Button */}
       <div className="max-w-2xl mx-auto mb-4">
         <button
-          onClick={() => router.replace('/login')}
+          onClick={() => router.replace(`/login?returnUrl=${encodeURIComponent(returnUrl)}`)}
           className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -163,7 +163,7 @@ function VerifyForm() {
             variant="outline"
             size="lg"
             className="w-full min-h-[48px] text-base font-semibold"
-            onClick={() => router.replace('/login')}
+            onClick={() => router.replace(`/login?returnUrl=${encodeURIComponent(returnUrl)}`)}
           >
             Use a Different Email
           </Button>
