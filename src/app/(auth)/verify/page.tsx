@@ -82,7 +82,7 @@ function VerifyForm() {
       {/* Back Button */}
       <div className="max-w-2xl mx-auto mb-4">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push('/login')}
           className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
         >
           <ArrowLeft className="w-5 h-5" />
