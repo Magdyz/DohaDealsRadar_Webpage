@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       .select('id')
       .eq('deal_id', dealId)
       .eq('device_id', userId)
-      .single()
+      .maybeSingle() // Use maybeSingle() to handle case when no report exists
 
     if (existingReport) {
       return NextResponse.json(
