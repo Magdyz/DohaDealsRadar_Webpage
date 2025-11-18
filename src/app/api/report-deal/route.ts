@@ -10,11 +10,11 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.
 
 export async function POST(request: NextRequest) {
   try {
-    const { dealId, userId, reason, details } = await request.json()
+    const { dealId, deviceId, reason, details } = await request.json()
 
-    if (!dealId || !userId || !reason) {
+    if (!dealId || !deviceId || !reason) {
       return NextResponse.json(
-        { error: 'Deal ID, user ID, and reason are required' },
+        { error: 'Deal ID, device ID, and reason are required' },
         { status: 400 }
       )
     }
@@ -43,12 +43,12 @@ export async function POST(request: NextRequest) {
     // Normalize reason to lowercase (Postgres ENUM is case-sensitive)
     const normalizedReason = reason.toLowerCase()
 
-    // Check if user has already reported this deal
+    // Check if device has already reported this deal
     const { data: existingReport } = await supabase
       .from('reports')
       .select('id')
       .eq('deal_id', dealId)
-      .eq('device_id', userId)
+      .eq('device_id', deviceId)
       .maybeSingle() // Use maybeSingle() to handle case when no report exists
 
     if (existingReport) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const { data: todayReports, error: countError } = await supabase
       .from('reports')
       .select('id')
-      .eq('device_id', userId)
+      .eq('device_id', deviceId)
       .gte('created_at', today.toISOString())
 
     if (countError) {
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       .from('reports')
       .insert({
         deal_id: dealId,
-        device_id: userId,
+        device_id: deviceId,
         reason: normalizedReason,
         note: details || null,
       })

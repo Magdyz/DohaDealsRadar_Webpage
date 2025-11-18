@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { X, AlertTriangle } from 'lucide-react'
+import { X, AlertTriangle, LogIn } from 'lucide-react'
 import { useUser } from '@/lib/store/authStore'
 import { useToast } from '@/lib/hooks/useToast'
+import { getDeviceId } from '@/lib/utils/deviceId'
+import { useRouter } from 'next/navigation'
 
 export type ReportReason = 'spam' | 'inappropriate' | 'expired' | 'misleading'
 
@@ -39,6 +41,7 @@ const reportReasons: Array<{ value: ReportReason; label: string; description: st
 
 export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: ReportModalProps) {
   const user = useUser()
+  const router = useRouter()
   const { toast } = useToast()
   const [selectedReason, setSelectedReason] = useState<ReportReason | null>(null)
   const [details, setDetails] = useState('')
@@ -46,28 +49,95 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
 
   if (!isOpen) return null
 
+  // If user is not logged in, show login required message
+  if (!user) {
+    return (
+      <>
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998]"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        {/* Modal */}
+        <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-surface rounded-2xl shadow-2xl max-w-md w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border/20">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+                <h2 className="text-lg font-bold text-text-primary">Login Required</h2>
+              </div>
+              <button
+                onClick={onClose}
+                className="text-text-secondary hover:text-text-primary transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mx-auto">
+                <LogIn className="w-8 h-8 text-action-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-text-primary mb-2">
+                  Please Log In to Report
+                </h3>
+                <p className="text-sm text-text-secondary">
+                  You need to be logged in to report deals. This helps us maintain a safe and trustworthy community.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-3 p-4 border-t border-border/20">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-border/40 text-text-primary font-semibold hover:bg-surface-variant transition-colors min-h-[44px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onClose()
+                  router.push('/login?returnUrl=' + encodeURIComponent(window.location.pathname))
+                }}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-action-primary to-primary-dark text-white font-semibold hover:shadow-lg transition-all min-h-[44px] flex items-center justify-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                Log In
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   // High-severity reports require at least 30 characters of details
   const highSeverityReasons: ReportReason[] = ['spam', 'misleading']
   const requiresDetails = selectedReason && highSeverityReasons.includes(selectedReason)
   const detailsValid = !requiresDetails || details.trim().length >= 30
 
   const handleSubmit = async () => {
-    if (!user) {
-      toast.error('You must be logged in to report a deal')
-      return
-    }
-
     if (!selectedReason || !detailsValid) return
 
     setIsSubmitting(true)
 
     try {
+      // Use device ID for reporting (consistent with voting system)
+      const deviceId = getDeviceId()
+
       const response = await fetch('/api/report-deal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dealId,
-          userId: user.id,
+          deviceId,
           reason: selectedReason,
           details: details.trim() || undefined,
         }),
@@ -209,7 +279,7 @@ export default function ReportModal({ dealId, dealTitle, isOpen, onClose }: Repo
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!user || !selectedReason || !detailsValid || isSubmitting}
+              disabled={!selectedReason || !detailsValid || isSubmitting}
               className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold transition-colors min-h-[44px]"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Report'}
