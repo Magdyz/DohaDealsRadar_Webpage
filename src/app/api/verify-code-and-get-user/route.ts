@@ -112,8 +112,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Transform to camelCase
+      // IMPORTANT: Return DATABASE user ID (not auth ID) for compatibility with Android app
       const user = {
-        id: existingUser.id,
+        id: existingUser.id, // Database UUID (different from auth.users.id)
         email: existingUser.email,
         username: existingUser.username,
         role: existingUser.role,
@@ -134,12 +135,13 @@ export async function POST(request: NextRequest) {
       })
     } else {
       // New user - create account
-      // CRITICAL: Use the Supabase Auth user ID to match auth.uid() for RLS policies
+      // Let PostgreSQL generate UUID for database (compatibility with Android app)
+      // Web app will map auth.user.email -> database user ID for authorization
       const { data: newUser, error: createError } = await supabase
         .from('users')
         .insert([
           {
-            id: authData.user.id, // Use auth user ID instead of letting PostgreSQL generate random UUID
+            // Don't specify ID - let PostgreSQL gen_random_uuid()
             email: normalizedEmail,
             device_id: deviceId,
             email_verified: true,
