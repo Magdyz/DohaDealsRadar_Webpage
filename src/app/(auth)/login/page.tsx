@@ -39,7 +39,7 @@ function LoginForm() {
     try {
       await sendVerificationCode(email)
       // Redirect to verification page with email and returnUrl
-      router.push(
+      router.replace(
         `/verify?email=${encodeURIComponent(email)}&returnUrl=${encodeURIComponent(returnUrl)}`
       )
     } catch (err: any) {
