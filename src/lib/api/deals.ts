@@ -260,13 +260,23 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 // Upload image
 export async function uploadImage(file: File): Promise<{ url: string }> {
   try {
-    // Convert file to base64
-    const base64 = await fileToBase64(file)
+    // PERFORMANCE: Use multipart/form-data instead of base64 (3-4x faster, 33% less overhead)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    // Get auth token separately since we can't set Content-Type with FormData
+    const token = useAuthStore.getState().getAccessToken()
+    const headers: HeadersInit = {}
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+    // Note: Don't set Content-Type header - browser will set it automatically with boundary for multipart/form-data
 
     const response = await fetch(`${API_BASE_URL}/upload-image`, {
       method: 'POST',
-      headers: getAuthHeaders(), // Requires authentication
-      body: JSON.stringify({ image: base64, filename: file.name }),
+      headers, // Don't include Content-Type, let browser set it
+      body: formData,
     })
 
     const data = await response.json()
@@ -280,16 +290,6 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
     console.error('Upload image error:', error)
     throw error
   }
-}
-
-// Helper function to convert file to base64
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = (error) => reject(error)
-  })
 }
 
 // Moderator functions

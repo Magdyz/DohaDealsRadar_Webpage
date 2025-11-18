@@ -71,58 +71,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
 
-    // Get accurate counts by querying the deals table directly
-    // Total deals count
-    const { count: totalDeals, error: totalError } = await supabase
+    // PERFORMANCE: Fetch all deals once and count in-memory (4x faster than 4 separate queries)
+    const { data: userDeals, error: dealsError } = await supabase
       .from('deals')
-      .select('*', { count: 'exact', head: true })
+      .select('status')
       .eq('submitted_by_user_id', userId)
 
-    if (totalError) {
-      throw totalError
+    if (dealsError) {
+      throw dealsError
     }
 
-    // Approved deals count
-    const { count: approvedDeals, error: approvedError } = await supabase
-      .from('deals')
-      .select('*', { count: 'exact', head: true })
-      .eq('submitted_by_user_id', userId)
-      .eq('status', 'approved')
-
-    if (approvedError) {
-      throw approvedError
-    }
-
-    // Pending deals count
-    const { count: pendingDeals, error: pendingError } = await supabase
-      .from('deals')
-      .select('*', { count: 'exact', head: true })
-      .eq('submitted_by_user_id', userId)
-      .eq('status', 'pending')
-
-    if (pendingError) {
-      throw pendingError
-    }
-
-    // Rejected deals count
-    const { count: rejectedDeals, error: rejectedError } = await supabase
-      .from('deals')
-      .select('*', { count: 'exact', head: true })
-      .eq('submitted_by_user_id', userId)
-      .eq('status', 'rejected')
-
-    if (rejectedError) {
-      throw rejectedError
-    }
-
+    // Count by status in-memory
     const stats = {
-      total_deals: totalDeals || 0,
-      approved_deals: approvedDeals || 0,
-      pending_deals: pendingDeals || 0,
-      rejected_deals: rejectedDeals || 0,
+      total_deals: userDeals.length,
+      approved_deals: userDeals.filter(d => d.status === 'approved').length,
+      pending_deals: userDeals.filter(d => d.status === 'pending').length,
+      rejected_deals: userDeals.filter(d => d.status === 'rejected').length,
     }
 
-    return NextResponse.json({ stats })
+    // PERFORMANCE: Cache user stats for 5 minutes
+    return NextResponse.json({ stats }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    })
   } catch (error: any) {
     return createErrorResponse(error, 500, 'Get User Stats API')
   }

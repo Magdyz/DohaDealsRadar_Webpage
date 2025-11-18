@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { ArrowLeft, Check } from 'lucide-react'
-import { Button, Input, Textarea, Badge } from '@/components/ui'
-import { DealTypeSelector, ImageUpload, PriceInput } from '@/components/post'
+import { Button, Input, Textarea, Badge, Spinner } from '@/components/ui'
+import { DealTypeSelector, PriceInput } from '@/components/post'
 import { ProtectedRoute } from '@/components/auth'
 import PriceDisplay from '@/components/deals/PriceDisplay'
 import { useAuthStore } from '@/lib/store/authStore'
@@ -12,6 +13,16 @@ import { submitDeal } from '@/lib/api/deals'
 import { dealSubmissionSchema, formatZodError, type DealSubmissionData } from '@/lib/validation/dealSchema'
 import { CATEGORIES } from '@/types'
 import type { DealCategory } from '@/types'
+
+// PERFORMANCE: Code split ImageUpload to reduce initial bundle size (includes browser-image-compression)
+const ImageUpload = dynamic(() => import('@/components/post/ImageUpload'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-48 border-2 border-dashed rounded-xl flex items-center justify-center">
+      <Spinner size="md" />
+    </div>
+  ),
+})
 
 function PostDealContent() {
   const router = useRouter()
