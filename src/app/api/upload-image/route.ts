@@ -35,52 +35,49 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    // PERFORMANCE: Use multipart/form-data instead of base64 (3-4x faster, 33% less network overhead)
+    const formData = await request.formData()
+    const file = formData.get('file') as File | null
 
-    // Validate required fields
-    const validation = validateRequiredFields(body, ['image', 'filename'])
-    if (!validation.valid) {
+    if (!file) {
       return NextResponse.json(
         {
           success: false,
-          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+          message: 'No file provided',
         },
         { status: 400 }
       )
     }
 
-    const { image, filename } = body
-
-    // CRITICAL SECURITY: Validate file is actually an image
-    const fileValidation = validateImageFile(image, filename)
-    if (!fileValidation.valid) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
       return NextResponse.json(
-        { success: false, message: fileValidation.error },
+        { success: false, message: 'File must be an image' },
         { status: 400 }
       )
     }
 
-    // Convert base64 to blob
-    const base64Data = image.split(',')[1]
-    const mimeType = fileValidation.mimeType!
-
-    // Decode base64
-    const binaryString = atob(base64Data)
-    const bytes = new Uint8Array(binaryString.length)
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i)
+    // Validate file size (max 5MB after compression from frontend)
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json(
+        { success: false, message: 'Image size must be less than 5MB' },
+        { status: 400 }
+      )
     }
-    const blob = new Blob([bytes], { type: mimeType })
+
+    // Convert file to blob for Supabase upload
+    const arrayBuffer = await file.arrayBuffer()
+    const blob = new Blob([arrayBuffer], { type: file.type })
 
     // SECURITY: Generate secure filename (prevents path traversal)
-    const uniqueFilename = generateSecureFilename(sanitizeFilename(filename))
+    const uniqueFilename = generateSecureFilename(sanitizeFilename(file.name))
     const filePath = `images/${uniqueFilename}`
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('deals')
       .upload(filePath, blob, {
-        contentType: mimeType,
+        contentType: file.type,
         cacheControl: '3600',
         upsert: false,
       })

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { Plus, User, Package, Shield, Archive } from 'lucide-react'
 import { Button, Spinner, Card, CardBody, DealCardSkeleton } from '@/components/ui'
 import { DealCard, SearchBar, CategoryFilter } from '@/components/deals'
@@ -14,108 +15,56 @@ export default function FeedPage() {
   const router = useRouter()
   const { isAuthenticated, user } = useAuthStore()
 
-  const [deals, setDeals] = useState<Deal[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [error, setError] = useState('')
-  const [hasMore, setHasMore] = useState(false)
-
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<DealCategory | ''>('')
 
-  // Use ref to track next page - updates immediately, no async issues
-  const nextPageRef = useRef(1)
-  const searchRef = useRef(search)
-  const categoryRef = useRef(category)
-  const mountId = useRef(Math.random().toString(36).substring(7))
-  const isLoadingRef = useRef(false)
-
-  // Update refs when search/category changes
-  useEffect(() => {
-    searchRef.current = search
-    categoryRef.current = category
-  }, [search, category])
-
-  const loadDeals = useCallback(async (reset: boolean = false) => {
-    // Prevent concurrent calls (except for resets which should override)
-    if (isLoadingRef.current && !reset) {
-      return
-    }
-    isLoadingRef.current = true
-
-    // Determine which page to fetch and update ref immediately
-    let pageToFetch: number
-
-    if (reset) {
-      setIsLoading(true)
-      pageToFetch = 1
-      nextPageRef.current = 2 // After page 1, next will be page 2
-    } else {
-      setIsLoadingMore(true)
-      pageToFetch = nextPageRef.current
-      nextPageRef.current = nextPageRef.current + 1 // Increment for next call
-    }
-
-    setError('')
-
-    try {
-      const response = await getDeals({
-        page: pageToFetch,
+  // PERFORMANCE: Use React Query for automatic caching, deduplication, and background refetching
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ['deals', search, category],
+    queryFn: ({ pageParam = 1 }) =>
+      getDeals({
+        page: pageParam,
         limit: 20,
-        search: searchRef.current,
-        category: categoryRef.current,
+        search,
+        category,
         isArchived: false,
-      })
+      }),
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.page + 1 : undefined
+    },
+    initialPageParam: 1,
+    staleTime: 1000 * 60 * 2, // Data fresh for 2 minutes
+    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+  })
 
-      if (reset) {
-        setDeals(response.deals)
-      } else {
-        setDeals(prevDeals => [...prevDeals, ...response.deals])
-      }
-
-      setHasMore(response.hasMore)
-    } catch (err: any) {
-      setError(err.message || 'Failed to load deals')
-      // Rollback page counter on error to allow retry
-      if (!reset) {
-        nextPageRef.current = pageToFetch
-      } else {
-        nextPageRef.current = 1
-      }
-    } finally {
-      setIsLoading(false)
-      setIsLoadingMore(false)
-      isLoadingRef.current = false
-    }
-  }, []) // Empty deps - function never recreates, uses refs for current values
-
-  // Only reset and reload when search or category changes
-  useEffect(() => {
-    loadDeals(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category]) // loadDeals is stable (never changes), safe to omit
-
-  const handleLoadMore = () => {
-    if (!isLoadingMore && hasMore) {
-      loadDeals()
-    }
-  }
+  // Flatten all pages into single deals array
+  const deals = data?.pages.flatMap((page) => page.deals) ?? []
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    // nextPageRef reset is handled by useEffect -> loadDeals(true)
   }
 
   const handleCategoryChange = (value: DealCategory | '') => {
     setCategory(value)
-    // nextPageRef reset is handled by useEffect -> loadDeals(true)
   }
 
   // Infinite scroll - automatically load more when scrolling near bottom
   const { observerTarget } = useInfiniteScroll({
-    onLoadMore: loadDeals,
-    hasMore,
-    isLoading: isLoadingMore,
+    onLoadMore: () => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    },
+    hasMore: hasNextPage ?? false,
+    isLoading: isFetchingNextPage,
   })
 
   return (
@@ -184,16 +133,18 @@ export default function FeedPage() {
               <DealCardSkeleton key={i} />
             ))}
           </div>
-        ) : error ? (
+        ) : isError ? (
           <div className="bg-card rounded-2xl p-10 md:p-12 border-2 border-error/20 shadow-lg text-center max-w-md mx-auto animate-scale-in">
             <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚠️</span>
             </div>
-            <p className="text-error text-base font-semibold mb-6">{error}</p>
+            <p className="text-error text-base font-semibold mb-6">
+              {error instanceof Error ? error.message : 'Failed to load deals'}
+            </p>
             <Button
               variant="primary"
               size="lg"
-              onClick={() => loadDeals(true)}
+              onClick={() => window.location.reload()}
             >
               Try Again
             </Button>
@@ -234,13 +185,13 @@ export default function FeedPage() {
             </div>
 
             {/* Infinite Scroll Trigger */}
-            {hasMore && (
+            {hasNextPage && (
               <>
                 {/* Observer target - triggers load when visible */}
                 <div ref={observerTarget} className="h-4" />
 
                 {/* Loading indicator */}
-                {isLoadingMore && (
+                {isFetchingNextPage && (
                   <div className="flex flex-col items-center justify-center py-8">
                     <Spinner size="md" />
                     <p className="text-text-secondary text-sm mt-3">
@@ -252,7 +203,7 @@ export default function FeedPage() {
             )}
 
             {/* End of content message */}
-            {!hasMore && deals.length > 0 && (
+            {!hasNextPage && deals.length > 0 && (
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="w-12 h-12 rounded-full bg-background-secondary border-2 border-border flex items-center justify-center mb-3">
                   <Package className="w-6 h-6 text-text-tertiary" />
