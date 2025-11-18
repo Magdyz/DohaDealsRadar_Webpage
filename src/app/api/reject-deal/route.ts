@@ -1,37 +1,40 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { verifyModerator, AuthError } from '@/lib/auth/serverAuth'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
+import { sanitizeText } from '@/lib/utils/sanitize'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { moderatorUserId, dealId, reason } = body
+    // CRITICAL SECURITY FIX: Verify moderator from session, not request body
+    const moderator = await verifyModerator(request)
 
-    if (!moderatorUserId || !dealId || !reason) {
+    const body = await request.json()
+    const { dealId, reason } = body
+
+    // Validate required fields
+    const validation = validateRequiredFields(body, ['dealId', 'reason'])
+    if (!validation.valid) {
       return NextResponse.json(
-        { success: false, message: 'Missing required fields' },
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
       )
     }
 
-    // Verify moderator permissions
-    const { data: moderator, error: modError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', moderatorUserId)
-      .single<{ role: string }>()
-
-    if (modError || !moderator) {
+    // Sanitize rejection reason
+    const sanitizedReason = sanitizeText(reason)
+    if (!sanitizedReason) {
       return NextResponse.json(
-        { success: false, message: 'Moderator not found' },
-        { status: 404 }
-      )
-    }
-
-    if (moderator.role !== 'moderator' && moderator.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, message: 'Insufficient permissions' },
-        { status: 403 }
+        { success: false, message: 'Rejection reason cannot be empty' },
+        { status: 400 }
       )
     }
 
@@ -41,9 +44,9 @@ export async function POST(request: NextRequest) {
       .from('deals')
       .update({
         status: 'rejected',
-        deleted_by: moderatorUserId,
+        deleted_by: moderator.id, // Use verified moderator ID from session
         deleted_at: new Date().toISOString(),
-        deletion_reason: reason,
+        deletion_reason: sanitizedReason,
         requires_review: false,
       })
       .eq('id', dealId)
@@ -53,21 +56,21 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error('Error rejecting deal:', updateError)
       return NextResponse.json(
-        { success: false, message: 'Failed to reject deal', error: updateError.message },
+        { success: false, message: 'Failed to reject deal' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Deal rejected successfully',
-      deal,
-    })
+    return createSuccessResponse({ deal }, 'Deal rejected successfully')
   } catch (error: any) {
-    console.error('Unexpected error:', error)
-    return NextResponse.json(
-      { success: false, message: 'Internal server error', error: error.message },
-      { status: 500 }
-    )
+    // Handle authentication errors specifically
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: error.statusCode }
+      )
+    }
+
+    return createErrorResponse(error, 500, 'Reject Deal API')
   }
 }

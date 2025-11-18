@@ -1,22 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import {
+  createErrorResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// SECURITY FIX: Use anon key - let RLS policies enforce security
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { dealId, deviceId, voteType } = body
 
-    if (!dealId || !deviceId || !voteType) {
+    // Validate required fields
+    const validation = validateRequiredFields(body, [
+      'dealId',
+      'deviceId',
+      'voteType',
+    ])
+    if (!validation.valid) {
       return NextResponse.json(
-        { message: 'Deal ID, device ID, and vote type are required' },
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
       )
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const { dealId, deviceId, voteType } = body
+
+    // Validate vote type
+    if (voteType !== 'hot' && voteType !== 'cold') {
+      return NextResponse.json(
+        { success: false, message: 'Invalid vote type. Must be "hot" or "cold"' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
 
     // Check if user already voted
     const { data: existingVote } = await supabase
@@ -77,10 +105,6 @@ export async function POST(request: NextRequest) {
       coldVotes: voteType === 'cold' ? updates.cold_count : deal.cold_count,
     })
   } catch (error: any) {
-    console.error('Cast vote API error:', error)
-    return NextResponse.json(
-      { message: error.message || 'Failed to cast vote' },
-      { status: 500 }
-    )
+    return createErrorResponse(error, 500, 'Cast Vote API')
   }
 }

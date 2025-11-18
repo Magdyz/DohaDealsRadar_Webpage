@@ -1,20 +1,52 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { checkRateLimit, loginRateLimit } from '@/lib/utils/rateLimit'
+import {
+  createErrorResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
+import { sanitizeEmail } from '@/lib/utils/sanitize'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, code, deviceId } = body
-
-    if (!email || !code || !deviceId) {
+    // Rate limiting: Prevent OTP verification spam
+    const rateLimitResult = checkRateLimit(request, loginRateLimit)
+    if (!rateLimitResult.success) {
       return NextResponse.json(
-        { success: false, message: 'Email, code, and deviceId are required' },
+        {
+          success: false,
+          message: loginRateLimit.message || 'Too many attempts',
+          resetAt: rateLimitResult.resetAt,
+        },
+        { status: 429 }
+      )
+    }
+
+    const body = await request.json()
+
+    // Validate required fields
+    const validation = validateRequiredFields(body, ['email', 'code', 'deviceId'])
+    if (!validation.valid) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
       )
     }
 
-    const normalizedEmail = email.toLowerCase()
+    const { email, code, deviceId } = body
+
+    // Sanitize email input
+    const normalizedEmail = sanitizeEmail(email)
+    if (!normalizedEmail) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid email format' },
+        { status: 400 }
+      )
+    }
 
     console.log(`🔐 Verifying OTP for ${normalizedEmail}...`)
 
@@ -28,12 +60,12 @@ export async function POST(request: NextRequest) {
     if (authError) {
       console.error('❌ Supabase Auth verification error:', authError)
       return NextResponse.json(
-        { success: false, message: authError.message || 'Invalid verification code' },
+        { success: false, message: 'Invalid or expired verification code' },
         { status: 400 }
       )
     }
 
-    if (!authData.user) {
+    if (!authData.user || !authData.session) {
       return NextResponse.json(
         { success: false, message: 'Verification failed' },
         { status: 400 }
@@ -42,6 +74,10 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ OTP verified successfully for ${normalizedEmail}`)
     console.log(`👤 Supabase User ID: ${authData.user.id}`)
+
+    // Extract session token for client to use in subsequent requests
+    const accessToken = authData.session.access_token
+    const refreshToken = authData.session.refresh_token
 
     // Check if user exists
     const { data: existingUser, error: fetchError } = await supabase
@@ -54,7 +90,7 @@ export async function POST(request: NextRequest) {
       // PGRST116 is "not found" error, which is ok
       console.error('Error fetching user:', fetchError)
       return NextResponse.json(
-        { success: false, message: 'Database error', error: fetchError.message },
+        { success: false, message: 'Failed to fetch user data' },
         { status: 500 }
       )
     }
@@ -91,6 +127,10 @@ export async function POST(request: NextRequest) {
         message: 'Login successful',
         user,
         isNewUser: false,
+        session: {
+          accessToken,
+          refreshToken,
+        },
       })
     } else {
       // New user - create account
@@ -112,7 +152,7 @@ export async function POST(request: NextRequest) {
       if (createError) {
         console.error('Error creating user:', createError)
         return NextResponse.json(
-          { success: false, message: 'Failed to create user', error: createError.message },
+          { success: false, message: 'Failed to create user account' },
           { status: 500 }
         )
       }
@@ -133,13 +173,14 @@ export async function POST(request: NextRequest) {
         message: 'Account created successfully',
         user,
         isNewUser: true,
+        session: {
+          accessToken,
+          refreshToken,
+        },
       })
     }
   } catch (error: any) {
     console.error('Verify code error:', error)
-    return NextResponse.json(
-      { success: false, message: 'Internal server error', error: error.message },
-      { status: 500 }
-    )
+    return createErrorResponse(error, 500, 'Verify Code API')
   }
 }

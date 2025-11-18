@@ -1,33 +1,29 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
+import { verifyAdmin, AuthError } from '@/lib/auth/serverAuth'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  validateRequiredFields,
+} from '@/lib/utils/errorHandler'
 
 export async function POST(request: NextRequest) {
   try {
-    const { dealId, moderatorUserId } = await request.json()
+    // CRITICAL SECURITY FIX: Verify admin from session, not request body
+    const admin = await verifyAdmin(request)
 
-    if (!dealId || !moderatorUserId) {
+    const { dealId } = await request.json()
+
+    // Validate required fields
+    const validation = validateRequiredFields({ dealId }, ['dealId'])
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: 'Deal ID and moderator user ID are required' },
+        {
+          success: false,
+          message: `Missing required fields: ${validation.missing?.join(', ')}`,
+        },
         { status: 400 }
-      )
-    }
-
-    // Verify moderator is admin
-    const { data: moderator, error: modError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', moderatorUserId)
-      .single<{ role: string }>()
-
-    if (modError || !moderator) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    if (moderator.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Only admins can delete deals' },
-        { status: 403 }
       )
     }
 
@@ -41,8 +37,8 @@ export async function POST(request: NextRequest) {
     if (getDealError) {
       console.error('Error fetching deal:', getDealError)
       return NextResponse.json(
-        { error: 'Failed to fetch deal' },
-        { status: 500 }
+        { success: false, message: 'Deal not found' },
+        { status: 404 }
       )
     }
 
@@ -55,7 +51,7 @@ export async function POST(request: NextRequest) {
     if (deleteError) {
       console.error('Error deleting deal:', deleteError)
       return NextResponse.json(
-        { error: 'Failed to delete deal' },
+        { success: false, message: 'Failed to delete deal' },
         { status: 500 }
       )
     }
@@ -63,12 +59,14 @@ export async function POST(request: NextRequest) {
     // Optionally delete the image from storage
     if (deal?.image_url) {
       try {
-        // Extract the file path from the URL
+        // SECURITY FIX: Safer path extraction to prevent path traversal
         const url = new URL(deal.image_url)
-        const pathMatch = url.pathname.match(/\/deals\/images\/(.+)$/)
+        const pathParts = url.pathname.split('/')
+        const filename = pathParts[pathParts.length - 1]
 
-        if (pathMatch && pathMatch[1]) {
-          const filePath = `images/${pathMatch[1]}`
+        // Validate filename (no path traversal characters)
+        if (filename && !filename.includes('..') && !filename.includes('/')) {
+          const filePath = `images/${filename}`
           await supabase.storage.from('deals').remove([filePath])
         }
       } catch (storageError) {
@@ -77,15 +75,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Deal permanently deleted',
-    })
+    return createSuccessResponse({}, 'Deal permanently deleted')
   } catch (error: any) {
-    console.error('Error in delete-deal API:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    // Handle authentication errors specifically
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: error.statusCode }
+      )
+    }
+
+    return createErrorResponse(error, 500, 'Delete Deal API')
   }
 }

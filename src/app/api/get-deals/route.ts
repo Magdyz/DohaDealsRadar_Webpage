@@ -1,9 +1,12 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sanitizeSearchQuery } from '@/lib/utils/sanitize'
+import { createErrorResponse } from '@/lib/utils/errorHandler'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// SECURITY FIX: Use anon key - let RLS policies enforce security
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +17,15 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || ''
     const isArchived = searchParams.get('isArchived') === 'true'
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    // SECURITY: Sanitize search query to prevent SQL injection
+    const sanitizedSearch = sanitizeSearchQuery(search)
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
 
     let query = supabase
       .from('deals')
@@ -23,9 +34,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .order('id', { ascending: false }) // Secondary sort for stable pagination
 
-    // Apply filters
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+    // Apply filters with SANITIZED search query
+    if (sanitizedSearch) {
+      query = query.or(
+        `title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`
+      )
     }
 
     if (category) {
@@ -91,10 +104,6 @@ export async function GET(request: NextRequest) {
       }
     )
   } catch (error: any) {
-    console.error('Get deals API error:', error)
-    return NextResponse.json(
-      { message: error.message || 'Failed to fetch deals' },
-      { status: 500 }
-    )
+    return createErrorResponse(error, 500, 'Get Deals API')
   }
 }
