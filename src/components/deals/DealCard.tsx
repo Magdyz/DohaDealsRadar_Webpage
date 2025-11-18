@@ -7,7 +7,10 @@ import Image from 'next/image'
 import { Eye } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
 import { getShimmerDataURL } from '@/lib/utils/imageUtils'
-import type { Deal } from '@/types'
+import { castVote } from '@/lib/api/deals'
+import { getDeviceId } from '@/lib/utils/deviceId'
+import { getVote, setVote, hasVoted } from '@/lib/utils/localStorage'
+import type { Deal, VoteType } from '@/types'
 import PriceDisplay from './PriceDisplay'
 
 interface DealCardProps {
@@ -18,6 +21,9 @@ interface DealCardProps {
 function DealCard({ deal, priority = false }: DealCardProps) {
   const router = useRouter()
   const [imageError, setImageError] = useState(false)
+  const [hotVotes, setHotVotes] = useState(deal.hotVotes)
+  const [coldVotes, setColdVotes] = useState(deal.coldVotes)
+  const [isVoting, setIsVoting] = useState(false)
   const prefetchedRef = useRef(false)
 
   // Check if deal is new (within 48 hours)
@@ -36,6 +42,46 @@ function DealCard({ deal, priority = false }: DealCardProps) {
     if (!prefetchedRef.current) {
       router.prefetch(`/deals/${deal.id}`)
       prefetchedRef.current = true
+    }
+  }
+
+  // Handle voting
+  const handleVote = async (e: React.MouseEvent, voteType: VoteType) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (hasVoted(deal.id) || isVoting) return
+
+    setIsVoting(true)
+
+    // Optimistic update
+    const prevHotVotes = hotVotes
+    const prevColdVotes = coldVotes
+    if (voteType === 'hot') {
+      setHotVotes(hotVotes + 1)
+    } else {
+      setColdVotes(coldVotes + 1)
+    }
+
+    try {
+      const deviceId = getDeviceId()
+      const response = await castVote(deal.id, deviceId, voteType)
+
+      if (response.success) {
+        // Update with actual counts from server
+        setHotVotes(response.hotVotes)
+        setColdVotes(response.coldVotes)
+
+        // Store vote in localStorage
+        setVote(deal.id, voteType)
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setHotVotes(prevHotVotes)
+      setColdVotes(prevColdVotes)
+      console.error('Vote failed:', error)
+    } finally {
+      setIsVoting(false)
     }
   }
 
@@ -77,14 +123,12 @@ function DealCard({ deal, priority = false }: DealCardProps) {
             <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-surface/90 backdrop-blur-md rounded-full px-1.5 py-1 shadow-md border border-border/20">
               {/* Hot Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-0.5 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-2 py-0.5 border border-hot-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm"
-                onClick={(e) => {
-                  e.preventDefault()
-                  // Vote handling would go here
-                }}
+                className="flex items-center gap-0.5 bg-gradient-to-br from-hot-bg to-hot-bg/80 rounded-full px-2 py-0.5 border border-hot-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-hot-content/50 transition-all active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={(e) => handleVote(e, 'hot')}
+                disabled={hasVoted(deal.id) || isVoting}
               >
                 <span className="text-xs">🔥</span>
-                <span className="text-hot-content text-xs font-semibold">{deal.hotVotes}</span>
+                <span className="text-hot-content text-xs font-semibold">{hotVotes}</span>
               </button>
 
               {/* Divider */}
@@ -92,14 +136,12 @@ function DealCard({ deal, priority = false }: DealCardProps) {
 
               {/* Cold Vote Button - Compact & Touch-Friendly */}
               <button
-                className="flex items-center gap-0.5 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-2 py-0.5 border border-cold-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm"
-                onClick={(e) => {
-                  e.preventDefault()
-                  // Vote handling would go here
-                }}
+                className="flex items-center gap-0.5 bg-gradient-to-br from-cold-bg to-cold-bg/80 rounded-full px-2 py-0.5 border border-cold-content/30 min-w-[36px] min-h-[28px] hover:scale-105 hover:border-cold-content/50 transition-all active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={(e) => handleVote(e, 'cold')}
+                disabled={hasVoted(deal.id) || isVoting}
               >
                 <span className="text-xs">❄️</span>
-                <span className="text-cold-content text-xs font-semibold">{deal.coldVotes}</span>
+                <span className="text-cold-content text-xs font-semibold">{coldVotes}</span>
               </button>
             </div>
           </div>
