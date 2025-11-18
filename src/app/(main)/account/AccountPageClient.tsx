@@ -24,7 +24,7 @@ export default function AccountPageClient() {
   useEffect(() => {
     // Redirect if not authenticated
     if (!isAuthenticated) {
-      router.push('/login?returnUrl=/account')
+      router.replace('/login?returnUrl=/account')
       return
     }
 

@@ -25,19 +25,19 @@ export default function ProtectedRoute({
   useEffect(() => {
     if (requireAuth && !isAuthenticated) {
       // Redirect to login with return URL
-      router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`)
+      router.replace(`/login?returnUrl=${encodeURIComponent(pathname)}`)
       return
     }
 
     if (requireModerator && user?.role !== 'moderator' && user?.role !== 'admin') {
       // Redirect to feed if not a moderator
-      router.push('/feed')
+      router.replace('/feed')
       return
     }
 
     if (requireAdmin && user?.role !== 'admin') {
       // Redirect to feed if not an admin
-      router.push('/feed')
+      router.replace('/feed')
       return
     }
   }, [isAuthenticated, user, requireAuth, requireModerator, requireAdmin, router, pathname])

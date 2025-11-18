@@ -18,7 +18,7 @@ function UsernameForm() {
   const [isLoading, setIsLoading] = useState(false)
 
   if (!user) {
-    router.push('/login')
+    router.replace('/login')
     return null
   }
 
