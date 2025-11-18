@@ -24,18 +24,19 @@ export async function GET(request: NextRequest) {
     let isAuthorized = false
 
     if (token) {
-      // Verify user from JWT token
+      // Verify user from JWT token (auth.users)
       const authSupabase = createClient(supabaseUrl, supabaseAnonKey)
-      const { data: { user }, error: authError } = await authSupabase.auth.getUser(token)
+      const { data: { user: authUser }, error: authError } = await authSupabase.auth.getUser(token)
 
-      if (!authError && user) {
-        // Use service role key to get user role
+      if (!authError && authUser && authUser.email) {
+        // EMAIL-BASED LOOKUP: Map auth user email → database user
+        // This allows web app (JWT) and Android app (database ID) to coexist
         const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey)
         const { data: userData, error: userLookupError } = await serviceSupabase
           .from('users')
           .select('role, id')
-          .eq('id', user.id)
-          .maybeSingle() // Use maybeSingle() instead of single() to handle missing users gracefully
+          .eq('email', authUser.email) // Look up by EMAIL not ID
+          .maybeSingle()
 
         if (userData) {
           // Allow if user is viewing their own deals or is moderator/admin
@@ -43,9 +44,6 @@ export async function GET(request: NextRequest) {
             userData.id === userId ||
             userData.role === 'moderator' ||
             userData.role === 'admin'
-        } else if (user.id === userId) {
-          // Allow users to view their own deals even if not in users table yet
-          isAuthorized = true
         }
       }
     }
