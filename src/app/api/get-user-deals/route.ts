@@ -31,11 +31,11 @@ export async function GET(request: NextRequest) {
       if (!authError && user) {
         // Use service role key to get user role
         const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: userData } = await serviceSupabase
+        const { data: userData, error: userLookupError } = await serviceSupabase
           .from('users')
           .select('role, id')
           .eq('id', user.id)
-          .single()
+          .maybeSingle() // Use maybeSingle() instead of single() to handle missing users gracefully
 
         if (userData) {
           // Allow if user is viewing their own deals or is moderator/admin
@@ -43,6 +43,9 @@ export async function GET(request: NextRequest) {
             userData.id === userId ||
             userData.role === 'moderator' ||
             userData.role === 'admin'
+        } else if (user.id === userId) {
+          // Allow users to view their own deals even if not in users table yet
+          isAuthorized = true
         }
       }
     }
