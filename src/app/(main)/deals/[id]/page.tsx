@@ -290,6 +290,9 @@ export default function DealDetailsPage() {
                   dealId={deal.id}
                   initialHotVotes={deal.hotVotes}
                   initialColdVotes={deal.coldVotes}
+                  onVoteSuccess={(hotVotes, coldVotes) => {
+                    setDeal({ ...deal, hotVotes, coldVotes })
+                  }}
                 />
               </div>
             )}
