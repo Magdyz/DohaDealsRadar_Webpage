@@ -28,10 +28,23 @@ export default function AccountPageClient() {
       return
     }
 
+    // SECURITY FIX: Check if user has JWT token stored
+    // Users who logged in before JWT token storage was implemented won't have tokens
+    // Force them to re-login to get new tokens
+    const { getAccessToken } = useAuthStore.getState()
+    const token = getAccessToken()
+
+    if (!token) {
+      console.warn('No JWT token found - user needs to re-login')
+      logout()
+      router.replace('/login?returnUrl=/account&message=session-expired')
+      return
+    }
+
     if (user) {
       loadStats()
     }
-  }, [user, isAuthenticated, router])
+  }, [user, isAuthenticated, router, logout])
 
   const loadStats = async () => {
     if (!user) return
