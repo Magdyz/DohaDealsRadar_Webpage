@@ -1,16 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowLeft, ExternalLink, MapPin, Tag, Calendar, Clock, Share2, Copy, Flag, User } from 'lucide-react'
 import { Button, Badge, Card, CardBody, Spinner } from '@/components/ui'
 import VoteButtons from '@/components/deals/VoteButtons'
-import { ReportModal } from '@/components/modals'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { getDealById } from '@/lib/api/deals'
 import { formatDate, formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
+import { getShimmerDataURL } from '@/lib/utils/imageUtils'
 import { CATEGORIES } from '@/types'
 import type { Deal } from '@/types'
+
+// Code-split the ReportModal - only loads when user opens it
+const ReportModal = dynamic(() => import('@/components/modals').then(mod => ({ default: mod.ReportModal })), {
+  ssr: false,
+})
 
 export default function DealDetailsPage() {
   const router = useRouter()
@@ -158,6 +165,8 @@ export default function DealDetailsPage() {
                 src={deal.imageUrl}
                 alt={deal.title}
                 fill
+                placeholder="blur"
+                blurDataURL={getShimmerDataURL(800, 600)}
                 className="object-contain"
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
@@ -200,6 +209,15 @@ export default function DealDetailsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
               {deal.title}
             </h1>
+
+            {/* Price Display */}
+            <div className="mb-6">
+              <PriceDisplay
+                originalPrice={deal.originalPrice}
+                discountedPrice={deal.discountedPrice}
+                variant="details"
+              />
+            </div>
 
             {/* Description */}
             {deal.description && (

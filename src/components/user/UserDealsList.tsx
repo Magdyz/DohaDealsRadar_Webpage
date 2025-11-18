@@ -5,6 +5,7 @@ import { ExternalLink, MapPin, Tag, Calendar, Clock, Package } from 'lucide-reac
 import { Card, CardBody, Badge, Button, Spinner } from '@/components/ui'
 import { getUserDeals } from '@/lib/api/deals'
 import { formatRelativeTime, getDaysUntilExpiry } from '@/lib/utils'
+import { getShimmerDataURL } from '@/lib/utils/imageUtils'
 import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
 import { CATEGORIES } from '@/types'
 import type { Deal } from '@/types'
@@ -142,6 +143,8 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                     width={96}
                     height={96}
                     unoptimized
+                    placeholder="blur"
+                    blurDataURL={getShimmerDataURL(96, 96)}
                     className="w-full h-full object-cover"
                   />
                 </div>

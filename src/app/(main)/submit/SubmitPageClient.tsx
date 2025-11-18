@@ -4,6 +4,8 @@ import { Suspense, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, X, Eye } from 'lucide-react'
 import { Button, Card, CardBody, Input, Badge, Spinner } from '@/components/ui'
+import { PriceInput } from '@/components/post'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { submitDeal, uploadImage } from '@/lib/api/deals'
 import { useAuthStore } from '@/lib/store/authStore'
 import { useDeviceId } from '@/lib/hooks/useDeviceId'
@@ -28,6 +30,8 @@ function SubmitDealContent() {
   const [location, setLocation] = useState('')
   const [category, setCategory] = useState<DealCategory>('food_dining')
   const [promoCode, setPromoCode] = useState('')
+  const [originalPrice, setOriginalPrice] = useState('')
+  const [discountedPrice, setDiscountedPrice] = useState('')
   const [expiryDays, setExpiryDays] = useState('7')
 
   // UI state
@@ -86,6 +90,8 @@ function SubmitDealContent() {
       location,
       category,
       promoCode,
+      originalPrice,
+      discountedPrice,
       expiryDays: days,
     })
 
@@ -129,6 +135,8 @@ function SubmitDealContent() {
         location: location.trim() || undefined,
         category,
         promoCode: promoCode.trim() || undefined,
+        originalPrice: originalPrice.trim() || undefined,
+        discountedPrice: discountedPrice.trim() || undefined,
         expiryDays: parseInt(expiryDays),
         userId: user?.id || deviceId,
       }
@@ -211,6 +219,41 @@ function SubmitDealContent() {
                 </p>
               </div>
 
+              {/* Price Fields - Matches Android app positioning */}
+              <div>
+                <label className="block text-sm md:text-base font-semibold text-text-primary mb-3">
+                  Price (Optional)
+                </label>
+                <div className="flex gap-4">
+                  <PriceInput
+                    label="Original"
+                    value={originalPrice}
+                    onChange={setOriginalPrice}
+                    placeholder="100"
+                  />
+                  <PriceInput
+                    label="Discounted"
+                    value={discountedPrice}
+                    onChange={setDiscountedPrice}
+                    placeholder="80"
+                  />
+                </div>
+
+                {/* Price Preview */}
+                {(originalPrice || discountedPrice) && (
+                  <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
+                    <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
+                      Price Preview:
+                    </div>
+                    <PriceDisplay
+                      originalPrice={originalPrice || null}
+                      discountedPrice={discountedPrice || null}
+                      variant="details"
+                    />
+                  </div>
+                )}
+              </div>
+
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
@@ -275,27 +318,45 @@ function SubmitDealContent() {
                 )}
               </div>
 
-              {/* Category - 2025 Modern Selection */}
+              {/* Category - 2025 Mobile-First Modern Selection */}
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-3">
+                <label className="block text-sm font-semibold text-text-primary mb-2.5">
                   Category *
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}
                       type="button"
                       onClick={() => setCategory(cat.id)}
                       disabled={isSubmitting}
-                      className={`p-4 rounded-xl border-2 transition-all duration-300 min-h-[56px] ${
-                        category === cat.id
-                          ? 'border-primary bg-primary-light shadow-purple scale-105'
-                          : 'border-border hover:border-primary/50 hover:bg-surface-variant hover:scale-102'
-                      }`}
+                      className={`
+                        relative overflow-hidden
+                        px-3 py-3 md:px-4 md:py-4
+                        rounded-xl border-2
+                        transition-all duration-300
+                        min-h-[48px] md:min-h-[56px]
+                        ${
+                          category === cat.id
+                            ? 'border-primary bg-gradient-to-br from-primary-light to-primary-light/70 shadow-md scale-[1.02] md:scale-105'
+                            : 'border-border/60 bg-surface hover:border-primary/40 hover:bg-surface-variant active:scale-[0.98] md:hover:scale-[1.02]'
+                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                      `}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-2xl">{cat.emoji}</span>
-                        <span className="text-sm font-semibold">{cat.label}</span>
+                      {/* Selected indicator - modern subtle glow */}
+                      {category === cat.id && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-action-primary/5 to-primary-dark/5 animate-pulse-slow" />
+                      )}
+
+                      <div className="relative flex items-center justify-start md:justify-center gap-2 md:gap-2.5">
+                        <span className="text-xl md:text-2xl flex-shrink-0">{cat.emoji}</span>
+                        <span className={`
+                          text-xs md:text-sm font-semibold text-left md:text-center
+                          ${category === cat.id ? 'text-primary-dark' : 'text-text-primary'}
+                        `}>
+                          {cat.label}
+                        </span>
                       </div>
                     </button>
                   ))}

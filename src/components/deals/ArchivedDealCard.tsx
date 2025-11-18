@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Eye, RotateCcw, Trash2 } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
+import { getShimmerDataURL } from '@/lib/utils/imageUtils'
 import type { Deal } from '@/types'
+import PriceDisplay from './PriceDisplay'
 
 interface ArchivedDealCardProps {
   deal: Deal
@@ -14,11 +17,21 @@ interface ArchivedDealCardProps {
 }
 
 export default function ArchivedDealCard({ deal, onRestore, onDelete }: ArchivedDealCardProps) {
+  const router = useRouter()
   const [imageError, setImageError] = useState(false)
   const [isRestoring, setIsRestoring] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const prefetchedRef = useRef(false)
 
   const hasValidImage = deal.imageUrl && deal.imageUrl.trim() !== '' && !imageError
+
+  // Prefetch deal details on hover for instant navigation
+  const handleMouseEnter = () => {
+    if (!prefetchedRef.current) {
+      router.prefetch(`/deals/${deal.id}`)
+      prefetchedRef.current = true
+    }
+  }
 
   const handleRestore = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -57,7 +70,10 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
   }
 
   return (
-    <div className="bg-surface rounded-2xl overflow-hidden border border-border/20 opacity-75 hover:opacity-100 transition-opacity">
+    <div
+      className="bg-surface rounded-2xl overflow-hidden border border-border/20 opacity-75 hover:opacity-100 transition-opacity"
+      onMouseEnter={handleMouseEnter}
+    >
       <Link href={`/deals/${deal.id}`} className="block">
         <div className="relative w-full aspect-square p-2">
           <div className="relative w-full h-full rounded-xl overflow-hidden bg-white">
@@ -67,6 +83,8 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
                 alt={deal.title}
                 fill
                 unoptimized
+                placeholder="blur"
+                blurDataURL={getShimmerDataURL(400, 400)}
                 className="object-contain"
                 sizes="(max-width: 768px) 50vw, 33vw"
                 onError={() => setImageError(true)}
@@ -103,6 +121,9 @@ export default function ArchivedDealCard({ deal, onRestore, onDelete }: Archived
             {deal.title}
           </h3>
         </Link>
+
+        {/* Price Display */}
+        <PriceDisplay originalPrice={deal.originalPrice} discountedPrice={deal.discountedPrice} />
 
         {/* Admin Action Buttons - 2025 Touch-Friendly */}
         <div className="grid grid-cols-2 gap-2">

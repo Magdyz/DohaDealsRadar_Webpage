@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check } from 'lucide-react'
 import { Button, Input, Textarea, Badge } from '@/components/ui'
-import { DealTypeSelector, ImageUpload } from '@/components/post'
+import { DealTypeSelector, ImageUpload, PriceInput } from '@/components/post'
 import { ProtectedRoute } from '@/components/auth'
+import PriceDisplay from '@/components/deals/PriceDisplay'
 import { useAuthStore } from '@/lib/store/authStore'
 import { submitDeal } from '@/lib/api/deals'
 import { dealSubmissionSchema, formatZodError, type DealSubmissionData } from '@/lib/validation/dealSchema'
@@ -21,6 +22,10 @@ function PostDealContent() {
     expiryDays: 10,
   })
 
+  // Price fields are managed as strings for input, converted to numbers for validation
+  const [originalPriceStr, setOriginalPriceStr] = useState('')
+  const [discountedPriceStr, setDiscountedPriceStr] = useState('')
+
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -35,7 +40,14 @@ function PostDealContent() {
   }
 
   const validateForm = (): boolean => {
-    const result = dealSubmissionSchema.safeParse(formData)
+    // Pass price strings directly for validation
+    const dataToValidate = {
+      ...formData,
+      originalPrice: originalPriceStr,
+      discountedPrice: discountedPriceStr,
+    }
+
+    const result = dealSubmissionSchema.safeParse(dataToValidate)
 
     if (!result.success) {
       const validationErrors: Record<string, string> = {}
@@ -71,6 +83,8 @@ function PostDealContent() {
         location: formData.location,
         category: formData.category!,
         promoCode: formData.promoCode,
+        originalPrice: originalPriceStr || undefined,
+        discountedPrice: discountedPriceStr || undefined,
         expiryDays: formData.expiryDays!,
         userId: user.id,
       })
@@ -147,6 +161,53 @@ function PostDealContent() {
             error={errors.title}
             helperText="3-200 characters"
           />
+
+          {/* Price Fields - Matches Android app positioning */}
+          <div>
+            <label className="block text-sm md:text-base font-semibold text-text-primary mb-3">
+              Price (Optional)
+            </label>
+            <div className="flex gap-4">
+              <PriceInput
+                label="Original"
+                value={originalPriceStr}
+                onChange={(value) => {
+                  setOriginalPriceStr(value)
+                  if (errors.originalPrice) {
+                    setErrors({ ...errors, originalPrice: '' })
+                  }
+                }}
+                placeholder="100"
+                error={errors.originalPrice}
+              />
+              <PriceInput
+                label="Discounted"
+                value={discountedPriceStr}
+                onChange={(value) => {
+                  setDiscountedPriceStr(value)
+                  if (errors.discountedPrice) {
+                    setErrors({ ...errors, discountedPrice: '' })
+                  }
+                }}
+                placeholder="80"
+                error={errors.discountedPrice}
+              />
+            </div>
+
+            {/* Price Preview */}
+            {(originalPriceStr || discountedPriceStr) && (
+              <div className="mt-4 p-4 bg-background-secondary rounded-xl border-2 border-border/30">
+                <div className="text-xs md:text-sm font-semibold text-text-secondary mb-2">
+                  Price Preview:
+                </div>
+                <PriceDisplay
+                  originalPrice={originalPriceStr || null}
+                  discountedPrice={discountedPriceStr || null}
+                  variant="details"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Description */}
           <Textarea
