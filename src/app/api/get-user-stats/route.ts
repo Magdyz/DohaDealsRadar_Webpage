@@ -19,34 +19,70 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     const token = authHeader?.replace('Bearer ', '')
 
-    let isAuthorized = false
+    console.log(`📊 [get-user-stats] Request for userId: ${userId}`)
 
-    if (token) {
-      // Verify user from JWT token (auth.users)
-      const authSupabase = createClient(supabaseUrl, supabaseAnonKey)
-      const { data: { user: authUser }, error: authError } = await authSupabase.auth.getUser(token)
-
-      if (!authError && authUser && authUser.email) {
-        // EMAIL-BASED LOOKUP: Map auth user email → database user
-        // This allows web app (JWT) and Android app (database ID) to coexist
-        const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: userData, error: userLookupError } = await serviceSupabase
-          .from('users')
-          .select('role, id')
-          .eq('email', authUser.email) // Look up by EMAIL not ID
-          .maybeSingle()
-
-        if (userData) {
-          // Allow if user is viewing their own stats or is moderator/admin
-          isAuthorized =
-            userData.id === userId ||
-            userData.role === 'moderator' ||
-            userData.role === 'admin'
-        }
-      }
+    if (!token) {
+      console.warn('❌ [get-user-stats] No authorization token provided')
+      return NextResponse.json(
+        { message: 'Authentication required' },
+        { status: 401 }
+      )
     }
 
+    // Verify user from JWT token (auth.users)
+    const authSupabase = createClient(supabaseUrl, supabaseAnonKey)
+    const { data: { user: authUser }, error: authError } = await authSupabase.auth.getUser(token)
+
+    if (authError || !authUser) {
+      console.error('❌ [get-user-stats] JWT verification failed:', authError?.message)
+      return NextResponse.json(
+        { message: 'Invalid or expired session. Please log in again.' },
+        { status: 401 }
+      )
+    }
+
+    console.log(`✅ [get-user-stats] JWT verified for email: ${authUser.email}`)
+
+    // EMAIL-BASED LOOKUP: Map auth user email → database user
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Normalize email for lookup (lowercase, trim whitespace)
+    const normalizedEmail = authUser.email?.toLowerCase().trim()
+
+    const { data: userData, error: userLookupError } = await serviceSupabase
+      .from('users')
+      .select('role, id, email')
+      .eq('email', normalizedEmail) // Look up by normalized EMAIL
+      .maybeSingle()
+
+    if (userLookupError) {
+      console.error('❌ [get-user-stats] Database user lookup error:', userLookupError)
+      return NextResponse.json(
+        { message: 'Failed to verify user identity' },
+        { status: 500 }
+      )
+    }
+
+    if (!userData) {
+      console.error(`❌ [get-user-stats] No database user found for email: ${normalizedEmail}`)
+      return NextResponse.json(
+        { message: 'User account not found. Please contact support.' },
+        { status: 404 }
+      )
+    }
+
+    console.log(`✅ [get-user-stats] Database user found: ${userData.id}`)
+
+    // Authorization check: Allow if viewing own stats OR moderator/admin
+    const isViewingOwnStats = userData.id === userId
+    const isModerator = userData.role === 'moderator'
+    const isAdmin = userData.role === 'admin'
+    const isAuthorized = isViewingOwnStats || isModerator || isAdmin
+
+    console.log(`🔐 [get-user-stats] Authorization: ${isAuthorized} (own: ${isViewingOwnStats}, mod: ${isModerator}, admin: ${isAdmin})`)
+
     if (!isAuthorized) {
+      console.warn(`❌ [get-user-stats] Authorization denied for user ${userData.id} trying to access stats of user ${userId}`)
       return NextResponse.json(
         { message: 'You do not have permission to view these stats' },
         { status: 403 }
