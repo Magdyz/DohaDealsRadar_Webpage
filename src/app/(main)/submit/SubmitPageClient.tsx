@@ -179,7 +179,7 @@ function SubmitDealContent() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.back()}
+              onClick={() => router.push('/feed')}
               disabled={isSubmitting}
             >
               Cancel
