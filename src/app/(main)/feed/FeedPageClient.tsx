@@ -179,7 +179,7 @@ export default function FeedPage() {
                 <DealCard
                   key={deal.id}
                   deal={deal}
-                  priority={index < 8} // Prioritize first 8 images (above the fold)
+                  priority={index < 2} // Only prioritize first 2 images (truly above-the-fold on mobile)
                 />
               ))}
             </div>

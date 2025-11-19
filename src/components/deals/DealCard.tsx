@@ -100,6 +100,7 @@ function DealCard({ deal, priority = false }: DealCardProps) {
                 alt={deal.title}
                 fill
                 priority={priority}
+                loading={priority ? 'eager' : 'lazy'} // Lazy load non-priority images for better performance
                 placeholder="blur"
                 blurDataURL={getShimmerDataURL(400, 400)}
                 className="object-cover transition-transform duration-300 hover:scale-105"

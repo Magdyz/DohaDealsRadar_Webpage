@@ -44,7 +44,7 @@ const withPWA = require('next-pwa')({
 // ========================================
 // IMPORTANT: All existing configurations are preserved below
 const nextConfig = {
-  // Image optimization enabled for better performance
+  // Image optimization enabled for better performance (2025 best practices)
   images: {
     remotePatterns: [
       {
@@ -53,9 +53,13 @@ const nextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
-    formats: ['image/avif', 'image/webp'], // Modern formats for smaller file sizes
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Optimized for mobile & desktop
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // For smaller images
+    formats: ['image/avif', 'image/webp'], // Modern formats: AVIF (60-80% smaller), WebP (30-50% smaller)
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840], // Added 4K & 8K for 2025 devices
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // For smaller images like thumbnails
+    minimumCacheTTL: 60 * 60 * 24 * 30, // Cache optimized images for 30 days (2025 best practice)
+    dangerouslyAllowSVG: false, // Security: Prevent SVG injection attacks
+    contentDispositionType: 'attachment', // Security: Force download for unknown types
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;", // Security: CSP for images
   },
 
   // Performance optimizations
