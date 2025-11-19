@@ -142,7 +142,7 @@ export default function UserDealsList({ userId }: UserDealsListProps) {
                     alt={deal.title}
                     width={96}
                     height={96}
-                    unoptimized
+                    loading="lazy" // Lazy load all user deal images for better performance
                     placeholder="blur"
                     blurDataURL={getShimmerDataURL(96, 96)}
                     className="w-full h-full object-cover"
