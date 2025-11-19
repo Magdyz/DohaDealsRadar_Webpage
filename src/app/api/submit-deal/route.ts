@@ -116,11 +116,27 @@ export async function POST(request: NextRequest) {
 
     console.log(`Category validation: received='${category}', using='${finalCategory}'`)
 
-    // Create Supabase client with anon key (RLS policies will be enforced)
+    // CRITICAL FIX: Extract user's JWT token from Authorization header
+    const authHeader = request.headers.get('authorization')
+    const userToken = authHeader?.replace('Bearer ', '')
+
+    if (!userToken) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication token missing' },
+        { status: 401 }
+      )
+    }
+
+    // Create Supabase client with user's JWT token (RLS policies will be enforced with auth context)
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       },
     })
 
