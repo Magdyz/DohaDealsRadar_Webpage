@@ -129,7 +129,14 @@ export default function DealDetailsPage() {
         <div className="max-w-4xl mx-auto px-3 py-3 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => router.back()}
+              onClick={() => {
+                // Smart navigation: try to go back, fallback to feed
+                if (typeof window !== 'undefined' && window.history.length > 1) {
+                  router.back()
+                } else {
+                  router.push('/feed')
+                }
+              }}
               className="flex items-center gap-2 px-4 py-2.5 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all"
             >
               <ArrowLeft className="w-5 h-5" />

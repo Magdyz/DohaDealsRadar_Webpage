@@ -54,11 +54,11 @@ function LoginForm() {
       {/* Back Button */}
       <div className="max-w-md mx-auto mb-4">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push('/feed')}
           className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-text-primary hover:bg-surface-variant rounded-xl transition-all hover:scale-105"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-medium">Back</span>
+          <span className="font-medium">Back to Feed</span>
         </button>
       </div>
 

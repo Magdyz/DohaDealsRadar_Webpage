@@ -145,7 +145,7 @@ function PostDealContent() {
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="md" onClick={() => router.back()}>
+            <Button variant="ghost" size="md" onClick={() => router.push('/feed')}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-xl md:text-2xl font-bold text-text-primary">Post a Deal</h1>
